@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+
+/* @config "../tailwind.config.js"; */
+
+@theme {
+  --color-primaryBlue: #4f46e5;
+  --color-primary-light: #4f46e550;
+}
