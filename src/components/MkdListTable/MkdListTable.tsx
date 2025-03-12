@@ -379,7 +379,7 @@ const MkdListTable = ({
                           [actions?.select?.show].includes(true)
                             ? "left-10"
                             : "left-0"
-                        } bg-white z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider text-black`}
+                        } bg-white z-10 border-b !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider text-black`}
                       >
                         Row
                       </th>
@@ -459,7 +459,7 @@ const MkdListTable = ({
                   }
                 )}
                 {actionColumn ? (
-                  <th className="$ bg-white sticky -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider text-black">
+                  <th className="$ bg-white sticky border-b -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider text-black">
                     Action
                   </th>
                 ) : null}
@@ -499,7 +499,7 @@ const MkdListTable = ({
                               [actions?.select?.show].includes(true)
                                 ? "left-10"
                                 : "left-0"
-                            } bg-white z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm`}
+                            } bg-white border-b z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm`}
                           >
                             {rowIndex + 1}
                           </td>
@@ -535,25 +535,25 @@ const MkdListTable = ({
                       }
                     )}
                     {actionColumn ? (
-                      <td className="bg-white sticky -right-[0.05rem] z-[5] !w-fit !min-w-fit !max-w-fit whitespace-nowrap px-[.75rem] py-[.5rem]">
-                        <div className="flex !w-fit !min-w-fit !max-w-fit items-center justify-end">
-                          {actionPostion?.includes(ActionLocations.DROPDOWN) ? (
-                            <MkdListTableRowDropdown
-                              row={row}
-                              actions={actions}
-                              actionId={actionId}
-                              setDeleteId={setDeleteId}
-                            />
-                          ) : null}
-                          {actionPostion?.includes(ActionLocations.BUTTONS) ? (
-                            <MkdListTableRowButtons
-                              row={row}
-                              actions={actions}
-                              actionId={actionId}
-                              setDeleteId={setDeleteId}
-                            />
-                          ) : null}
-                        </div>
+                      <td className="bg-white sticky border-b -right-[0.05rem] z-[5] !w-fit !min-w-fit !max-w-fit whitespace-nowrap px-[.75rem] py-[.5rem]">
+                        {/* <div className="flex !w-fit !min-w-fit !max-w-fit items-center justify-end"> */}
+                        {actionPostion?.includes(ActionLocations.DROPDOWN) ? (
+                          <MkdListTableRowDropdown
+                            row={row}
+                            actions={actions}
+                            actionId={actionId}
+                            setDeleteId={setDeleteId}
+                          />
+                        ) : null}
+                        {actionPostion?.includes(ActionLocations.BUTTONS) ? (
+                          <MkdListTableRowButtons
+                            row={row}
+                            actions={actions}
+                            actionId={actionId}
+                            setDeleteId={setDeleteId}
+                          />
+                        ) : null}
+                        {/* </div> */}
                       </td>
                     ) : null}
                   </tr>

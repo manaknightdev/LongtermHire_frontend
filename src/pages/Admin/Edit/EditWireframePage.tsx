@@ -9,6 +9,7 @@ import { ModalPrompt } from "@/components/Modal";
 import { useContexts } from "@/hooks/useContexts";
 import { ProjectDeployment } from "@/components/Deployment";
 import { ViewMapType, ViewWrapper } from "@/components/ViewWrapper";
+import { UploadConfig } from "@/components/UploadConfig";
 
 const EditWireframePage = () => {
   const { globalDispatch, setGlobalState } = useContexts();
@@ -89,15 +90,17 @@ const EditWireframePage = () => {
 
   return (
     <div className="mx-auto grid h-full max-h-full min-h-full grid-rows-[auto_1fr]">
-      <LazyLoad>
-        <EditWireframeTabs
-          activeTab={activeTab}
-          handleClick={handleClick}
-          filterArr={[EditWireframeTabTypes?.Requirements]}
-        />
-      </LazyLoad>
+      <div className="w-full h-fit m-auto sticky top-0 z-10 inset-x-0">
+        <LazyLoad>
+          <EditWireframeTabs
+            activeTab={activeTab}
+            handleClick={handleClick}
+            filterArr={[EditWireframeTabTypes?.Requirements]}
+          />
+        </LazyLoad>
+      </div>
 
-      <div className="">
+      <div className="h-full min-h-full max-h-full">
         {activeTab === EditWireframeTabTypes.Requirements && (
           <LazyLoad counts={[1, 3, 2, 1, 2]} count={5}>
             <></>
@@ -126,7 +129,7 @@ const EditWireframePage = () => {
                 </>
               </LazyLoad>
               <LazyLoad view={views.UPLOAD_CONFIGURATION.value}>
-                <></>
+                <UploadConfig />
               </LazyLoad>
             </ViewWrapper>
           </LazyLoad>

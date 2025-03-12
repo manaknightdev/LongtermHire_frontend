@@ -47,7 +47,7 @@ const CustomSelect = ({
               </label>
             )}
             <Listbox.Button
-              style={{ borderColor: "#aaa", zIndex: "10" }}
+              style={{ borderColor: "#aaa", zIndex: 10 }}
               className={`h-full max-h-full min-h-full w-full text-[.875rem] ${
                 showBorder ? "border-b border-l-0 border-r-0 border-t-0 " : ""
               } cursor-pointer rounded !border-primaryBlue pl-2 font-normal leading-[1.5rem] tracking-[.0313rem] text-[#636363]`}

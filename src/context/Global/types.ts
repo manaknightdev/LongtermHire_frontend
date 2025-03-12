@@ -1,3 +1,5 @@
+import { Edge, Node } from "reactflow";
+
 export type ToastStatus = "success" | "error" | "warning" | "info";
 
 export interface Room extends Record<string, any> {
@@ -15,7 +17,73 @@ export interface PanelItem {
   properties: Record<string, unknown>;
 }
 
-export interface GlobalState extends Record<string, any> {
+export interface Model {
+  id: string;
+  name: string;
+  fields: {
+    name: string;
+    type: string;
+    defaultValue: string;
+    validation: string;
+    mapping?: string;
+  }[];
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  slug: string;
+  permissions: {
+    routes: string[];
+    canCreateUsers?: boolean;
+    canEditUsers?: boolean;
+    canDeleteUsers?: boolean;
+    canManageRoles?: boolean;
+    canUpdateOtherUsers: boolean;
+  };
+}
+
+export interface Route {
+  id: string;
+  name: string;
+  method: string;
+  url: string;
+  flowData?: {
+    nodes: any[];
+    edges: any[];
+  };
+}
+
+export interface Settings {
+  id: string;
+  globalKey: string;
+  databaseType: string;
+  authType: string;
+  timezone: string;
+  dbHost: string;
+  dbPort: string;
+  dbUser: string;
+  dbPassword: string;
+  dbName: string;
+  isPWA: boolean;
+  isMultiTenant: boolean;
+  model_namespace: string;
+  payment_option: string;
+}
+
+export interface FlowState {
+  nodes?: Node[];
+  edges?: Edge[];
+  selectedNode?: Node | null;
+  models?: Model[];
+  roles?: Role[];
+  routes?: Route[];
+  activeRoute?: Route | null;
+  settings?: Settings;
+  defaultTablesShown?: boolean;
+}
+
+export interface GlobalState extends FlowState, Record<string, any> {
   globalMessage: string;
   toastStatus: ToastStatus;
   isOpen: boolean;
@@ -64,12 +132,24 @@ export type GlobalAction =
   | { type: "UPDATEROOM"; payload: Room }
   | { type: "DELETEROOM"; payload: { position: number } }
   | { type: "SETROOM"; payload: any }
+  | { type: "UPDATE_SETTINGS"; payload: Settings }
+  | { type: "SET_DEFAULT_TABLES_SHOWN"; payload: boolean }
+  | { type: "UPDATE_NODE"; payload: { id: string; data: any } }
+  | { type: "UPDATE_MODELS"; payload: Model[] }
+  | { type: "UPDATE_ROLES"; payload: Role[] }
+  | { type: "UPDATE_ROUTES"; payload: Route[] }
   | RequestAction
   | GlobalPropertyAction;
 
 export interface GlobalContextType {
   state: GlobalState;
   dispatch: React.Dispatch<GlobalAction>;
+  updateSettings?: (settings: Settings) => void;
+  setDefaultTablesShown?: (shown: boolean) => void;
+  updateNode?: (nodeId: string, newData: any) => void;
+  updateModels?: (models: Model[]) => void;
+  updateRoles?: (roles: Role[]) => void;
+  updateRoutes?: (routes: Route[]) => void;
 }
 
 export interface ApiErrorResponse {

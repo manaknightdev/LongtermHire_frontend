@@ -52,4 +52,10 @@ declare module "papaparse" {
   export default content;
 }
 
+// Fallback type for reactflow
+declare module "reactflow" {
+  export type Edge = any
+  export type Node = any
+}
+
 // recovery

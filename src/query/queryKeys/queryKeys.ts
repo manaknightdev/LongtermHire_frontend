@@ -7,6 +7,9 @@ const queryKeys: Record<string, any> = {
     create: "project:create",
     update: "project:update",
     delete: "project:delete",
+    list: "project:list",
+    many: "project:many",
+    paginate: "project:paginate"
   },
   user: {
     all: "user:all",
@@ -16,25 +19,10 @@ const queryKeys: Record<string, any> = {
     create: "user:create",
     update: "user:update",
     delete: "user:delete",
-  },
-  role: {
-    all: "role:all",
-    byId: "role:byId",
-    byName: "role:byName",
-    bySlug: "role:bySlug",
-    create: "role:create",
-    update: "role:update",
-    delete: "role:delete",
-  },
-  permission: {
-    all: "permission:all",
-    byId: "permission:byId",
-    byName: "permission:byName",
-    bySlug: "permission:bySlug",
-    create: "permission:create",
-    update: "permission:update",
-    delete: "permission:delete",
-  },
+    list: "user:list",
+    many: "user:many",
+    paginate: "user:paginate"
+  }
 };
 
 export default queryKeys;

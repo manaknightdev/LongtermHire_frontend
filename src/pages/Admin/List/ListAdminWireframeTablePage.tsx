@@ -4,14 +4,14 @@ import { MkdListTableV2 } from "@/components/MkdListTable";
 import { LazyLoad } from "@/components/LazyLoad";
 import {
   Action,
-  ActionLocations,
+  ActionLocations
 } from "@/components/MkdListTable/MkdListTableV2";
 import { EditIcon, EyeIcon, PlusIcon } from "lucide-react";
 import { useContexts } from "@/hooks/useContexts";
 import { ModalSidebar } from "@/components/ModalSidebar";
 import {
   AddAdminWireframeTablePage,
-  ViewAdminWireframeTablePage,
+  ViewAdminWireframeTablePage
 } from "@/routes/LazyLoad";
 import { TableActionEnum } from "@/utils/Enums";
 
@@ -34,7 +34,7 @@ interface LocalData {
 const columns = [
   {
     header: "Row",
-    accessor: "row",
+    accessor: "row"
   },
   {
     header: "Name",
@@ -43,7 +43,7 @@ const columns = [
     selected_column: true,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Created Date",
@@ -52,7 +52,7 @@ const columns = [
     selected_column: true,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Updated Date",
@@ -61,12 +61,12 @@ const columns = [
     selected_column: true,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Action",
-    accessor: "",
-  },
+    accessor: ""
+  }
 ];
 
 const ActionProperties: {
@@ -80,13 +80,13 @@ const ActionProperties: {
     title: "Add Project",
     icon: <PlusIcon />,
     customMinWidthInTw:
-      "md:min-w-[18.75rem] md:w-[18.775rem] md:max-w-[18.75rem] w-full",
+      "md:min-w-[18.75rem] md:w-[18.775rem] md:max-w-[18.75rem] w-full"
   },
   view: {
     title: "View Project",
     icon: <EyeIcon />,
-    customMinWidthInTw: "md:min-w-[30rem] md:w-[30rem] md:max-w-[30rem] w-full",
-  },
+    customMinWidthInTw: "md:min-w-[30rem] md:w-[30rem] md:max-w-[30rem] w-full"
+  }
 };
 const ListAdminWireframeTablePage: React.FC = () => {
   // refresh ref
@@ -99,7 +99,7 @@ const ListAdminWireframeTablePage: React.FC = () => {
   const [localData, setLocalData] = useState<LocalData>({
     modal: null,
     showModal: false,
-    selectedItems: [],
+    selectedItems: []
   });
 
   // other hooks
@@ -114,7 +114,7 @@ const ListAdminWireframeTablePage: React.FC = () => {
 
     setLocalData((prevData) => ({
       ...prevData,
-      ...newState,
+      ...newState
     }));
   };
 
@@ -127,7 +127,7 @@ const ListAdminWireframeTablePage: React.FC = () => {
       },
       locations: [ActionLocations.DROPDOWN],
       children: "Edit",
-      icon: <EditIcon />,
+      icon: <EditIcon />
     },
     [TableActionEnum.ADD]: {
       show: true,
@@ -139,7 +139,7 @@ const ListAdminWireframeTablePage: React.FC = () => {
       },
       locations: [],
       children: "Add",
-      icon: <PlusIcon />,
+      icon: <PlusIcon />
     },
     [TableActionEnum.VIEW]: {
       show: true,
@@ -151,8 +151,8 @@ const ListAdminWireframeTablePage: React.FC = () => {
       },
       locations: [ActionLocations.DROPDOWN],
       children: "View",
-      icon: <EyeIcon />,
-    },
+      icon: <EyeIcon />
+    }
   };
 
   // useEffect
@@ -160,8 +160,8 @@ const ListAdminWireframeTablePage: React.FC = () => {
     globalDispatch({
       type: "SETPATH",
       payload: {
-        path: "wireframe",
-      },
+        path: "wireframe"
+      }
     });
   }, []);
 

@@ -25,7 +25,7 @@ interface MkdListTableRowDropdownProps {
 const MkdListTableRowDropdown = ({
   row,
   actions,
-  actionId = "id",
+  actionId = "id"
 }: MkdListTableRowDropdownProps) => {
   return (
     <>
@@ -37,20 +37,21 @@ const MkdListTableRowDropdown = ({
           actions[key]?.locations?.includes(ActionLocations.DROPDOWN) &&
           checkBinding(actions[key], row)
       ).length ? (
-        <div className="items center z-3 relative flex h-fit w-fit">
-          <LazyLoad>
-            <MkdPopover
-              display={
-                <KebabIcon
-                  className="h-[1.5rem] w-[1.5rem] rotate-90"
-                  stroke="#1F1D1A"
-                />
-              }
-              tooltipClasses="!rounded-[.125rem] !min-w-fit !w-fit !max-w-fit !px-0 !right-[3.25rem] !border !border-black bg-white"
-              place={"left-end"}
-              classNameArrow={"!border-b !border-r !border-black"}
-            >
-              {/* {actions?.edit?.show && (
+        // <div className="items center relative flex h-fit w-fit gap-2">
+        <LazyLoad>
+          <MkdPopover
+            display={
+              <KebabIcon
+                className="h-[1.5rem] w-[1.5rem] rotate-90"
+                stroke="#1F1D1A"
+              />
+            }
+            // tooltipClasses="!rounded-[.125rem] !min-w-fit !w-fit !max-w-fit !px-0 !right-[3.25rem]  bg-white"
+            tooltipClasses="!rounded-[.5rem] !min-w-fit !w-fit !max-w-fit !px-0 !right-[3.25rem] !border !border-black bg-white"
+            place={"left-end"}
+            classNameArrow={"!border-b !border-r !border-black"}
+          >
+            {/* {actions?.edit?.show && (
                 <LazyLoad>
                   <DropdownOption
                     className="!w-[11rem] !min-w-[11rem] !max-w-[11rem] !bg-brown-main-bg"
@@ -102,43 +103,43 @@ const MkdListTableRowDropdown = ({
                 </LazyLoad>
               )} */}
 
-              {Object.keys(actions)
-                .filter(
-                  (key) =>
-                    actions[key]?.show &&
-                    actions[key]?.locations &&
-                    actions[key]?.locations?.length &&
-                    actions[key]?.locations?.includes(ActionLocations.DROPDOWN)
-                )
-                .map((key, keyIndex) => {
-                  if (
-                    actions[key]?.type &&
-                    [optionTypes.DROPDOWN].includes(actions[key]?.type)
-                  ) {
-                    return (
-                      <RenderDropdownActions
-                        row={row}
-                        key={keyIndex}
-                        actionKey={key}
-                        actionId={actionId}
-                        action={actions[key]}
-                      />
-                    );
-                  } else if (!actions[key]?.type) {
-                    return (
-                      <RenderActions
-                        row={row}
-                        key={keyIndex}
-                        actionId={actionId}
-                        action={actions[key]}
-                      />
-                    );
-                  }
-                })}
-            </MkdPopover>
-          </LazyLoad>
-        </div>
-      ) : null}
+            {Object.keys(actions)
+              .filter(
+                (key) =>
+                  actions[key]?.show &&
+                  actions[key]?.locations &&
+                  actions[key]?.locations?.length &&
+                  actions[key]?.locations?.includes(ActionLocations.DROPDOWN)
+              )
+              .map((key, keyIndex) => {
+                if (
+                  actions[key]?.type &&
+                  [optionTypes.DROPDOWN].includes(actions[key]?.type)
+                ) {
+                  return (
+                    <RenderDropdownActions
+                      row={row}
+                      key={keyIndex}
+                      actionKey={key}
+                      actionId={actionId}
+                      action={actions[key]}
+                    />
+                  );
+                } else if (!actions[key]?.type) {
+                  return (
+                    <RenderActions
+                      row={row}
+                      key={keyIndex}
+                      actionId={actionId}
+                      action={actions[key]}
+                    />
+                  );
+                }
+              })}
+          </MkdPopover>
+        </LazyLoad>
+      ) : // </div>
+      null}
     </>
   );
 };

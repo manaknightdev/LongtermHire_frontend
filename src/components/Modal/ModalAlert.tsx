@@ -20,7 +20,7 @@ const ModalAlert = ({
       className="fixed top-0 right-0 bottom-0 left-0 flex justify-center items-center "
       style={{
         backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: "1000",
+        zIndex: 1000,
       }}
     >
       <section className="bg-white min-w-[25rem] w-[25rem]  rounded-[.5rem] py-6 px-6 flex flex-col gap-6">

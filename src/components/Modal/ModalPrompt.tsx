@@ -35,7 +35,7 @@ const ModalPrompt = ({
       }`}
       style={{
         backgroundColor: "rgba(0, 0, 0, 0.5)",
-        zIndex: "91000",
+        zIndex: 91000,
       }}
     >
       <section className="flex w-[25rem] min-w-[25rem] flex-col  gap-6 rounded-md bg-white px-6 py-6">

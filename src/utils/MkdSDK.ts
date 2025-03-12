@@ -48,7 +48,13 @@ interface MkdAPIResponse {
 }
 
 // Enhanced method configuration for dynamic method generation
-interface MethodConfig {
+export interface RestAPIMethodConfig {
+  body?: any;
+  params?: Record<string, string | number>;
+  additionalHeaders?: Record<string, string>;
+}
+
+export interface MethodConfig extends RestAPIMethodConfig {
   endpoint: string;
   method?: RestAPIMethod;
   requiresAuth?: boolean;
@@ -168,13 +174,7 @@ export default class MkdSDK {
     return localStorage.getItem("role") || "role";
   }
   // Centralized method for dynamic API calls
-  async request(
-    config: MethodConfig & {
-      body?: any;
-      params?: Record<string, string | number>;
-      additionalHeaders?: Record<string, string>;
-    }
-  ): Promise<MkdAPIResponse> {
+  async request(config: MethodConfig): Promise<MkdAPIResponse> {
     // Destructure configuration with defaults
     const {
       endpoint,

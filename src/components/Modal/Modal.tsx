@@ -10,7 +10,7 @@ export type ModalClassType = {
 
 interface ModalProps {
   isOpen: boolean;
-  zIndex?: string | number;
+  zIndex?: number;
   disableCancel?: boolean;
   children: ReactNode;
   title: ReactNode | string;

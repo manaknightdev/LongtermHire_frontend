@@ -4,7 +4,7 @@ import {
   tokenExpireError as tokenExpiredError,
   AuthState,
   AuthContextType,
-  AuthAction,
+  AuthAction
 } from "@/context/Auth";
 
 import {
@@ -30,9 +30,12 @@ import {
   DeleteRequestOptions,
   CustomRequestOptions,
   GetManyOptions,
-  setLoading as setLoadingGlobal,
+  setLoading as setLoadingGlobal
 } from "@/context/Global";
 import { ToastStatusEnum } from "@/utils/Enums";
+import { Settings } from "@/context/Global/types";
+import { Model, Role } from "@/context/Global/types";
+import { Route } from "@/context/Global/types";
 
 interface ApiResponse<T = any> {
   error: boolean;
@@ -85,11 +88,27 @@ interface UseContextsResult {
     options: DeleteRequestOptions
   ) => Promise<ApiResponse>;
   custom: (options: CustomRequestOptions) => Promise<ApiResponse>;
+  projectConfig: {
+    updateSettings: (settings: Settings) => void;
+    setDefaultTablesShown: (shown: boolean) => void;
+    updateNode: (nodeId: string, newData: any) => void;
+    updateModels: (models: Model[]) => void;
+    updateRoles: (roles: Role[]) => void;
+    updateRoutes: (routes: Route[]) => void;
+  };
 }
 
 const useContexts = (): UseContextsResult => {
-  const { state: globalState, dispatch: globalDispatch } =
-    useContext<GlobalContextType>(GlobalContext);
+  const {
+    state: globalState,
+    dispatch: globalDispatch,
+    updateSettings,
+    setDefaultTablesShown,
+    updateNode,
+    updateModels,
+    updateRoles,
+    updateRoutes
+  } = useContext<GlobalContextType>(GlobalContext);
   const { state: authState, dispatch: authDispatch } =
     useContext<AuthContextType>(AuthContext);
 
@@ -256,6 +275,14 @@ const useContexts = (): UseContextsResult => {
     remove,
     custom,
     setLoading,
+    projectConfig: {
+      updateSettings: updateSettings || (() => {}),
+      setDefaultTablesShown: setDefaultTablesShown || (() => {}),
+      updateNode: updateNode || (() => {}),
+      updateModels: updateModels || (() => {}),
+      updateRoles: updateRoles || (() => {}),
+      updateRoutes: updateRoutes || (() => {})
+    }
   };
 };
 

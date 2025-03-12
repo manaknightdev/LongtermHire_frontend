@@ -5,6 +5,12 @@ export const SET_GLOBAL_PROPERTY = "SET_GLOBAL_PROPERTY";
 export const ADD_BACKGROUND_PROCESS = "ADD_BACKGROUND_PROCESS";
 export const SET_BACKGROUND_PROCESSES = "SET_BACKGROUND_PROCESSES";
 export const REMOVE_BACKGROUND_PROCESS = "REMOVE_BACKGROUND_PROCESS";
+export const UPDATE_SETTINGS = "UPDATE_SETTINGS";
+export const SET_DEFAULT_TABLES_SHOWN = "SET_DEFAULT_TABLES_SHOWN";
+export const UPDATE_NODE = "UPDATE_NODE";
+export const UPDATE_MODELS = "UPDATE_MODELS";
+export const UPDATE_ROLES = "UPDATE_ROLES";
+export const UPDATE_ROUTES = "UPDATE_ROUTES";
 
 interface RequestItemsType {
   readonly viewModel: string;
@@ -21,8 +27,8 @@ const RequestItems: RequestItemsType = {
   updateModel: "updateModel",
   listModel: "listModel",
   deleteModel: "deleteModel",
-  customRequest: "customRequest",
-} as const
+  customRequest: "customRequest"
+} as const;
 
 interface ViewsType {
   readonly RouteList: string;
@@ -33,8 +39,8 @@ interface ViewsType {
 const Views: ViewsType = {
   RouteList: "routelist",
   BasicRouteEditor: "basicrouteeditor",
-  AdvancedRouteEditor: "advancedrouteeditor",
-} as const
+  AdvancedRouteEditor: "advancedrouteeditor"
+} as const;
 
 interface ViewsMapType {
   readonly RouteList: string;
@@ -43,14 +49,13 @@ interface ViewsMapType {
 
 const ViewsMap: ViewsMapType = {
   RouteList: "Route List",
-  RouteEditor: "Route Editor",
-} as const
-
+  RouteEditor: "Route Editor"
+} as const;
 
 const BackgroundProcessStatus = {
   PENDING: "PENDING",
   REJECTED: "REJECTED",
-  FULFILLED: "FULFILLED",
-} as const
+  FULFILLED: "FULFILLED"
+} as const;
 
-export { RequestItems, Views, ViewsMap,BackgroundProcessStatus };
+export { RequestItems, Views, ViewsMap, BackgroundProcessStatus };
