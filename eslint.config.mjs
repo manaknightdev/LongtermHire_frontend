@@ -44,20 +44,20 @@ export default [
       "react-hooks": reactHooks
     },
     rules: {
-      //   ...reactHooks.configs.recommended.rules,
-      //   "no-unused-vars": "off", // Turn off base rule
+      ...reactHooks.configs.recommended.rules,
+      "no-unused-vars": "off", // Turn off base rule
       //   eqeqeq: "error",
-      //   "no-console": "warn",
-      //   "no-debugger": "warn",
-      //   "@typescript-eslint/no-explicit-any": "off",
-      //   "@typescript-eslint/explicit-function-return-type": "off",
-      //   "@typescript-eslint/no-unused-vars": [
-      //     "warn",
-      //     {
-      //       argsIgnorePattern: "^_",
-      //       varsIgnorePattern: "^_"
-      //     }
-      //   ]
+      "no-console": "warn",
+      "no-debugger": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_"
+        }
+      ]
     }
   }
 ];
