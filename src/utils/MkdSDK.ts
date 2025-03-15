@@ -749,9 +749,9 @@ export default class MkdSDK {
    * @param role User role
    * @returns Social login link or error
    */
-  async oauthLoginApi(type: string): Promise<string> {
+  async oauthLoginApi(type: string, role: string): Promise<string> {
     const socialLogin = await fetch(
-      `${this.baseUrl()}/v1/api/${this.getProjectId()}/{{role}}/lambda/${type}/login?role={{role}}`,
+      `${this.baseUrl()}/v1/api/${this.getProjectId()}/${role}/lambda/${type}/login?role=${role}`,
       {
         headers: {
           "x-project": this._base64Encode

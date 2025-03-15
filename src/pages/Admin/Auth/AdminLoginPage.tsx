@@ -91,6 +91,11 @@ const AdminLoginPage = ({
     }
   };
 
+  const socialLogin = async (type: string) => {
+    const result = await sdk.oauthLoginApi(type, RoleEnum.SUPER_ADMIN);
+    window.open(result, "_self"); //  "sharer",  "toolbar=0,status=0,width=650,height=400,"
+  };
+
   return (
     <main
       className="flex min-h-screen flex-col bg-cover bg-no-repeat"
@@ -173,6 +178,26 @@ const AdminLoginPage = ({
               Sign in
             </InteractiveButton>
           </form>
+          <div className="w-full text-[1rem] text-[#525252] text-center">
+            {/* OR */}
+          </div>
+
+          <div className="oauth mt-2 flex w-full flex-col gap-[2rem] text-[#344054] ">
+            <button
+              onClick={() => socialLogin("google")}
+              className="my-2 flex h-[2.75rem] min-w-[70%] cursor-pointer items-center justify-center gap-3 rounded-sm border-2  px-4"
+            >
+              <img
+                src={
+                  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAALpSURBVHgBtVbNTxNBFH8zuy3QoN0YJMEQs8QQP05LAsbEg4uRxMSD4AeaeLB6xEPhpIkm4MF4IsG/oODF4Edajgahy8UDxbAcjDEc2IORCIlUhVK6u/OcKbVpaZdWxN+lkzd9v9+b9968WQK7YEnXlYPSxm0GqCMQjZtUYScASUSw+NJwGU40GXOGFwfxIg7IqX6KGEYABSqCWBmKPc2TCbOiwEpXhwaMRAFQhb+Ei/i4aXpuyFNAkBMG8eqiLoVIG2N2Z5NhWiUCyxfPqLLtznuTYxKQWIRk869wT60SuYD8ZyHZrGzk3NGkCP3r6Cy0GGYyH5CuqRL1DXKhkBd5/gRrfa0h+7MSKQ0aRhqnEwOwC1YvtOuO41jlyPMCzpRvKT3boKbeNRdsYOzw1FwP/COoPSnriKjWdKxCsO8j0GAmm0/HdQZgHyADhXM8FdtqnPzArUVIv280gsOWVc5BH9xUoWrUJkWRi7pBiAQufRmF4fIukt+N8Hh0qAYsNUoBSztHRtmCfQASVCn8Z1BCiLXT6DJbg32CzPhFKpwXv9AHkY3jOoA5Uc6B53+Mn90o2SBi0mKo2MS5RZvyVVwYFp0g3P95GpbdQNJJuy3mnVgSqsT5JxuRnQKMQYj6uhyDr5Pjm8fg3o+zsMwCQlqR66RIteT6082S6LNw7BlJ/EpX22ufp1r1DEiF2yeOXDupfH396W0lcopMZKCoG/llNYzB4LN8+tvHr8zz3JYUl48MPkHJ0OyNN2NFxJFuZb1W7pfSp8J1K3cV6jQU+aHk1+IP/At5Ae3FTVWm9ny5e5FT4uMasi8WL7RKcs+nALUboO5bGKStozl2GJl+VD+w7VaAjpfXNRTHxb09OP61Hqj53m3GH9a35cUL/5DofWU6zNfGI7RgD9g6FI1hxu4stJV99LVotyJnaJjXZAiqAPI6Aa/Thx118hTIC/G6UMjolJLL2Y+AXBMgr4coPmc2CMVYojc648XxG0ZrPRAMMnAhAAAAAElFTkSuQmCC"
+                }
+                className="h-[18px] w-[18px]"
+              />
+              <span className="text-[1rem] text-[#525252] font-[600]">
+                Sign in With Google
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </main>
@@ -180,45 +205,3 @@ const AdminLoginPage = ({
 };
 
 export default AdminLoginPage;
-{
-  /* <span
-                  className="cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M9.99998 3.33337C13.5326 3.33335 16.9489 5.50937 19.0735 9.61715L19.2715 10L19.0735 10.3828C16.9489 14.4906 13.5326 16.6667 10 16.6667C6.46737 16.6667 3.05113 14.4907 0.926472 10.3829L0.728455 10.0001L0.926472 9.61724C3.05113 5.50946 6.46736 3.3334 9.99998 3.33337ZM7.08333 10C7.08333 8.38921 8.38917 7.08337 10 7.08337C11.6108 7.08337 12.9167 8.38921 12.9167 10C12.9167 11.6109 11.6108 12.9167 10 12.9167C8.38917 12.9167 7.08333 11.6109 7.08333 10Z"
-                        fill="#A8A8A8"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M3.28033 2.21967C2.98744 1.92678 2.51256 1.92678 2.21967 2.21967C1.92678 2.51256 1.92678 2.98744 2.21967 3.28033L5.38733 6.44799C4.04329 7.533 2.8302 8.97021 1.81768 10.7471C1.37472 11.5245 1.37667 12.4782 1.81881 13.2539C3.74678 16.6364 6.40456 18.789 9.29444 19.6169C12.0009 20.3923 14.8469 19.9857 17.3701 18.4308L20.7197 21.7803C21.0126 22.0732 21.4874 22.0732 21.7803 21.7803C22.0732 21.4874 22.0732 21.0126 21.7803 20.7197L3.28033 2.21967ZM14.2475 15.3082L13.1559 14.2166C12.81 14.3975 12.4167 14.4995 11.9991 14.4995C10.6184 14.4995 9.49911 13.3802 9.49911 11.9995C9.49911 11.5819 9.60116 11.1886 9.78207 10.8427L8.69048 9.75114C8.25449 10.3917 7.99911 11.1662 7.99911 11.9995C7.99911 14.2087 9.78998 15.9995 11.9991 15.9995C12.8324 15.9995 13.6069 15.7441 14.2475 15.3082Z"
-                        fill="#A8A8A8"
-                      />
-                      <path
-                        d="M19.7234 16.5416C20.5189 15.7335 21.2556 14.7869 21.9145 13.7052C22.5512 12.66 22.5512 11.34 21.9145 10.2948C19.3961 6.16075 15.7432 4.00003 11.9999 4C10.6454 3.99999 9.30281 4.28286 8.02148 4.83974L19.7234 16.5416Z"
-                        fill="#A8A8A8"
-                      />
-                    </svg>
-                  )}
-                </span> */
-}

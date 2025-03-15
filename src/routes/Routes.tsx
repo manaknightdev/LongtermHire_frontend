@@ -119,7 +119,7 @@ export default () => {
         setGlobalState("openRouteChangeModal", false);
       }
     },
-    [openRouteChangeModal]
+    [setGlobalState]
   );
 
   const toggleSideBar = (open: boolean) => {
