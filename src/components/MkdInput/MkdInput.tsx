@@ -106,7 +106,7 @@ const MkdInput = ({
               disabled={disabled}
               id={uniqueId}
               cols={cols}
-              name={`unique-${name}-${uniqueId}`}
+              name={name}
               placeholder={placeholder}
               rows={rows}
               {...(value ? { value: value } : null)}
@@ -137,7 +137,7 @@ const MkdInput = ({
                 defaultValue={""}
                 disabled={disabled}
                 id={uniqueId}
-                name={`unique-${name}`}
+                name={name}
                 {...(value ? { value: value } : null)}
                 checked={checked}
                 placeholder={placeholder}
@@ -169,7 +169,7 @@ const MkdInput = ({
             type={type}
             defaultValue={""}
             id={uniqueId}
-            name={`unique-${name}-${uniqueId}`}
+            name={name}
             disabled={disabled}
             placeholder={placeholder}
             {...(register
@@ -197,7 +197,7 @@ const MkdInput = ({
             {mapping ? (
               <select
                 id={uniqueId}
-                name={`unique-${name}-${uniqueId}`}
+                name={name}
                 disabled={disabled}
                 {...(value ? { value: value } : null)}
                 placeholder={placeholder}
@@ -232,7 +232,7 @@ const MkdInput = ({
             type={type}
             defaultValue={""}
             id={uniqueId}
-            name={`unique-${name}-${uniqueId}`}
+            name={name}
             disabled={disabled}
             placeholder={placeholder}
             {...(value ? { value: value } : null)}
@@ -280,7 +280,7 @@ const MkdInput = ({
               type={type}
               defaultValue={""}
               id={uniqueId}
-              name={`unique-${name}-${uniqueId}`}
+              name={name}
               disabled={true}
               placeholder={placeholder}
               {...(value ? { value: value } : null)}
@@ -309,7 +309,7 @@ const MkdInput = ({
             type={type}
             defaultValue={""}
             id={uniqueId}
-            name={`unique-${name}-${uniqueId}`}
+            name={name}
             disabled={disabled}
             placeholder={placeholder}
             {...(value ? { value: value } : null)}
