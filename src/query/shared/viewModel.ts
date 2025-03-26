@@ -5,7 +5,8 @@ import { TreeSDKOptions } from "@/utils/TreeSDK";
 
 export const useViewModelQuery = (
   table: keyof typeof queryKeys,
-  id: string | number
+  id: string | number,
+  options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
@@ -13,7 +14,7 @@ export const useViewModelQuery = (
     table: keyof typeof queryKeys,
     id: string | number
   ) => {
-    const response = await tdk.getOne(table, id);
+    const response = await tdk.getOne(table, id, options);
     return response.data ?? response?.model;
   };
 
