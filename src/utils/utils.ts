@@ -101,55 +101,135 @@ export function slugify(str: string): string {
 interface StringCaserOptions {
   separator?: "space" | string;
   casetype?:
-    | "uppercase"
+    | "UPPERCASE"
     | "lowercase"
-    | "capitalize"
+    | "Capitalize"
     | "camelCase"
     | "PascalCase";
+  exclude?: String[];
 }
 
-export function StringCaser(
-  string: string,
-  options: StringCaserOptions = {}
-): string {
-  const { separator, casetype = "lowercase" } = options;
-  let words = string.split(/[\s_-]/);
+export class StringCaser {
+  private stringCaser(
+    string: string,
+    options: StringCaserOptions = {}
+  ): string {
+    if (!string) return "";
+    if (typeof string !== "string") return "";
 
-  switch (casetype) {
-    case "uppercase":
-      words = words.map((word) => word.toUpperCase());
-      break;
-    case "lowercase":
-      words = words.map((word) => word.toLowerCase());
-      break;
-    case "capitalize":
-      words = words.map(
-        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      );
-      break;
-    case "camelCase":
-      words = words.map((word, index) =>
-        index === 0
-          ? word.toLowerCase()
-          : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      );
-      break;
-    case "PascalCase":
-      words = words.map(
-        (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      );
-      break;
+    const { separator, casetype = "lowercase", exclude } = options;
+
+    const removedSpecialCharacters = exclude?.length
+      ? string.replace(new RegExp(`[^a-zA-Z0-9${exclude.join("")}]`, "g"), " ")
+      : string.replace(/[^a-zA-Z0-9]/g, " ");
+
+    let words = removedSpecialCharacters.split(/[\s_-]/).filter(Boolean);
+
+    switch (casetype) {
+      case "UPPERCASE":
+        words = words.map((word) => word.toUpperCase());
+        break;
+      case "lowercase":
+        words = words.map((word) => word.toLowerCase());
+        break;
+      case "Capitalize":
+        words = words.map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+        break;
+      case "camelCase":
+        words = words.map((word, index) =>
+          index === 0
+            ? word.toLowerCase()
+            : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+        break;
+      case "PascalCase":
+        words = words.map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+        break;
+    }
+
+    if (separator === "space") {
+      return words.join(" ");
+    } else if (separator) {
+      return words.join(separator);
+    }
+
+    return words.join("");
   }
 
-  if (separator === "space") {
-    return words.join(" ");
-  } else if (separator) {
-    return words.join(separator);
+  UPPERCASE(
+    text: string,
+    options: Omit<StringCaserOptions, "casetype"> = {
+      exclude: [],
+      separator: "",
+    }
+  ) {
+    return this.stringCaser(text, {
+      casetype: "UPPERCASE",
+      separator: options?.separator,
+      exclude: options?.exclude,
+    });
   }
 
-  return words.join("");
+  lowercase(
+    text: string,
+    options: Omit<StringCaserOptions, "casetype"> = {
+      exclude: [],
+      separator: "",
+    }
+  ) {
+    return this.stringCaser(text, {
+      casetype: "lowercase",
+      separator: options?.separator,
+      exclude: options?.exclude,
+    });
+  }
+
+  Capitalize(
+    text: string,
+    options: Omit<StringCaserOptions, "casetype"> = {
+      exclude: [],
+      separator: "",
+    }
+  ) {
+    return this.stringCaser(text, {
+      casetype: "Capitalize",
+      separator: options?.separator,
+      exclude: options?.exclude,
+    });
+  }
+
+  camelCase(
+    text: string,
+    options: Omit<StringCaserOptions, "casetype"> = {
+      exclude: [],
+      separator: "",
+    }
+  ) {
+    return this.stringCaser(text, {
+      casetype: "camelCase",
+      separator: options?.separator,
+      exclude: options?.exclude,
+    });
+  }
+
+  PascalCase(
+    text: string,
+    options: Omit<StringCaserOptions, "casetype"> = {
+      exclude: [],
+      separator: "",
+    }
+  ) {
+    return this.stringCaser(text, {
+      casetype: "PascalCase",
+      separator: options?.separator,
+      exclude: options?.exclude,
+    });
+  }
 }
-
 interface TableColumn {
   header: string;
   accessor: string;
