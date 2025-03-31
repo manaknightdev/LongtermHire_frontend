@@ -12,15 +12,11 @@ interface UseSDKReturnType {
 
 const useSDK = (): UseSDKReturnType => {
   const sdk = useMemo(() => {
-    return new MkdSDK({
-      project_id: "pavetech"
-    });
+    return new MkdSDK();
   }, [MkdSDK]);
 
   const tdk = useMemo(() => {
-    return new TreeSDK({
-      project_id: "pavetech"
-    });
+    return new TreeSDK();
   }, [TreeSDK]);
 
   const projectId = sdk.getProjectId();
