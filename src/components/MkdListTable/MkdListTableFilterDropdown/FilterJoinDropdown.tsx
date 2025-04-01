@@ -23,8 +23,10 @@ interface FilterJoinDropdownProps {
 const FilterJoinDropdown = ({
   columnData,
   option,
-  setOptionValue,
+  setOptionValue
 }: FilterJoinDropdownProps) => {
+  const { Capitalize } = new StringCaser();
+
   return (
     <>
       {columnData?.join && ["user"].includes(columnData?.join) ? (
@@ -33,9 +35,8 @@ const FilterJoinDropdown = ({
           className="flex w-full flex-col items-start "
           uniqueKey={"id"}
           displaySeparator={"-"}
-          label={StringCaser(columnData?.accessor, {
-            casetype: "capitalize",
-            separator: " ",
+          label={Capitalize(columnData?.accessor, {
+            separator: " "
           })}
           display={[columnData?.accessor]}
           placeholder={columnData?.accessor}
@@ -59,16 +60,15 @@ const FilterJoinDropdown = ({
         "location_type",
         "campaign",
         "division",
-        "rate_card",
+        "rate_card"
       ].includes(columnData?.join) ? (
         <SearchableDropdown
           className="flex w-full flex-col items-start "
           uniqueKey={"id"}
           displaySeparator={"-"}
           table={columnData?.join}
-          label={StringCaser(columnData?.accessor, {
-            casetype: "capitalize",
-            separator: " ",
+          label={Capitalize(columnData?.accessor, {
+            separator: " "
           })}
           display={[columnData?.accessor]}
           placeholder={columnData?.accessor}

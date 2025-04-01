@@ -31,6 +31,7 @@ const MkdDebounceInput = ({
   showIcon = true,
 }: MkdDebounceInputProps) => {
   const inputId = useId();
+  const stringCaser = new StringCaser()
   const [inputValue, setInputValue] = useState("");
 
   function handleInput(
@@ -61,8 +62,7 @@ const MkdDebounceInput = ({
           className="mb-2 block cursor-pointer text-sm font-bold text-gray-700"
           htmlFor={inputId}
         >
-          {StringCaser(label ?? "", {
-            casetype: "capitalize",
+          {stringCaser?.Capitalize(label ?? "", {
             separator: "space",
           })}
         </label>

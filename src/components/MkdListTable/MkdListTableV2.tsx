@@ -173,7 +173,7 @@ interface MkdListTableV2Props {
   showXScrollbar?: boolean;
   showScrollbar?: boolean;
 }
-
+const { Capitalize } = new StringCaser();
 const MkdListTableV2 = ({
   // columnId,
   // columns = [],
@@ -1286,8 +1286,7 @@ const MkdListTableV2 = ({
                         actions[key].children
                       ) : (
                         <>
-                          {StringCaser(key === "delete" ? "Remove" : key, {
-                            casetype: "capitalize",
+                          {Capitalize(key === "delete" ? "Remove" : key, {
                             separator: " "
                           })}
                         </>

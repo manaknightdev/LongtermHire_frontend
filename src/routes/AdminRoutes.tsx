@@ -11,6 +11,7 @@ interface AdminRouteProps {
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ path, children }) => {
   const { authState } = useContexts();
+  const { Capitalize } = new StringCaser();
 
   const { isAuthenticated } = authState;
 
@@ -18,15 +19,14 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ path, children }) => {
     const metadata = metadataJSON[path ?? "/"];
     if (metadata !== undefined) {
       document.title = metadata?.title
-        ? StringCaser(metadata?.title, {
-            casetype: "capitalize",
-            separator: " ",
+        ? Capitalize(metadata?.title, {
+            separator: " "
           })
         : "Wireframe Tool | Manaknight Digital";
     } else {
       document.title = "Wireframe Tool | Manaknight Digital";
     }
-  }, [path]);
+  }, [path, Capitalize]);
 
   return (
     <>

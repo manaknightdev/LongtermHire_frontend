@@ -10,8 +10,10 @@ interface MkdTabContainerProps {
 const MkdTabContainer = ({
   tabs = ["Tab One", "Tab Two"],
   children,
-  className = "",
+  className = ""
 }: MkdTabContainerProps) => {
+  const { Capitalize } = new StringCaser();
+
   const [activeId, setActiveId] = useState(0);
 
   const childrenArray = React.Children.toArray(
@@ -34,9 +36,8 @@ const MkdTabContainer = ({
                       activeId === tabKey ? "bg-[#f4f4f4] text-[#525252]" : ""
                     }`}
                   >
-                    {StringCaser(tab, {
-                      casetype: "capitalize",
-                      separator: " ",
+                    {Capitalize(tab, {
+                      separator: " "
                     })}
                   </button>
                 ))

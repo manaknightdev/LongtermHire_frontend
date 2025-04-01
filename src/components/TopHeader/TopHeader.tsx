@@ -5,6 +5,7 @@ import { StringCaser } from "@/utils/utils";
 import { useContexts } from "@/hooks/useContexts";
 
 const TopHeader = () => {
+  const { Capitalize } = new StringCaser();
   const {
     globalState: { showBackButton }
   } = useContexts();
@@ -28,8 +29,7 @@ const TopHeader = () => {
         <h1 className="text-base capitalize">
           {currentPath === "generate-ui"
             ? "Generate UI"
-            : StringCaser(currentPath, {
-                casetype: "capitalize",
+            : Capitalize(currentPath, {
                 separator: " "
               })}
         </h1>

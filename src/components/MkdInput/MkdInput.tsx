@@ -31,6 +31,8 @@ interface MkdInputProps {
   showErrorMessage?: boolean;
 }
 
+const { Capitalize } = new StringCaser();
+
 const MkdInput = ({
   type = "text",
   page,
@@ -52,14 +54,14 @@ const MkdInput = ({
   required = false,
   labelClassName = "",
   customField = false,
-  showErrorMessage = true,
+  showErrorMessage = true
 }: MkdInputProps) => {
   const uniqueId = useId();
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [inputData, setInputData] = useState({
     modal: null as string | null,
-    showModal: false,
+    showModal: false
   });
 
   const onToggleModal = (modal: string | null, toggle: boolean) => {
@@ -84,7 +86,6 @@ const MkdInput = ({
                 {required && (
                   <sup className="z-[99999] text-[.825rem] text-red-600">*</sup>
                 )}
-                {/* {StringCaser(label, { casetype: "capitalize", separator: "space" })} */}
               </label>
             )}
           </>
@@ -112,10 +113,10 @@ const MkdInput = ({
               {...(value ? { value: value } : null)}
               {...(register
                 ? register(name, {
-                    ...(required && customField ? { required: true } : null),
+                    ...(required && customField ? { required: true } : null)
                   })
                 : {
-                    onChange: onChange,
+                    onChange: onChange
                   })}
             ></textarea>
           </>
@@ -143,10 +144,10 @@ const MkdInput = ({
                 placeholder={placeholder}
                 {...(register
                   ? register(name, {
-                      ...(required && customField ? { required: true } : null),
+                      ...(required && customField ? { required: true } : null)
                     })
                   : {
-                      onChange: onChange,
+                      onChange: onChange
                     })}
                 className={`focus:shadow-outline font-inter !h-4 !w-4 cursor-pointer appearance-none rounded border leading-tight text-primary shadow focus:outline-none focus:ring-0 ${className} ${
                   name && errors && errors?.[name] && errors?.[name]?.message
@@ -174,10 +175,10 @@ const MkdInput = ({
             placeholder={placeholder}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null),
+                  ...(required && customField ? { required: true } : null)
                 })
               : {
-                  onChange: onChange,
+                  onChange: onChange
                 })}
             className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none truncate rounded-[.625rem]  border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0  ${className} ${
               name && errors && errors?.[name] && errors?.[name]?.message
@@ -203,10 +204,10 @@ const MkdInput = ({
                 placeholder={placeholder}
                 {...(register
                   ? register(name, {
-                      ...(required && customField ? { required: true } : null),
+                      ...(required && customField ? { required: true } : null)
                     })
                   : {
-                      onChange: onChange,
+                      onChange: onChange
                     })}
                 className={`focus:shadow-outline font-inter h-[3rem] w-full truncate rounded-[.625rem]  border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0  ${className} ${
                   name && errors && errors?.[name] && errors?.[name]?.message
@@ -238,10 +239,10 @@ const MkdInput = ({
             {...(value ? { value: value } : null)}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null),
+                  ...(required && customField ? { required: true } : null)
                 })
               : {
-                  onChange: onChange,
+                  onChange: onChange
                 })}
             step={"0.01"}
             min={"0.00"}
@@ -286,10 +287,10 @@ const MkdInput = ({
               {...(value ? { value: value } : null)}
               {...(register
                 ? register(name, {
-                    ...(required && customField ? { required: true } : null),
+                    ...(required && customField ? { required: true } : null)
                   })
                 : {
-                    onChange: onChange,
+                    onChange: onChange
                   })}
               {...(type === "number" ? { step: "0.01" } : null)}
               min={type === "number" ? "0.00" : undefined} //
@@ -315,10 +316,10 @@ const MkdInput = ({
             {...(value ? { value: value } : null)}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null),
+                  ...(required && customField ? { required: true } : null)
                 })
               : {
-                  onChange: onChange,
+                  onChange: onChange
                 })}
             {...(type === "number" ? { step: "0.01" } : null)}
             min={type === "number" ? "0.00" : undefined} //
@@ -332,9 +333,8 @@ const MkdInput = ({
 
         {showErrorMessage && name && errors && errors?.[name] && (
           <p className="text-field-error absolute inset-x-0 top-[90%] m-auto mt-2 text-[.8rem] italic text-red-500">
-            {StringCaser(errors?.[name]?.message, {
-              casetype: "capitalize",
-              separator: " ",
+            {Capitalize(errors?.[name]?.message, {
+              separator: " "
             })}
           </p>
         )}
@@ -349,7 +349,7 @@ const MkdInput = ({
           modalDialog:
             "!px-0 !rounded-[.125rem] h-fit min-h-fit max-h-fit !w-full !max-w-full !min-w-full ",
           modalContent: `!z-10 !mt-0 overflow-hidden !pt-0`,
-          modal: "h-full",
+          modal: "h-full"
         }}
       >
         {inputData.showModal && ["custom_date"].includes(inputData.modal!) ? (
@@ -387,5 +387,6 @@ function determineModalTitle(modal: string) {
     return "Select Time";
   }
 
-  return StringCaser(modal, { casetype: "capitalize", separator: " " });
+  const title = Capitalize(modal, { separator: "space" });
+  return title;
 }

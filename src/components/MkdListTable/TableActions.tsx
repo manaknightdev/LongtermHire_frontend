@@ -5,6 +5,8 @@ interface TableActionsProps {
   selectedItems: any;
 }
 const TableActions = ({ actions, selectedItems }: TableActionsProps) => {
+  const { Capitalize } = new StringCaser();
+
   return (
     <div className="flex gap-2">
       {Object.keys(actions)
@@ -43,9 +45,8 @@ const TableActions = ({ actions, selectedItems }: TableActionsProps) => {
                         }
                       }}
                     >
-                      {StringCaser(key, {
-                        casetype: "capitalize",
-                        separator: " ",
+                      {Capitalize(key, {
+                        separator: " "
                       })}
                     </MkdButton>
                   );
@@ -75,9 +76,8 @@ const TableActions = ({ actions, selectedItems }: TableActionsProps) => {
                         }
                       }}
                     >
-                      {StringCaser(key, {
-                        casetype: "capitalize",
-                        separator: " ",
+                      {Capitalize(key, {
+                        separator: " "
                       })}
                     </MkdButton>
                   );

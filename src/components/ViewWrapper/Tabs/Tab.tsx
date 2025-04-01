@@ -8,6 +8,8 @@ interface TabProps {
   tabClassName?: string;
 }
 const Tab = ({ tab, setView, view, viewsMap, tabClassName }: TabProps) => {
+  const { Capitalize } = new StringCaser();
+
   return (
     <div
       onClick={() => setView(tab)}
@@ -15,7 +17,7 @@ const Tab = ({ tab, setView, view, viewsMap, tabClassName }: TabProps) => {
         view === viewsMap[tab]?.value ? "border-black text-black" : ""
       }`}
     >
-      {StringCaser(tab, { casetype: "capitalize", separator: " " })}
+      {Capitalize(tab, { separator: " " })}
       {viewsMap[tab]?.hasCount ? (
         <div
           className={`flex h-[1.25rem] w-[1.25rem] items-center justify-center rounded-full font-inter text-[.75rem] font-[600] leading-[1rem] ${

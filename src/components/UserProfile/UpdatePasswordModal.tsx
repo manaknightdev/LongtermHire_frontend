@@ -23,6 +23,7 @@ const UpdatePasswordModal = ({
   isOpen = false,
   onClose
 }: UpdatePasswordModalProps) => {
+  const { Capitalize } = new StringCaser();
   const { sdk } = useSDK();
 
   const { tokenExpireError, showToast } = useContexts();
@@ -55,33 +56,36 @@ const UpdatePasswordModal = ({
     resolver: yupResolver(schema)
   });
 
-  const onSubmit = useCallback(async (_data: any) => {
-    try {
-      if (_data?.password && _data?.password?.length > 0) {
-        const passwordresult = await sdk.updatePassword(_data.password);
-        if (!passwordresult.error) {
-          showToast("Password Updated", 5000, ToastStatusEnum.SUCCESS);
-        } else {
-          if (passwordresult.validation) {
-            const keys = Object.keys(passwordresult.validation);
-            for (let i = 0; i < keys.length; i++) {
-              const field = keys[i];
-              setError(field as any, {
-                type: "manual",
-                message: passwordresult.validation[field]
-              });
+  const onSubmit = useCallback(
+    async (_data: any) => {
+      try {
+        if (_data?.password && _data?.password?.length > 0) {
+          const passwordresult = await sdk.updatePassword(_data.password);
+          if (!passwordresult.error) {
+            showToast("Password Updated", 5000, ToastStatusEnum.SUCCESS);
+          } else {
+            if (passwordresult.validation) {
+              const keys = Object.keys(passwordresult.validation);
+              for (let i = 0; i < keys.length; i++) {
+                const field = keys[i];
+                setError(field as any, {
+                  type: "manual",
+                  message: passwordresult.validation[field]
+                });
+              }
             }
           }
         }
+      } catch (error: any) {
+        const message = error?.response?.data?.message
+          ? error?.response?.data?.message
+          : error?.message;
+        showToast(message, 5000, ToastStatusEnum.ERROR);
+        tokenExpireError(message);
       }
-    } catch (error: any) {
-      const message = error?.response?.data?.message
-        ? error?.response?.data?.message
-        : error?.message;
-      showToast(message, 5000, ToastStatusEnum.ERROR);
-      tokenExpireError(message);
-    }
-  }, []);
+    },
+    [sdk, setError, showToast, tokenExpireError]
+  );
   // md:min-h-[90%] md:h-[90%] md:max-h-[90%] max-h-[90%] min-h-[90%]
   return (
     <>
@@ -129,8 +133,7 @@ const UpdatePasswordModal = ({
                     />
                     {errors && errors?.confirm && (
                       <p className="text-field-error m-auto mt-2 text-[.8rem] italic text-red-500">
-                        {StringCaser(errors?.confirm?.message as string, {
-                          casetype: "capitalize",
+                        {Capitalize(errors?.confirm?.message as string, {
                           separator: " "
                         })}
                       </p>

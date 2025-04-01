@@ -7,6 +7,8 @@ interface SimpleTabProps {
   viewsMap: any;
 }
 const SimpleTab = ({ tab, setView, view, viewsMap }: SimpleTabProps) => {
+  const { Capitalize } = new StringCaser();
+
   return (
     <div
       onClick={() => setView(tab)}
@@ -14,7 +16,7 @@ const SimpleTab = ({ tab, setView, view, viewsMap }: SimpleTabProps) => {
         view === viewsMap[tab] ? "bg-white text-black" : "text-sub-500"
       }`}
     >
-      {StringCaser(tab, { casetype: "capitalize", separator: " " })}
+      {Capitalize(tab, { separator: " " })}
     </div>
   );
 };

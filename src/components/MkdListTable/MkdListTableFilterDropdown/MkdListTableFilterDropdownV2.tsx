@@ -4,7 +4,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import {
   MkdListTableFilterOptions,
   FilterJoinDropdown,
-  MkdListTableFilterDateRange,
+  MkdListTableFilterDateRange
 } from "./index";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdButton } from "@/components/MkdButton";
@@ -46,10 +46,10 @@ const MkdListTableFilterDropdownV2 = ({
   onColumnClick,
   setOptionValue,
   setSelectedOptions,
-  onClose,
+  onClose
 }: MkdListTableFilterDropdownV2Props) => {
   const [_showFilterOptions, setShowFilterOptions] = useState(false);
-
+  const { Capitalize } = new StringCaser();
   // console.log("selectedOptions >>", selectedOptions);
   return (
     <div className="filter-form-holder  z-[9999999] grid h-full max-h-full min-h-full w-full min-w-full max-w-full grid-cols-1 grid-rows-[auto_1fr_auto_auto] overflow-hidden rounded-md bg-white p-5 shadow-xl">
@@ -117,9 +117,8 @@ const MkdListTableFilterDropdownV2 = ({
                                 className="mb-2 block cursor-pointer text-left text-sm font-bold text-gray-700"
                                 htmlFor={option?.uid}
                               >
-                                {StringCaser(columnData?.accessor, {
-                                  casetype: "capitalize",
-                                  separator: "space",
+                                {Capitalize(columnData?.accessor, {
+                                  separator: "space"
                                 })}
                               </label>
                               <select
@@ -176,9 +175,8 @@ const MkdListTableFilterDropdownV2 = ({
                         >
                           <LazyLoad>
                             <MkdInput
-                              label={StringCaser(columnData?.accessor, {
-                                casetype: "capitalize",
-                                separator: " ",
+                              label={Capitalize(columnData?.accessor, {
+                                separator: " "
                               })}
                               placeholder="Enter value..."
                               value={option?.value}

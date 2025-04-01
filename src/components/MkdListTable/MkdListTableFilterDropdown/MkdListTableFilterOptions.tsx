@@ -20,7 +20,7 @@ const excludedFields = [
   "allowed customers",
   "allowed customer",
   "allowed_customers",
-  "allowed_customer",
+  "allowed_customer"
 ];
 
 interface MkdListTableFilterOptionsProps {
@@ -39,16 +39,17 @@ interface MkdListTableFilterOptionsProps {
 
 const MkdListTableFilterOptions = ({
   columns = [],
-  onColumnClick,
+  onColumnClick
 }: MkdListTableFilterOptionsProps) => {
   const { operations } = useSDK();
+  const { Capitalize } = new StringCaser();
 
   return (
     <div
       style={{
         maxHeight: "31.25rem",
         height: "fit-content",
-        overflowY: "auto",
+        overflowY: "auto"
       }}
       className="absolute top-[-2000%] z-10 m-auto w-[12.5rem] min-w-[12.5rem] max-w-[12.5rem] bg-white p-2 text-gray-600 opacity-0 shadow-md transition-all hover:top-[80%] hover:opacity-100 focus:top-[80%] focus:opacity-100 peer-focus:top-[80%] peer-focus:opacity-100 peer-focus-visible:top-[80%] peer-focus-visible:opacity-100"
     >
@@ -73,9 +74,8 @@ const MkdListTableFilterOptions = ({
                   }
                 }}
               >
-                {StringCaser(column?.header, {
-                  casetype: "capitalize",
-                  separator: "",
+                {Capitalize(column?.header, {
+                  separator: ""
                 })}
               </button>
             );
@@ -101,9 +101,8 @@ const MkdListTableFilterOptions = ({
                     }
                   }}
                 >
-                  {StringCaser(column.header, {
-                    casetype: "capitalize",
-                    separator: "",
+                  {Capitalize(column.header, {
+                    separator: ""
                   })}
                 </button>
               );
@@ -116,7 +115,7 @@ const MkdListTableFilterOptions = ({
         className={`h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] text-black`}
         onClick={() => {
           onColumnClick?.("created_at", operations?.BETWEEN, {
-            format: "date_range",
+            format: "date_range"
           });
         }}
       >

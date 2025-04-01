@@ -29,9 +29,10 @@ const Modal = ({
   modalHeader,
   modalCloseClick,
   disableCancel = false,
-  classes = { modal: "h-full", modalDialog: "h-[90%]", modalContent: "" },
+  classes = { modal: "h-full", modalDialog: "h-[90%]", modalContent: "" }
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const { Capitalize } = new StringCaser();
 
   // useEffect(() => {
   //   if (isOpen) {
@@ -68,7 +69,7 @@ const Modal = ({
       ref={modalRef}
       style={{
         zIndex: zIndex ?? 999999999999,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.5)"
       }}
       className={`fixed bottom-0 left-0 right-0 top-0 flex w-full scale-0 items-center justify-center bg-[#00000099] p-[1.5rem] backdrop-blur-sm transition-all ${
         isOpen ? "scale-100" : "scale-0"
@@ -84,15 +85,14 @@ const Modal = ({
         {modalHeader && (
           <div
             style={{
-              zIndex: 1,
+              zIndex: 1
             }}
             className={`bg-white sticky inset-x-0 top-0 m-auto flex w-full justify-between border-b px-5 py-4`}
           >
             <div className="font-iowan text-center text-[1.25rem] font-[700] capitalize leading-[1.5rem] tracking-[-1.5%]">
               {["string"].includes(typeof title)
-                ? StringCaser(title as string, {
-                    casetype: "capitalize",
-                    separator: " ",
+                ? Capitalize(title as string, {
+                    separator: " "
                   })
                 : title}
             </div>

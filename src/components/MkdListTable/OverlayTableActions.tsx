@@ -14,10 +14,11 @@ interface OverlayTableActionsProps {
   currentTableData: any;
 }
 
+const { Capitalize } = new StringCaser();
 const OverlayTableActions = ({
   actions,
   selectedItems,
-  currentTableData,
+  currentTableData
 }: OverlayTableActionsProps) => {
   return (
     <div className="fixed inset-x-0 bottom-5 z-[999999] m-auto flex !h-[3.25rem] !max-h-[3.25rem] w-fit items-center justify-start gap-2 rounded-[.875rem] bg-black px-[.75rem] pb-[.5rem] pt-[.5rem]">
@@ -84,7 +85,7 @@ const RenderButtonDropdownActions = ({
   action,
   actionKey,
   selectedItems,
-  currentTableData,
+  currentTableData
 }: RenderButtonDropdownActionsProps) => {
   return (
     <LazyLoad>
@@ -192,7 +193,7 @@ const RenderActions = ({
   selectedItems,
   action,
   actionKey,
-  currentTableData,
+  currentTableData
 }: RenderActionsProps) => {
   const selectedTableData = currentTableData.filter((item: any) =>
     selectedItems.includes(item?.id)
@@ -249,7 +250,7 @@ const RenderActionButtons = ({
   action,
   actionKey,
   selectedItems,
-  rows,
+  rows
 }: RenderActionButtonsProps) => {
   if (action?.bind) {
     switch (action?.bind?.action) {
@@ -281,13 +282,9 @@ const RenderActionButtons = ({
                   action.children
                 ) : (
                   <>
-                    {StringCaser(
-                      actionKey === "delete" ? "Remove" : actionKey,
-                      {
-                        casetype: "capitalize",
-                        separator: " ",
-                      }
-                    )}
+                    {Capitalize(actionKey === "delete" ? "Remove" : actionKey, {
+                      separator: " "
+                    })}
                   </>
                 )}
               </MkdButton>
@@ -323,9 +320,8 @@ const RenderActionButtons = ({
             action.children
           ) : (
             <>
-              {StringCaser(actionKey === "delete" ? "Remove" : actionKey, {
-                casetype: "capitalize",
-                separator: " ",
+              {Capitalize(actionKey === "delete" ? "Remove" : actionKey, {
+                separator: " "
               })}
             </>
           )}

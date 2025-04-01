@@ -33,6 +33,8 @@ const SetColumns = ({
   columnModel = "",
   columnData = null
 }: SetColumnsProps) => {
+  const { Capitalize } = new StringCaser();
+
   // if (!isOpen) return null;
   const { dispatch } = React.useContext(AuthContext);
   const {
@@ -471,8 +473,7 @@ const SetColumns = ({
                         }`}
                       />
                       <div className="grow px-5 text-left !capitalize">
-                        {StringCaser(column?.header, {
-                          casetype: "capitalize",
+                        {Capitalize(column?.header, {
                           separator: " "
                         })}
                       </div>
