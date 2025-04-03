@@ -164,13 +164,13 @@ export class StringCaser {
     text: string,
     options: Omit<StringCaserOptions, "casetype"> = {
       exclude: [],
-      separator: "",
+      separator: ""
     }
   ) {
     return this.stringCaser(text, {
       casetype: "UPPERCASE",
       separator: options?.separator,
-      exclude: options?.exclude,
+      exclude: options?.exclude
     });
   }
 
@@ -178,13 +178,13 @@ export class StringCaser {
     text: string,
     options: Omit<StringCaserOptions, "casetype"> = {
       exclude: [],
-      separator: "",
+      separator: ""
     }
   ) {
     return this.stringCaser(text, {
       casetype: "lowercase",
       separator: options?.separator,
-      exclude: options?.exclude,
+      exclude: options?.exclude
     });
   }
 
@@ -192,13 +192,14 @@ export class StringCaser {
     text: string,
     options: Omit<StringCaserOptions, "casetype"> = {
       exclude: [],
-      separator: "",
+      separator: ""
     }
   ) {
+    // return text;
     return this.stringCaser(text, {
       casetype: "Capitalize",
       separator: options?.separator,
-      exclude: options?.exclude,
+      exclude: options?.exclude
     });
   }
 
@@ -206,13 +207,13 @@ export class StringCaser {
     text: string,
     options: Omit<StringCaserOptions, "casetype"> = {
       exclude: [],
-      separator: "",
+      separator: ""
     }
   ) {
     return this.stringCaser(text, {
       casetype: "camelCase",
       separator: options?.separator,
-      exclude: options?.exclude,
+      exclude: options?.exclude
     });
   }
 
@@ -220,13 +221,13 @@ export class StringCaser {
     text: string,
     options: Omit<StringCaserOptions, "casetype"> = {
       exclude: [],
-      separator: "",
+      separator: ""
     }
   ) {
     return this.stringCaser(text, {
       casetype: "PascalCase",
       separator: options?.separator,
-      exclude: options?.exclude,
+      exclude: options?.exclude
     });
   }
 }
@@ -244,7 +245,7 @@ export const testColumns: TableColumn[] = [
   {
     header: "Action",
     accessor: "",
-    show: true,
+    show: true
   },
   {
     header: "Id",
@@ -253,7 +254,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "User Id",
@@ -262,7 +263,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "First Name",
@@ -271,7 +272,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Last Name",
@@ -280,7 +281,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Email",
@@ -289,7 +290,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Role",
@@ -300,8 +301,8 @@ export const testColumns: TableColumn[] = [
     mappingExist: true,
     mappings: {
       admin: "Admin",
-      employee: "Employee",
-    },
+      employee: "Employee"
+    }
   },
   {
     header: "Photo",
@@ -310,7 +311,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Phone",
@@ -319,7 +320,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Status",
@@ -328,7 +329,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: true,
-    mappings: { 0: "pending", 1: "approved" },
+    mappings: { 0: "pending", 1: "approved" }
   },
   {
     header: "Type",
@@ -340,8 +341,8 @@ export const testColumns: TableColumn[] = [
     mappings: {
       0: "normal",
       1: "facebook",
-      2: "google",
-    },
+      2: "google"
+    }
   },
   {
     header: "Verify",
@@ -352,8 +353,8 @@ export const testColumns: TableColumn[] = [
     mappingExist: true,
     mappings: {
       0: "not verified",
-      1: "verified",
-    },
+      1: "verified"
+    }
   },
   {
     header: "Create At",
@@ -362,7 +363,7 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
+    mappings: {}
   },
   {
     header: "Update At",
@@ -371,8 +372,8 @@ export const testColumns: TableColumn[] = [
     isSorted: false,
     isSortedDesc: false,
     mappingExist: false,
-    mappings: {},
-  },
+    mappings: {}
+  }
 ];
 
 interface Component {
@@ -442,7 +443,7 @@ export function insertChildrenIntoParents(
 
 export const RoleMap = {
   super_admin: "admin",
-  admin: "admin",
+  admin: "admin"
 };
 
 export const updatedRolesFn = (role: keyof typeof RoleMap, location: any) => {

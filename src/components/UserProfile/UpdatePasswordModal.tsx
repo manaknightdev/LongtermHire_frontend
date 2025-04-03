@@ -23,7 +23,7 @@ const UpdatePasswordModal = ({
   isOpen = false,
   onClose
 }: UpdatePasswordModalProps) => {
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
   const { sdk } = useSDK();
 
   const { tokenExpireError, showToast } = useContexts();
@@ -133,9 +133,12 @@ const UpdatePasswordModal = ({
                     />
                     {errors && errors?.confirm && (
                       <p className="text-field-error m-auto mt-2 text-[.8rem] italic text-red-500">
-                        {Capitalize(errors?.confirm?.message as string, {
-                          separator: " "
-                        })}
+                        {stringCaser.Capitalize(
+                          errors?.confirm?.message as string,
+                          {
+                            separator: " "
+                          }
+                        )}
                       </p>
                     )}
                   </div>

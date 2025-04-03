@@ -12,7 +12,7 @@ const MkdTabContainer = ({
   children,
   className = ""
 }: MkdTabContainerProps) => {
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
 
   const [activeId, setActiveId] = useState(0);
 
@@ -36,7 +36,7 @@ const MkdTabContainer = ({
                       activeId === tabKey ? "bg-[#f4f4f4] text-[#525252]" : ""
                     }`}
                   >
-                    {Capitalize(tab, {
+                    {stringCaser.Capitalize(tab, {
                       separator: " "
                     })}
                   </button>

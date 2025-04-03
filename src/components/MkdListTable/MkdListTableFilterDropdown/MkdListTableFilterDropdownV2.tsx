@@ -1,4 +1,3 @@
-import { MkdDebounceInput } from "@/components/MkdDebounceInput";
 import { memo, useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import {
@@ -49,7 +48,7 @@ const MkdListTableFilterDropdownV2 = ({
   onClose
 }: MkdListTableFilterDropdownV2Props) => {
   const [_showFilterOptions, setShowFilterOptions] = useState(false);
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
   // console.log("selectedOptions >>", selectedOptions);
   return (
     <div className="filter-form-holder  z-[9999999] grid h-full max-h-full min-h-full w-full min-w-full max-w-full grid-cols-1 grid-rows-[auto_1fr_auto_auto] overflow-hidden rounded-md bg-white p-5 shadow-xl">
@@ -117,7 +116,7 @@ const MkdListTableFilterDropdownV2 = ({
                                 className="mb-2 block cursor-pointer text-left text-sm font-bold text-gray-700"
                                 htmlFor={option?.uid}
                               >
-                                {Capitalize(columnData?.accessor, {
+                                {stringCaser.Capitalize(columnData?.accessor, {
                                   separator: "space"
                                 })}
                               </label>
@@ -175,9 +174,12 @@ const MkdListTableFilterDropdownV2 = ({
                         >
                           <LazyLoad>
                             <MkdInput
-                              label={Capitalize(columnData?.accessor, {
-                                separator: " "
-                              })}
+                              label={stringCaser.Capitalize(
+                                columnData?.accessor,
+                                {
+                                  separator: " "
+                                }
+                              )}
                               placeholder="Enter value..."
                               value={option?.value}
                               onChange={(e: any) => {

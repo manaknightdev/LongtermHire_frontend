@@ -31,7 +31,7 @@ interface MkdInputProps {
   showErrorMessage?: boolean;
 }
 
-const { Capitalize } = new StringCaser();
+const stringCaser = new StringCaser();
 
 const MkdInput = ({
   type = "text",
@@ -333,7 +333,7 @@ const MkdInput = ({
 
         {showErrorMessage && name && errors && errors?.[name] && (
           <p className="text-field-error absolute inset-x-0 top-[90%] m-auto mt-2 text-[.8rem] italic text-red-500">
-            {Capitalize(errors?.[name]?.message, {
+            {stringCaser.Capitalize(errors?.[name]?.message, {
               separator: " "
             })}
           </p>
@@ -387,6 +387,6 @@ function determineModalTitle(modal: string) {
     return "Select Time";
   }
 
-  const title = Capitalize(modal, { separator: "space" });
+  const title = stringCaser.Capitalize(modal, { separator: "space" });
   return title;
 }

@@ -14,7 +14,7 @@ interface OverlayTableActionsProps {
   currentTableData: any;
 }
 
-const { Capitalize } = new StringCaser();
+const stringCaser = new StringCaser();
 const OverlayTableActions = ({
   actions,
   selectedItems,
@@ -282,9 +282,12 @@ const RenderActionButtons = ({
                   action.children
                 ) : (
                   <>
-                    {Capitalize(actionKey === "delete" ? "Remove" : actionKey, {
-                      separator: " "
-                    })}
+                    {stringCaser.Capitalize(
+                      actionKey === "delete" ? "Remove" : actionKey,
+                      {
+                        separator: " "
+                      }
+                    )}
                   </>
                 )}
               </MkdButton>
@@ -320,9 +323,12 @@ const RenderActionButtons = ({
             action.children
           ) : (
             <>
-              {Capitalize(actionKey === "delete" ? "Remove" : actionKey, {
-                separator: " "
-              })}
+              {stringCaser.Capitalize(
+                actionKey === "delete" ? "Remove" : actionKey,
+                {
+                  separator: " "
+                }
+              )}
             </>
           )}
         </MkdButton>

@@ -8,18 +8,18 @@ interface PublicRouteProps {
 }
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ element, path }) => {
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
 
   useEffect(() => {
     const defaultPath = "/";
     const metadata = metadataJSON[path || defaultPath] || metadataJSON[""];
 
     document.title = metadata?.title
-      ? Capitalize(metadata.title, {
+      ? stringCaser.Capitalize(metadata.title, {
           separator: " "
         })
       : "Wireframe Tool | Manaknight Digital";
-  }, [path, Capitalize]);
+  }, [path]);
 
   return element;
 };

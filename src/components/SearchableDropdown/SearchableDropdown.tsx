@@ -83,7 +83,7 @@ const SearchableDropdown = ({
   onPopoverStateChange,
   popoverShown
 }: SearchableDropdownProps) => {
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
   // Refs
   const uniqueId = uuidv4();
   const uniqueClassName = btoa(uniqueId);
@@ -118,9 +118,12 @@ const SearchableDropdown = ({
             if (item?.first_name || item?.last_name) {
               return {
                 ...item,
-                full_name: Capitalize(`${item.first_name} ${item.last_name}`, {
-                  separator: " "
-                })
+                full_name: stringCaser.Capitalize(
+                  `${item.first_name} ${item.last_name}`,
+                  {
+                    separator: " "
+                  }
+                )
               };
             } else {
               return item;
@@ -686,7 +689,7 @@ const SearchableDropdown = ({
 
             {errors && name && errors?.[name!] && (
               <p className="text-field-error absolute inset-x-0 top-[90%] m-auto mt-2 text-[.8rem] italic text-red-500">
-                {Capitalize(errors?.[name!]?.message, {
+                {stringCaser.Capitalize(errors?.[name!]?.message, {
                   separator: " "
                 })}
               </p>

@@ -32,7 +32,7 @@ const Modal = ({
   classes = { modal: "h-full", modalDialog: "h-[90%]", modalContent: "" }
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
 
   // useEffect(() => {
   //   if (isOpen) {
@@ -91,7 +91,7 @@ const Modal = ({
           >
             <div className="font-iowan text-center text-[1.25rem] font-[700] capitalize leading-[1.5rem] tracking-[-1.5%]">
               {["string"].includes(typeof title)
-                ? Capitalize(title as string, {
+                ? stringCaser.Capitalize(title as string, {
                     separator: " "
                   })
                 : title}

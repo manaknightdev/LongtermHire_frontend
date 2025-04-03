@@ -25,7 +25,7 @@ const FilterJoinDropdown = ({
   option,
   setOptionValue
 }: FilterJoinDropdownProps) => {
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
 
   return (
     <>
@@ -35,7 +35,7 @@ const FilterJoinDropdown = ({
           className="flex w-full flex-col items-start "
           uniqueKey={"id"}
           displaySeparator={"-"}
-          label={Capitalize(columnData?.accessor, {
+          label={stringCaser.Capitalize(columnData?.accessor, {
             separator: " "
           })}
           display={[columnData?.accessor]}
@@ -67,7 +67,7 @@ const FilterJoinDropdown = ({
           uniqueKey={"id"}
           displaySeparator={"-"}
           table={columnData?.join}
-          label={Capitalize(columnData?.accessor, {
+          label={stringCaser.Capitalize(columnData?.accessor, {
             separator: " "
           })}
           display={[columnData?.accessor]}

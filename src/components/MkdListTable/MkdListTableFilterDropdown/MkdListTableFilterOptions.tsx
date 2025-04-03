@@ -42,7 +42,7 @@ const MkdListTableFilterOptions = ({
   onColumnClick
 }: MkdListTableFilterOptionsProps) => {
   const { operations } = useSDK();
-  const { Capitalize } = new StringCaser();
+  const stringCaser = new StringCaser();
 
   return (
     <div
@@ -74,7 +74,7 @@ const MkdListTableFilterOptions = ({
                   }
                 }}
               >
-                {Capitalize(column?.header, {
+                {stringCaser.Capitalize(column?.header, {
                   separator: ""
                 })}
               </button>
@@ -101,7 +101,7 @@ const MkdListTableFilterOptions = ({
                     }
                   }}
                 >
-                  {Capitalize(column.header, {
+                  {stringCaser.Capitalize(column.header, {
                     separator: ""
                   })}
                 </button>
