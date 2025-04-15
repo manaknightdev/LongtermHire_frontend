@@ -1,6 +1,3 @@
-
-            import { lazy } from "react";
+import { lazy } from "react";
 
 export const AdminHeader = lazy(() => import("./AdminHeader"));
-
-            

@@ -17,16 +17,20 @@ const LazyLoad = ({
   children,
   counts = [1],
   count = 1,
-  // className,
+  className: propClassName,
   circle = false,
-  brand = false
+  brand = false,
+  view: _view, // Prefix with underscore to indicate it's intentionally unused
 }: LazyLoadProps) => {
   const childrenArray = React.Children.toArray(children).filter(
     Boolean
   ) as React.ReactElement[];
-  const className = childrenArray.filter(Boolean)[0]?.props?.className
-    ? childrenArray[0]?.props?.className
-    : "";
+
+  // Use the provided className prop if available, otherwise try to get it from children
+  const className =
+    propClassName ||
+    (childrenArray.length > 0 && childrenArray[0]?.props?.className) ||
+    "";
   // console.log("childrenArray >>", childrenArray);
   // console.log("className >>", className);
 

@@ -3,16 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "node git-hook-setup.js && vite",
     "tc": "tsc --noEmit",
-    "tw": "npx tailwindcss -i ./src/index.css -o ./src/output.css --watch",
-    "build": "tsc && vite build",
+    "lint": "eslint . --fix",
     "preview": "vite preview",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/mkd_logo.png",
-    "commit": "git add . && git commit -m \"Update | test fixes\" && git pull && git push origin android",
-    "push": "yarn build && yarn commit:script",
-    "commit:script": "node git-script add,commit,pull,push message=\"UPDATE | merge wireframe \" origin=master",
-    "lint": "eslint . --fix"
+    "test": "playwright test",
+    "build": "tsc && vite build",
+    "test:e2e": "playwright test",
+    "dev:test": "vite --port 3002",
+    "test:ui": "playwright test --ui",
+    "dev": "node git-hook-setup.js && vite",
+    "test:unit": "echo \"Unit tests not implemented yet\"",
+    "test:integration": "echo \"Integration tests not implemented yet\"",
+    "tw": "npx tailwindcss -i ./src/index.css -o ./src/output.css --watch",
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/mkd_logo.png"
   },
   "dependencies": {
     "@craftjs/core": "^0.2.0-beta.11",
@@ -117,6 +120,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@playwright/test": "^1.51.1",
     "@types/node": "^22.13.1",
     "@types/prettier": "^3.0.0",
     "@types/react": "^18.3.18",

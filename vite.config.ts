@@ -111,7 +111,7 @@ const config: UserConfig = {
     },
   },
   server: {
-    port: 3001,
+    port: parseInt(process.env.PORT || "3001"),
   },
 };
 
