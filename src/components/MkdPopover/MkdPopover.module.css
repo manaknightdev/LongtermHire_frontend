@@ -1,0 +1,47 @@
+.button {
+  position: relative;
+  border: none;
+  color: #ffffff;
+  text-align: center;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+.button:after {
+  content: "";
+  background: #4f46e5;
+  display: block;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s;
+}
+
+.button:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s;
+}
+.tip {
+  position: absolute;
+  top: anchor(bottom);
+  left: anchor(50%);
+}
+
+/* PopoverOnClick.css */
+
+/* Customize the appearance of the tooltip */
+.tooltip {
+  background-color: #333;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  /* Add any other styles you need */
+}

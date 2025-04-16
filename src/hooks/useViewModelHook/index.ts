@@ -1,0 +1,1 @@
+export { useViewModelHook } from "./useViewModelHook";
