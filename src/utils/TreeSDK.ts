@@ -81,7 +81,10 @@ export default class TreeSDK {
       ([key, value]) => {
         if (exlude?.includes(key)) return;
         headers.append(key, value);
+      }
     );
+    return headers;
+  }
 
   baseUrl(): string {
     return this._baseurl;

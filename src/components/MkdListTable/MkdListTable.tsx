@@ -254,11 +254,7 @@ const MkdListTable = ({
         setColumnData((prev: any) => {
           return {
             ...prev,
-<<<<<<< HEAD
             columns: tempColumns,
-=======
-            columns: tempColumns
->>>>>>> ca61b841660d6bb17fab3a7cbbd49022ae7bc1e5
           };
         });
       }
