@@ -8,16 +8,16 @@ import { LoginBgNew } from "@/assets/images";
 import { useContexts } from "@/hooks/useContexts";
 import { ToastStatusEnum, RoleEnum } from "@/utils/Enums";
 import { LazyLoad } from "@/components/LazyLoad";
-import { MkdInput } from "@/components/MkdInput";
 import { useSDK } from "@/hooks/useSDK";
 import { MkdPasswordInput } from "@/components/MkdPasswordInput";
+import MkdInputV2 from "@/components/MkdInputV2";
 
 interface AdminLoginPageProps {
   role?: string;
 }
 
 const AdminLoginPage = ({
-  role = RoleEnum.SUPER_ADMIN
+  role = RoleEnum.SUPER_ADMIN,
 }: AdminLoginPageProps) => {
   const { sdk } = useSDK();
 
@@ -34,7 +34,7 @@ const AdminLoginPage = ({
   const schema = yup
     .object({
       email: yup.string().email().required(),
-      password: yup.string().required()
+      password: yup.string().required(),
     })
     .required();
 
@@ -42,9 +42,9 @@ const AdminLoginPage = ({
     register,
     handleSubmit,
     setError,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data: yup.InferType<typeof schema>) => {
@@ -56,7 +56,7 @@ const AdminLoginPage = ({
       if (!result.error) {
         dispatch({
           type: "LOGIN",
-          payload: result as any
+          payload: result as any,
         });
         showToast("Succesfully Logged In", 4000, ToastStatusEnum.SUCCESS);
         navigate(redirect_uri ?? `/admin/build`);
@@ -68,7 +68,7 @@ const AdminLoginPage = ({
             const field = keys[i];
             setError(field as "email" | "password", {
               type: "manual",
-              message: result.validation[field]
+              message: result.validation[field],
             });
           }
         }
@@ -86,7 +86,7 @@ const AdminLoginPage = ({
         type: "manual",
         message: error?.response?.data?.message
           ? error?.response?.data?.message
-          : error?.message
+          : error?.message,
       });
     }
   };
@@ -132,14 +132,25 @@ const AdminLoginPage = ({
           <form className="w-full max-w-full" onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-6 flex flex-col text-sm">
               <LazyLoad>
-                <MkdInput
-                  type="email"
-                  label="Email"
+                <MkdInputV2
                   name="email"
-                  placeholder="admin@mail.com"
+                  type="email"
                   register={register}
                   errors={errors}
-                />
+                  required
+                  placeholder="admin@mail.com"
+                >
+                  <MkdInputV2.Container>
+                    <MkdInputV2.Label className="text-blue-600">
+                      Email Address
+                    </MkdInputV2.Label>
+                    <MkdInputV2.Field
+                      // placeholder="Enter your email"
+                      className="border-blue-200 focus:border-blue-500"
+                    />
+                    <MkdInputV2.Error />
+                  </MkdInputV2.Container>
+                </MkdInputV2>
               </LazyLoad>
             </div>
             <div className="flex flex-col text-sm">

@@ -23,7 +23,7 @@ import {
   UserMagicLoginPage,
   ListAdminWireframeTablePage,
   AdminSignUpPage,
-  TestUpload,
+  TestComponents,
 } from "./LazyLoad";
 
 import EditWireframePage from "@/pages/Admin/Edit/EditWireframePage";
@@ -317,13 +317,13 @@ export default () => {
         {/* Custom Routes */}
 
         <Route
-          path="/test-upload"
+          path="/test-components"
           element={
             <PublicRoute
-              path={"/test-upload"}
+              path={"/test-components"}
               element={
                 <PublicWrapper>
-                  <TestUpload />
+                  <TestComponents />
                 </PublicWrapper>
               }
             />
@@ -359,12 +359,12 @@ export default () => {
                     name: `${state?.role} Login`,
                     route: `/${state?.role}/login`,
                   },
-                  { name: "Test Upload", route: "/test-upload" },
+                  { name: "Test Components", route: "/test-components" },
                 ]
               : [
                   { name: "Admin Login", route: "/admin/login" },
                   { name: "User Login", route: "/user/login" },
-                  { name: "Test Upload", route: "/test-upload" },
+                  { name: "Test Components", route: "/test-components" },
                 ]),
           ]}
           title="Change Route"

@@ -68,8 +68,8 @@ export const UserMagicLoginPage = lazy(() => {
 
 // OTHERS
 
-export const TestUpload = lazy(() => {
-  const __import = import("@/pages/PG/Custom/TestUpload");
+export const TestComponents = lazy(() => {
+  const __import = import("@/pages/PG/Custom/TestComponents");
   __import.finally(() => {});
   return __import;
 });
