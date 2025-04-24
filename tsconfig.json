@@ -23,10 +23,11 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["prettier"]
   },
-  "include": ["/", "src", "src/types", "src/utils"],
+  "include": ["src", "src/types", "src/utils"],
   "exclude": [
     "node_modules",
     "**/*.spec.ts",
+    "**/*.e2e.ts",
     "dist",
     "dev-dist",
     "playwright-report",

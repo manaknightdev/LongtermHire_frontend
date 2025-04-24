@@ -23,6 +23,17 @@ const __dirname = dirname(__filename);
 const repoRoot = join(__dirname, '..', '..');
 process.chdir(repoRoot);
 
+console.log('Running Type Check...');
+const typeResult = spawnSync('npm', ['run', 'tc'], {
+    stdio: 'inherit',
+    shell: true
+});
+
+if (typeResult.status !== 0) {
+    console.error('❌ Type Check failed. Please fix the errors before committing.');
+    process.exit(1);
+}
+
 console.log('Running ESLint...');
 const lintResult = spawnSync('npm', ['run', 'lint'], {
     stdio: 'inherit',

@@ -1,7 +1,7 @@
 {
-  "name": "adminportal",
+  "name": "mkd-baasv5-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.10.0",
   "scripts": {
     "dev:skip": "vite",
     "tc": "tsc --noEmit",
