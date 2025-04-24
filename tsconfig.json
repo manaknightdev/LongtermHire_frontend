@@ -31,7 +31,8 @@
     "dist",
     "dev-dist",
     "playwright-report",
-    "test-results"
+    "test-results",
+    "src/test/e2e/global-setup.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

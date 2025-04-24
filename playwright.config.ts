@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
 
 /**
  * See https://playwright.dev/docs/test-configuration
@@ -36,7 +37,7 @@ export default defineConfig({
   },
 
   /* Global setup to run before all tests */
-  // globalSetup: path.join(__dirname, "src/test/e2e/global-setup.ts"),
+  globalSetup: path.join(__dirname, "src/test/e2e/global-setup.ts"),
 
   /* Configure projects for major browsers */
   projects: [
