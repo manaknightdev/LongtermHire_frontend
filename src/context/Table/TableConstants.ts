@@ -1,0 +1,1 @@
+export const SET_TABLE_PROPERTY = "SET_TABLE_PROPERTY";

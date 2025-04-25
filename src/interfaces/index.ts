@@ -1,5 +1,10 @@
 export type {
   Action,
+  Column,
+  ModalState,
+  FilterState,
+  ExternalData,
   ActionBindType,
-  ColumnDataState,
+  PaginationState,
+  ColumnDataState
 } from "./table.interface";

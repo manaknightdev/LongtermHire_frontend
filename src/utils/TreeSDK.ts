@@ -5,7 +5,7 @@ import { RestAPIMethodEnum } from "./Enums";
 export interface TreeSDKOptions {
   join?: string | string[];
   order?: string;
-  direction?: "asc" | "desc";
+  direction?: "asc" | "desc" | string | undefined;
   filter?: string[];
   size?: number;
   page?: number;
@@ -70,7 +70,7 @@ export default class TreeSDK {
     const baseHeaders: TreeSDKHeaders = {
       "Content-Type": "application/json",
       "x-project": this._base64Encode,
-      Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      Authorization: `Bearer ${localStorage.getItem("token") || ""}`
     };
 
     // Create Headers instance
@@ -123,8 +123,8 @@ export default class TreeSDK {
   }
 
   private getOrdering(options: TreeSDKOptions): string {
-    const order = options.order ?? "id";
-    const direction = options.direction ?? "desc";
+    const order = empty(options.order) ? "id" : options.order;
+    const direction = empty(options.direction) ? "desc" : options.direction;
     return `order=${order},${direction}&`;
   }
 
@@ -164,7 +164,7 @@ export default class TreeSDK {
       params = {},
       signal,
       dynamicEndpoint = false,
-      additionalHeaders = {},
+      additionalHeaders = {}
     } = config;
 
     // Construct dynamic endpoint if needed
@@ -183,7 +183,7 @@ export default class TreeSDK {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
-      signal,
+      signal
     };
     const role = this.getRole();
     try {
@@ -229,7 +229,7 @@ export default class TreeSDK {
 
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}/${id}?${joinQuery}`,
-      method: RestAPIMethodEnum.GET,
+      method: RestAPIMethodEnum.GET
     });
   }
 
@@ -245,7 +245,7 @@ export default class TreeSDK {
 
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}?${filterQuery}`,
-      method: RestAPIMethodEnum.GET,
+      method: RestAPIMethodEnum.GET
     });
   }
 
@@ -261,7 +261,7 @@ export default class TreeSDK {
 
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}/${id}?${joinQuery}`,
-      method: RestAPIMethodEnum.GET,
+      method: RestAPIMethodEnum.GET
     });
   }
 
@@ -279,7 +279,7 @@ export default class TreeSDK {
 
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}?${joinQuery}${filterQuery}${orderQuery}size=${size}&page=${page}`,
-      method: RestAPIMethodEnum.GET,
+      method: RestAPIMethodEnum.GET
     });
   }
 
@@ -299,7 +299,7 @@ export default class TreeSDK {
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}?${joinQuery}${filterQuery}${orderQuery}size=${size}&page=${page}`,
       method: RestAPIMethodEnum.GET,
-      signal,
+      signal
     });
   }
 
@@ -312,7 +312,7 @@ export default class TreeSDK {
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}`,
       method: RestAPIMethodEnum.POST,
-      body: payload,
+      body: payload
     });
   }
 
@@ -326,7 +326,7 @@ export default class TreeSDK {
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}/${id}`,
       method: RestAPIMethodEnum.PUT,
-      body: payload,
+      body: payload
     });
   }
 
@@ -342,7 +342,7 @@ export default class TreeSDK {
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}`,
       method: RestAPIMethodEnum.PUT,
-      body: { ...payload, updateCondition: where },
+      body: { ...payload, updateCondition: where }
     });
   }
 
@@ -356,7 +356,7 @@ export default class TreeSDK {
     return this.request<T>({
       endpoint: `/{{project}}/{{role}}/${table}/${id}`,
       method: RestAPIMethodEnum.DELETE,
-      body: payload,
+      body: payload
     });
   }
 }

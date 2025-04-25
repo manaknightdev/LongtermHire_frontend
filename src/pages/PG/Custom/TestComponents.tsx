@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useSDK } from "@/hooks/useSDK";
-import { MkdButton } from "@/components/MkdButton";
-import { LazyLoad } from "@/components/LazyLoad";
-import { MkdInputV2HookFormExample } from "@/components/MkdInputV2";
+// import { MkdButton } from "@/components/MkdButton";
+// import { LazyLoad } from "@/components/LazyLoad";
+// import { MkdInputV2HookFormExample } from "@/components/MkdInputV2";
+// import MkdListTableWithQueryExample from "@/components/MkdListTable/MkdListTableWithQuery.example";
 
 const TestUpload = () => {
   const { sdk } = useSDK();
@@ -34,7 +35,7 @@ const TestUpload = () => {
 
   return (
     <div className={`h-full min-h-full max-h-full overflow-auto`}>
-      <div className="flex flex-col items-center space-y-4 p-4">
+      {/* <div className="flex flex-col items-center space-y-4 p-4">
         <input
           type="file"
           accept="image/*"
@@ -62,11 +63,11 @@ const TestUpload = () => {
         <MkdButton onClick={handleUpload} disabled={!file} className="mt-4">
           Upload Image{" "}
         </MkdButton>
-      </div>
+      </div> */}
 
-      <LazyLoad>
-        <MkdInputV2HookFormExample />
-      </LazyLoad>
+      {/* <LazyLoad>
+        <MkdListTableWithQueryExample />
+      </LazyLoad> */}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { NarrowUpArrowIcon } from "@/assets/svgs";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { LimitSelect } from "./index";
 import { MkdPopover } from "@/components/MkdPopover";
 import { LazyLoad } from "@/components/LazyLoad";
@@ -11,8 +11,8 @@ interface PaginationBarProps {
   canPreviousPage: boolean;
   canNextPage: boolean;
   updatePageSize: (pageSize: number) => void;
-  previousPage: () => void;
-  nextPage: () => void;
+  previousPage?: () => void;
+  nextPage?: () => void;
   startSize: number;
   multiplier: number;
   updateCurrentPage: (page: number) => void;
@@ -25,14 +25,26 @@ const PaginationBar = ({
   canPreviousPage,
   canNextPage,
   updatePageSize,
-  previousPage,
-  nextPage,
+  // previousPage,
+  // nextPage,
   startSize = 500,
   multiplier = 100,
   updateCurrentPage,
-  canChangeLimit = true,
+  canChangeLimit = true
 }: PaginationBarProps) => {
   const [showAboveFive, setShowAboveFive] = useState(false);
+
+  const nextPage = useCallback(() => {
+    if (canNextPage && currentPage + 1 <= pageCount) {
+      updateCurrentPage(currentPage + 1);
+    }
+  }, [canNextPage, currentPage, pageCount, updateCurrentPage]);
+
+  const previousPage = useCallback(() => {
+    if (canPreviousPage && currentPage - 1 > 0) {
+      updateCurrentPage(currentPage - 1);
+    }
+  }, [canPreviousPage, currentPage, updateCurrentPage]);
 
   return (
     <div className=" flex h-fit w-full flex-col items-center justify-between gap-[1.5rem]  pl-2 md:flex-row">

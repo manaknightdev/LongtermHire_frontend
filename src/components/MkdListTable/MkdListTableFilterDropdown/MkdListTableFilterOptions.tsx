@@ -1,5 +1,6 @@
 import { StringCaser } from "@/utils/utils";
 import { useSDK } from "@/hooks/useSDK";
+import { Column } from "@/interfaces";
 
 const excludedFields = [
   "row",
@@ -25,14 +26,7 @@ const excludedFields = [
 
 interface MkdListTableFilterOptionsProps {
   selectedOptions?: string[];
-  columns?: {
-    accessor: string;
-    header: string;
-    filter_field: string;
-    isFilter?: boolean;
-    selected_column?: boolean;
-    join?: string;
-  }[];
+  columns?: Column[];
   onColumnClick?: (column: string, operation?: string, config?: any) => void;
   setShowFilterOptions?: (show: boolean) => void;
 }
@@ -57,8 +51,8 @@ const MkdListTableFilterOptions = ({
         .map((column) => {
           if (
             column?.hasOwnProperty("isFilter") &&
-            column.isFilter &&
-            column.hasOwnProperty("selected_column") &&
+            column?.isFilter &&
+            column?.hasOwnProperty("selected_column") &&
             column?.selected_column
           ) {
             return (

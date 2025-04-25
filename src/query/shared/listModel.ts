@@ -5,7 +5,11 @@ import { TreeSDKOptions } from "@/utils/TreeSDK";
 
 export const useGetPaginateQuery = (
   table: keyof typeof queryKeys,
-  options?: TreeSDKOptions
+  options?: TreeSDKOptions,
+  config?: {
+    enabled?: boolean;
+    [key: string]: any;
+  }
 ) => {
   const { tdk } = useSDK();
 
@@ -25,8 +29,8 @@ export const useGetPaginateQuery = (
 
   return useQuery({
     queryKey: [queryKeys?.[table]?.paginate, table, options],
-    enabled: !!table,
-    queryFn: () => queryFn(table, options)
+    queryFn: () => queryFn(table, options),
+    ...config
   });
 };
 

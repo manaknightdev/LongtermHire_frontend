@@ -61,7 +61,7 @@ const MkdListTable = ({
   selectedItems = [],
   allowSortColumns = true,
   noDataComponent,
-  showScrollbar = true,
+  showScrollbar = true
 }: MkdListTableProps) => {
   const [_deleteId, setIdToDelete] = React.useState(null);
   const [_isOneOrMoreRowSelected, setIsOneOrMoreRowSelected] =
@@ -254,7 +254,7 @@ const MkdListTable = ({
         setColumnData((prev: any) => {
           return {
             ...prev,
-            columns: tempColumns,
+            columns: tempColumns
           };
         });
       }
@@ -319,7 +319,7 @@ const MkdListTable = ({
       },
       0
     );
-    setSelectedColumnLength(length);
+    setSelectedColumnLength(length ?? 0);
   }, [currentColumnsMemo]);
 
   return (

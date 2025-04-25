@@ -14,13 +14,16 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({
   path,
   element,
-  access,
+  access
 }: PrivateRouteProps) => {
   const { authState } = useContexts();
-console.log(authState)
+
   if (authState?.isAuthenticated) {
     switch (true) {
-      case [...(["string"].includes(typeof access)? [access]: access), authState?.role].includes(RoleEnum.ADMIN):
+      case [
+        ...(["string"].includes(typeof access) ? [access] : access),
+        authState?.role
+      ].includes(RoleEnum.ADMIN):
         return <AdminRoute path={path}>{element}</AdminRoute>;
 
       default:

@@ -5,16 +5,15 @@ import { ModalSidebar } from "@/components/ModalSidebar";
 import MkdListTableFilterDropdownV2 from "./MkdListTableFilterDropdown/MkdListTableFilterDropdownV2";
 import { FilterIcon } from "lucide-react";
 import { DisplayEnum } from "@/utils/Enums";
-
+import { ColumnDataState } from "@/interfaces";
 interface MkdListTableFilterProps {
   onSubmit: () => void;
-  columnData: {
-    columns: any[] | undefined;
-  };
+  columnData: ColumnDataState;
   onColumnClick: (column: string, operation?: string, config?: any) => void;
   setOptionValue: (field: string, value: any, uid: any) => void;
   selectedOptions: any[];
   setSelectedOptions?: React.Dispatch<React.SetStateAction<any[]>>;
+  removeSelectedOption: (uid: string[]) => void;
   filterDisplays?: DisplayEnum[];
   onOptionValueChange?: (value: any) => void;
 }
@@ -25,9 +24,9 @@ const MkdListTableFilter = ({
   onColumnClick,
   setOptionValue,
   selectedOptions,
-  setSelectedOptions,
+  removeSelectedOption,
   filterDisplays = [],
-  onOptionValueChange,
+  onOptionValueChange
 }: MkdListTableFilterProps) => {
   const [openFilter, setOpenFilter] = React.useState(false);
   // const [showFilterOptions, setShowFilterOptions] = React.useState(false);
@@ -62,7 +61,7 @@ const MkdListTableFilter = ({
             headerContentClassName={"text-black"}
             closePosition={2}
             classes={{
-              modalBody: "bg-white",
+              modalBody: "bg-white"
             }}
           >
             <LazyLoad>
@@ -72,9 +71,9 @@ const MkdListTableFilter = ({
                 onColumnClick={onColumnClick}
                 setOptionValue={setOptionValue}
                 selectedOptions={selectedOptions}
-                setSelectedOptions={setSelectedOptions}
-                onOptionValueChange={onOptionValueChange}
                 onClose={() => setOpenFilter(false)}
+                onOptionValueChange={onOptionValueChange}
+                removeSelectedOption={removeSelectedOption}
               />
             </LazyLoad>
           </ModalSidebar>

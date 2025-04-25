@@ -10,18 +10,11 @@ import { MkdButton } from "@/components/MkdButton";
 import { InteractiveButton } from "@/components/InteractiveButton";
 import { StringCaser } from "@/utils/utils";
 import { MkdInput } from "@/components/MkdInput";
+import { Column } from "@/interfaces";
 
 interface MkdListTableFilterDropdownV2Props {
   onSubmit: () => void;
-  columns?: {
-    accessor: string;
-    header: string;
-    filter_field: string;
-    selected_column: boolean;
-    join?: string;
-    mappings?: { [key: string | number]: any };
-    mappingExist?: boolean;
-  }[];
+  columns?: Column[];
   selectedOptions?: {
     accessor: string;
     operator: string;
@@ -33,7 +26,7 @@ interface MkdListTableFilterDropdownV2Props {
   }[];
   onColumnClick?: (column: string, operation?: string, config?: any) => void;
   setOptionValue: (key: string, value: any, uid: string) => void;
-  setSelectedOptions: any;
+  removeSelectedOption: (uid: string[]) => void;
   onOptionValueChange?: (value: any) => void;
   onClose: () => void;
 }
@@ -44,7 +37,7 @@ const MkdListTableFilterDropdownV2 = ({
   selectedOptions = [],
   onColumnClick,
   setOptionValue,
-  setSelectedOptions,
+  removeSelectedOption,
   onClose
 }: MkdListTableFilterDropdownV2Props) => {
   const [_showFilterOptions, setShowFilterOptions] = useState(false);
@@ -206,9 +199,7 @@ const MkdListTableFilterDropdownV2 = ({
               <RiDeleteBin5Line
                 className="cursor-pointer self-end text-2xl !text-sub-500"
                 onClick={() => {
-                  setSelectedOptions((prev: any[]) =>
-                    prev.filter((op: any) => op.uid !== option?.uid)
-                  );
+                  removeSelectedOption([option?.uid]);
                 }}
               />
             </div>
@@ -243,7 +234,10 @@ const MkdListTableFilterDropdownV2 = ({
       <div className="flex items-center justify-center">
         <MkdButton
           type="button"
-          onClick={() => setSelectedOptions && setSelectedOptions(() => [])}
+          onClick={() =>
+            removeSelectedOption &&
+            removeSelectedOption(selectedOptions?.map((item) => item?.uid))
+          }
           disabled={selectedOptions?.length === 0 ? true : false}
           className={`!shadow-none !text-black w-fit !border-0 !bg-white font-[700] !underline`}
         >

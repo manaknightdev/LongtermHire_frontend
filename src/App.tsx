@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/context/Auth";
 import { GlobalProvider } from "@/context/Global";
+import { TableProvider } from "@/context/Table";
 // rcovery
 import Main from "@/routes/Routes";
 import "@uppy/core/dist/style.css";
@@ -27,7 +28,13 @@ const stripePromise = loadStripe(
 );
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      experimental_prefetchInRender: true
+    }
+  }
+});
 
 function App(): JSX.Element {
   return (
@@ -35,13 +42,15 @@ function App(): JSX.Element {
       <LazyLoad brand>
         <AuthProvider>
           <GlobalProvider>
-            <QueryClientProvider client={queryClient}>
-              <Router>
-                <Elements stripe={stripePromise}>
-                  <Main />
-                </Elements>
-              </Router>
-            </QueryClientProvider>
+            <TableProvider>
+              <QueryClientProvider client={queryClient}>
+                <Router>
+                  <Elements stripe={stripePromise}>
+                    <Main />
+                  </Elements>
+                </Router>
+              </QueryClientProvider>
+            </TableProvider>
           </GlobalProvider>
         </AuthProvider>
       </LazyLoad>

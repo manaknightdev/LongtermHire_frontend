@@ -36,6 +36,13 @@ import { ToastStatusEnum } from "@/utils/Enums";
 import { Settings } from "@/context/Global/types";
 import { Model, Role } from "@/context/Global/types";
 import { Route } from "@/context/Global/types";
+import {
+  setTableProperty,
+  TableAction,
+  TableContext,
+  TableContextType,
+  TableState
+} from "@/context/Table";
 
 interface ApiResponse<T = any> {
   error: boolean;
@@ -46,7 +53,9 @@ interface ApiResponse<T = any> {
 interface UseContextsResult {
   globalState: GlobalState;
   authState: AuthState;
+  tableState: TableState;
   authDispatch: React.Dispatch<AuthAction>;
+  tableDispatch: React.Dispatch<TableAction>;
   globalDispatch: React.Dispatch<GlobalAction>;
   showToast: (
     message: string,
@@ -55,6 +64,7 @@ interface UseContextsResult {
   ) => void;
   setLoading: (state: string, data: any, where?: string) => void;
   setGlobalState: (state: string, value: any) => void;
+  setTableState: (state: string, value: any) => void;
   tokenExpireError: (message: string) => void;
   getMany: (table: string, options: GetListOptions) => Promise<ApiResponse>;
   getListByFilter: (
@@ -111,6 +121,8 @@ const useContexts = (): UseContextsResult => {
   } = useContext<GlobalContextType>(GlobalContext);
   const { state: authState, dispatch: authDispatch } =
     useContext<AuthContextType>(AuthContext);
+  const { state: tableState, dispatch: tableDispatch } =
+    useContext<TableContextType>(TableContext);
 
   const showToast = useCallback(
     (
@@ -128,6 +140,13 @@ const useContexts = (): UseContextsResult => {
       setGLobalProperty(globalDispatch, value, state);
     },
     [globalDispatch]
+  );
+
+  const setTableState = useCallback(
+    (state: string, value: any) => {
+      setTableProperty(tableDispatch, value, state);
+    },
+    [tableDispatch]
   );
 
   const setLoading = useCallback(
@@ -261,8 +280,10 @@ const useContexts = (): UseContextsResult => {
   return {
     globalState,
     authState,
+    tableState,
     globalDispatch,
     authDispatch,
+    tableDispatch,
     showToast,
     setGlobalState,
     tokenExpireError,
@@ -275,6 +296,7 @@ const useContexts = (): UseContextsResult => {
     remove,
     custom,
     setLoading,
+    setTableState,
     projectConfig: {
       updateSettings: updateSettings || (() => {}),
       setDefaultTablesShown: setDefaultTablesShown || (() => {}),

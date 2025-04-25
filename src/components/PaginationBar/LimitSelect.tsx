@@ -25,7 +25,7 @@ const LimitSelect = ({
           disabled={!canChangeLimit}
           className={`${
             !canChangeLimit ? "appearance-none bg-none px-2" : ""
-          } h-[2.5rem] max-h-[2.5rem] w-fit min-w-fit self-end rounded-[.125rem] border-black bg-brown-main-bg py-[.375rem]`}
+          } h-[2.5rem] max-h-[2.5rem] w-fit min-w-fit self-end rounded-[.625rem] py-[.375rem]`}
           value={pageSize}
           onChange={(e) => {
             updatePageSize(Number(e.target.value));

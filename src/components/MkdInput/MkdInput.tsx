@@ -340,31 +340,33 @@ const MkdInput = ({
         )}
       </div>
 
-      <Modal
-        modalHeader
-        title={inputData.modal ? determineModalTitle(inputData?.modal) : ""}
-        isOpen={inputData.showModal}
-        modalCloseClick={() => onToggleModal(null, false)}
-        classes={{
-          modalDialog:
-            "!px-0 !rounded-[.125rem] h-fit min-h-fit max-h-fit !w-full !max-w-full !min-w-full ",
-          modalContent: `!z-10 !mt-0 overflow-hidden !pt-0`,
-          modal: "h-full"
-        }}
-      >
-        {inputData.showModal && ["custom_date"].includes(inputData.modal!) ? (
-          <LazyLoad>
-            <MkdCalendar
-              selectedDay={selectedDay}
-              setSelectedDay={setSelectedDay}
-              onSave={() => {
-                onChange({ target: { value: selectedDay } });
-                onToggleModal(null, false);
-              }}
-            />
-          </LazyLoad>
-        ) : null}
-      </Modal>
+      {inputData.showModal ? (
+        <Modal
+          modalHeader
+          title={inputData.modal ? determineModalTitle(inputData?.modal) : ""}
+          isOpen={inputData.showModal}
+          modalCloseClick={() => onToggleModal(null, false)}
+          classes={{
+            modalDialog:
+              "!px-0 !rounded-[.125rem] h-fit min-h-fit max-h-fit !w-full !max-w-full !min-w-full ",
+            modalContent: `!z-10 !mt-0 overflow-hidden !pt-0`,
+            modal: "h-full"
+          }}
+        >
+          {inputData.showModal && ["custom_date"].includes(inputData.modal!) ? (
+            <LazyLoad>
+              <MkdCalendar
+                selectedDay={selectedDay}
+                setSelectedDay={setSelectedDay}
+                onSave={() => {
+                  onChange({ target: { value: selectedDay } });
+                  onToggleModal(null, false);
+                }}
+              />
+            </LazyLoad>
+          ) : null}
+        </Modal>
+      ) : null}
     </>
   );
 };

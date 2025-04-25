@@ -5,6 +5,7 @@ export const MkdListTableRowListColumn = lazy(
 );
 export const MkdListTable = lazy(() => import("./MkdListTable"));
 export const MkdListTableV2 = lazy(() => import("./MkdListTableV2"));
+export const MkdTableWrapper = lazy(() => import("./MkdTableWrapper"));
 export const TableActions = lazy(() => import("./TableActions"));
 export const OverlayTableActions = lazy(() => import("./OverlayTableActions"));
 export const MkdListTableRowCol = lazy(() => import("./MkdListTableRowCol"));
