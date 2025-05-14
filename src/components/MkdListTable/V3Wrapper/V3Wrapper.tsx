@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { Action, ExternalData } from "@/interfaces";
 import { queryKeys } from "@/query/queryKeys";
 import { TreeSDKOptions } from "@/utils/TreeSDK";
-import { MkdListTableV2 } from "@/components/MkdListTable";
+import { Action, ExternalData } from "@/interfaces";
+import { MkdListTableV3 } from "@/components/MkdListTable";
 import { ActionLocations, DisplayEnum } from "@/utils/Enums";
 import { useEnhancedTableData } from "@/hooks/useEnhancedTableData";
 
@@ -125,7 +125,7 @@ const MkdTableWrapper = ({
   ]);
 
   return (
-    <MkdListTableV2
+    <MkdListTableV3
       table={table}
       tableRole={tableRole}
       defaultColumns={defaultColumns}

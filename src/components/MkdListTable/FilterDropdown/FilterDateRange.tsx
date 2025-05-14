@@ -7,16 +7,16 @@ import { LazyLoad } from "@/components/LazyLoad";
 //   return value < 10 ? `0${value}` : value;
 // };
 
-interface MkdListTableFilterDateRangeProps {
+interface FilterDateRangeProps {
   data: any;
   setValue: any;
   field: string;
 }
-const MkdListTableFilterDateRange = ({
+const FilterDateRange = ({
   data = {},
   setValue,
   field,
-}: MkdListTableFilterDateRangeProps) => {
+}: FilterDateRangeProps) => {
   const handleSetData = (value: string, position: string) => {
     if (["start"].includes(position)) {
       const [_, end] = data?.value?.split(",");
@@ -83,4 +83,4 @@ const MkdListTableFilterDateRange = ({
     </div>
   );
 };
-export default memo(MkdListTableFilterDateRange);
+export default memo(FilterDateRange);

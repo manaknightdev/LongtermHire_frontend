@@ -1,9 +1,13 @@
 import React, { memo, useCallback, useMemo } from "react";
 import { LazyLoad } from "@/components/LazyLoad";
-import MkdListTableRowCol from "./MkdListTableRowCol";
+
 import { Skeleton as SkeletonLoader } from "@/components/Skeleton";
 import { NoteModal } from "./NoteModal";
-import { MkdListTableRowButtons, MkdListTableRowDropdown } from "./index";
+import {
+  MkdListTableRowButtons,
+  MkdListTableRowDropdown,
+  MkdListTableRowCol
+} from "./index";
 import { DotIcon } from "lucide-react";
 import { NarrowUpArrowIcon } from "@/assets/svgs";
 import { Action, ColumnDataState } from "@/interfaces";

@@ -24,17 +24,14 @@ const excludedFields = [
   "allowed_customer"
 ];
 
-interface MkdListTableFilterOptionsProps {
+interface FilterOptionsProps {
   selectedOptions?: string[];
   columns?: Column[];
   onColumnClick?: (column: string, operation?: string, config?: any) => void;
   setShowFilterOptions?: (show: boolean) => void;
 }
 
-const MkdListTableFilterOptions = ({
-  columns = [],
-  onColumnClick
-}: MkdListTableFilterOptionsProps) => {
+const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
   const { operations } = useSDK();
   const stringCaser = new StringCaser();
 
@@ -119,4 +116,4 @@ const MkdListTableFilterOptions = ({
   );
 };
 
-export default MkdListTableFilterOptions;
+export default FilterOptions;

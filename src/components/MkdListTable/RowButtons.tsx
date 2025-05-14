@@ -1,8 +1,8 @@
+import { Action } from "@/interfaces";
+import { processBind } from "./BindOperations";
+import { ActionLocations } from "@/utils/Enums";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdButton } from "@/components/MkdButton";
-import { processBind } from "./MkdListTableBindOperations";
-import { Action } from "@/interfaces";
-import { ActionLocations } from "@/utils/Enums";
 
 interface MkdListTableRowDropdownProps {
   row: Record<any, any>;
@@ -15,7 +15,7 @@ const MkdListTableRowDropdown = ({
   row,
   actions,
   actionId = "id",
-  setDeleteId,
+  setDeleteId
 }: MkdListTableRowDropdownProps) => {
   return (
     <>

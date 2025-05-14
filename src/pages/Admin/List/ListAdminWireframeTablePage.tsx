@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MkdListTableV2, MkdTableWrapper } from "@/components/MkdListTable";
+import { MkdListTableV3Wrapper } from "@/components/MkdListTable";
 import { LazyLoad } from "@/components/LazyLoad";
 import { Action } from "@/interfaces";
 import { ActionLocations, TableActionEnum } from "@/utils/Enums";
@@ -166,7 +166,7 @@ const ListAdminWireframeTablePage: React.FC = () => {
     <>
       <div className="grid h-full max-h-full min-h-full w-full grid-cols-1 grid-rows-1 p-8">
         <LazyLoad counts={[1, 3, 2, 1, 2]} count={5}>
-          <MkdTableWrapper
+          <MkdListTableV3Wrapper
             table={"project"}
             actions={actions}
             refreshRef={refreshRef}

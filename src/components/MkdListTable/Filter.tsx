@@ -1,11 +1,11 @@
 import React from "react";
-import MkdListTableFilterDisplays from "./MkdListTableFilterDisplays";
-import { LazyLoad } from "@/components/LazyLoad";
-import { ModalSidebar } from "@/components/ModalSidebar";
-import MkdListTableFilterDropdownV2 from "./MkdListTableFilterDropdown/MkdListTableFilterDropdownV2";
 import { FilterIcon } from "lucide-react";
 import { DisplayEnum } from "@/utils/Enums";
 import { ColumnDataState } from "@/interfaces";
+import { LazyLoad } from "@/components/LazyLoad";
+import { ModalSidebar } from "@/components/ModalSidebar";
+import { FilterDropdown, FilterDisplays } from "./index";
+
 interface MkdListTableFilterProps {
   onSubmit: () => void;
   columnData: ColumnDataState;
@@ -36,7 +36,7 @@ const MkdListTableFilter = ({
       <div className="relative flex w-fit items-center justify-between rounded bg-white">
         <div className="flex w-full flex-col items-start justify-between gap-4 text-gray-700 md:flex-row  md:items-center">
           <LazyLoad>
-            <MkdListTableFilterDisplays
+            <FilterDisplays
               columns={columnData?.columns}
               selectedOptions={selectedOptions}
               display={[DisplayEnum.FILTER, ...filterDisplays]}
@@ -65,7 +65,7 @@ const MkdListTableFilter = ({
             }}
           >
             <LazyLoad>
-              <MkdListTableFilterDropdownV2
+              <FilterDropdown
                 onSubmit={onSubmit}
                 columns={columnData?.columns}
                 onColumnClick={onColumnClick}

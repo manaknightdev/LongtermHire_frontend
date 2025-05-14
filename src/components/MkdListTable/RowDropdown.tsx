@@ -1,12 +1,11 @@
-import { LazyLoad } from "@/components/LazyLoad";
-import { MkdPopover } from "@/components/MkdPopover";
+import { Action } from "@/interfaces";
 import { KebabIcon } from "@/assets/svgs";
 import { optionTypes } from "@/utils/config";
-import RenderDropdownActions from "./RenderDropdownActions";
-import RenderActions from "./RenderActions";
-import { processBind } from "./MkdListTableBindOperations";
-import { Action } from "@/interfaces";
+import { processBind } from "./BindOperations";
 import { ActionLocations } from "@/utils/Enums";
+import { LazyLoad } from "@/components/LazyLoad";
+import { MkdPopover } from "@/components/MkdPopover";
+import { RenderDropdownActions, RenderActions } from "./index";
 
 const checkBinding = (action: Action, row: Record<any, any>) => {
   if (action?.bind && ["hide"].includes(action?.bind?.action)) {
@@ -26,7 +25,7 @@ interface MkdListTableRowDropdownProps {
 const MkdListTableRowDropdown = ({
   row,
   actions,
-  actionId = "id",
+  actionId = "id"
 }: MkdListTableRowDropdownProps) => {
   return (
     <>

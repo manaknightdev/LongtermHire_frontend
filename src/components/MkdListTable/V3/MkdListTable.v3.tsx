@@ -8,7 +8,7 @@ import {
 import { PaginationBar } from "@/components/PaginationBar";
 import {
   MkdListTable,
-  MkdListTableFilter,
+  TableFilter,
   OverlayTableActions,
   TableActions
 } from "@/components/MkdListTable";
@@ -247,7 +247,7 @@ const MkdListTableV2 = ({
     queryClient.invalidateQueries({
       queryKey: [queryKeys?.[table]?.paginate, table],
       exact: false,
-      refetchType: "all"
+      refetchType: "active"
     });
   }, [tableProperty, table, setTableProperty, queryClient]);
 
@@ -505,7 +505,7 @@ const MkdListTableV2 = ({
           } items-start justify-between gap-2 text-center md:items-center`}
         >
           {hasFilter ? (
-            <MkdListTableFilter
+            <TableFilter
               onSubmit={onSubmit}
               columnData={columnState ?? { columns: [] }}
               onColumnClick={onColumnClick}

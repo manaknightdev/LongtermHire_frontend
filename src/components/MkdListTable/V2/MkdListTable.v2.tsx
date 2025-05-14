@@ -8,9 +8,9 @@ import {
 import { PaginationBar } from "@/components/PaginationBar";
 import {
   MkdListTable,
-  MkdListTableFilter,
-  OverlayTableActions,
-  TableActions
+  TableFilter,
+  TableActions,
+  OverlayTableActions
 } from "@/components/MkdListTable";
 
 import { MkdButton } from "@/components/MkdButton";
@@ -25,9 +25,9 @@ import { TrashIcon } from "lucide-react";
 import { useSDK } from "@/hooks/useSDK";
 import { operations } from "@/utils";
 import { useContexts } from "@/hooks/useContexts";
-import { getProcessedTableData } from "./MkdListTableRowListColumn";
 import { Action, ColumnDataState } from "@/interfaces";
 import { ActionLocations, DisplayEnum } from "@/utils/Enums";
+import { getProcessedTableData } from "@/components/MkdListTable/RowListColumn";
 
 const dataProcesses = async (processes: any[], data: any[], columns: any[]) => {
   if (!processes?.length) {
@@ -1131,7 +1131,7 @@ const MkdListTableV2 = ({
           } items-start justify-between gap-2 text-center md:items-center`}
         >
           {hasFilter ? (
-            <MkdListTableFilter
+            <TableFilter
               onSubmit={onSubmit}
               columnData={columnData}
               onColumnClick={onColumnClick}

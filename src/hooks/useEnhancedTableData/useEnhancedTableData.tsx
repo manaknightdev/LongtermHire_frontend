@@ -1,9 +1,9 @@
 import { useMemo, useCallback, useState, useEffect } from "react";
 import { useGetPaginateQuery } from "@/query/shared/listModel";
-import { getProcessedTableData } from "@/components/MkdListTable/MkdListTableRowListColumn";
+import { getProcessedTableData } from "@/components/MkdListTable/RowListColumn";
 import { useContexts } from "@/hooks/useContexts";
-import { TreeSDKOptions } from "@/utils/TreeSDK";
-import { ColumnDataState } from "@/interfaces/table.interface";
+// import { TreeSDKOptions } from "@/utils/TreeSDK";
+// import { ColumnDataState } from "@/interfaces/table.interface";
 
 const dataProcesses = async (processes: any[], data: any[], columns: any[]) => {
   if (!processes?.length) {

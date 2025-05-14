@@ -1,9 +1,9 @@
 import { memo, useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import {
-  MkdListTableFilterOptions,
+  FilterOptions,
   FilterJoinDropdown,
-  MkdListTableFilterDateRange
+  FilterDateRange
 } from "./index";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdButton } from "@/components/MkdButton";
@@ -12,7 +12,7 @@ import { StringCaser } from "@/utils/utils";
 import { MkdInput } from "@/components/MkdInput";
 import { Column } from "@/interfaces";
 
-interface MkdListTableFilterDropdownV2Props {
+interface FilterDropdownProps {
   onSubmit: () => void;
   columns?: Column[];
   selectedOptions?: {
@@ -31,7 +31,7 @@ interface MkdListTableFilterDropdownV2Props {
   onClose: () => void;
 }
 
-const MkdListTableFilterDropdownV2 = ({
+const FilterDropdown = ({
   onSubmit,
   columns = [],
   selectedOptions = [],
@@ -39,7 +39,7 @@ const MkdListTableFilterDropdownV2 = ({
   setOptionValue,
   removeSelectedOption,
   onClose
-}: MkdListTableFilterDropdownV2Props) => {
+}: FilterDropdownProps) => {
   const [_showFilterOptions, setShowFilterOptions] = useState(false);
   const stringCaser = new StringCaser();
   // console.log("selectedOptions >>", selectedOptions);
@@ -56,7 +56,7 @@ const MkdListTableFilterDropdownV2 = ({
         </MkdButton>
 
         <LazyLoad>
-          <MkdListTableFilterOptions
+          <FilterOptions
             columns={columns}
             setShowFilterOptions={setShowFilterOptions}
             onColumnClick={(column, operation, config) =>
@@ -84,7 +84,7 @@ const MkdListTableFilterDropdownV2 = ({
               {option?.config?.format &&
               ["date_range"].includes(option?.config?.format) ? (
                 <LazyLoad>
-                  <MkdListTableFilterDateRange
+                  <FilterDateRange
                     data={option}
                     setValue={setOptionValue}
                     field={"value"}
@@ -248,4 +248,4 @@ const MkdListTableFilterDropdownV2 = ({
   );
 };
 
-export default memo(MkdListTableFilterDropdownV2);
+export default memo(FilterDropdown);

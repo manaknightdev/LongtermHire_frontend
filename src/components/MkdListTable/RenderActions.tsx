@@ -1,6 +1,6 @@
+import { processBind } from "./BindOperations";
 import { LazyLoad } from "@/components/LazyLoad";
 import { DropdownOption } from "@/components/DropdownOptions";
-import { processBind } from "./MkdListTableBindOperations";
 
 interface RenderActionsProps {
   action: any;

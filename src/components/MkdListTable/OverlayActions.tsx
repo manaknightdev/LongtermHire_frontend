@@ -4,7 +4,7 @@ import { optionTypes } from "@/utils/config";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdPopover } from "@/components/MkdPopover";
 import { DropdownOption } from "@/components/DropdownOptions";
-import { processMultipleBind } from "./MkdListTableBindOperations";
+import { processMultipleBind } from "./BindOperations";
 import { ChevronRightIcon, TrashIcon } from "lucide-react";
 import { ComponentProps } from "react";
 
