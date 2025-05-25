@@ -16,7 +16,7 @@ import {
 import { MkdButton } from "@/components/MkdButton";
 import { ExportButton } from "@/components/ExportButton";
 import { LazyLoad } from "@/components/LazyLoad";
-import "./MkdListTable.css";
+import "../MkdListTable.css";
 // import { ExCircleIcon } from "Assets/svgs";
 import { useProfile } from "@/hooks/useProfile";
 import { BiSearch } from "react-icons/bi";

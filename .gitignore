@@ -12,6 +12,7 @@ node_modules
 dev-dist
 playwright-report
 test-results
+deploy.sh
 
 *.local
 release
