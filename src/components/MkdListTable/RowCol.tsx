@@ -218,7 +218,7 @@ const MkdListTableRowCol = ({
   return (
     <td
       style={{ background: row?.bg ?? "" }}
-      className={`!w-[auto]  !min-w-[6.25rem] !max-w-[auto] whitespace-nowrap  border-b pr-6 ${
+      className={`!w-[auto] text-black dark:text-white  !min-w-[6.25rem] !max-w-[auto] whitespace-nowrap  border-b border-border pr-6 ${
         removeLeftPadding ? "pl-0" : "pl-6"
       }`}
     >

@@ -4,13 +4,13 @@ import { useSDK } from "@/hooks/useSDK";
 import { TreeSDKOptions } from "@/utils/TreeSDK";
 
 const useGetAllProjects = (
-  table: keyof typeof queryKeys,
+  table: string,
   options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     options?: TreeSDKOptions
   ) => {
     const response = await tdk.getPaginate(table, options);

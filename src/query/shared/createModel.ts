@@ -5,7 +5,7 @@ import { useContexts } from "@/hooks/useContexts";
 import { ToastStatusEnum } from "@/utils/Enums";
 import { ApiResponse } from "@/utils/TreeSDK";
 
-export const useCreateModelMutation = (table: keyof typeof queryKeys) => {
+export const useCreateModelMutation = (table: string) => {
   const { tdk } = useSDK();
   const { showToast, tokenExpireError } = useContexts();
   const queryClient = useQueryClient();

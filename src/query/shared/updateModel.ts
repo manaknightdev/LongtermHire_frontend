@@ -4,7 +4,7 @@ import { useSDK } from "@/hooks/useSDK";
 import { useContexts } from "@/hooks/useContexts";
 import { ToastStatusEnum } from "@/utils/Enums";
 
-export const useUpdateModelMutation = (table: keyof typeof queryKeys) => {
+export const useUpdateModelMutation = (table: string) => {
   const { tdk } = useSDK();
   const { showToast, tokenExpireError } = useContexts();
   const queryClient = useQueryClient();
@@ -45,7 +45,7 @@ export const useUpdateModelMutation = (table: keyof typeof queryKeys) => {
   });
 };
 
-export const useUpdateWhereModelMutation = (table: keyof typeof queryKeys) => {
+export const useUpdateWhereModelMutation = (table: string) => {
   const { tdk } = useSDK();
   const { showToast, tokenExpireError } = useContexts();
   const queryClient = useQueryClient();

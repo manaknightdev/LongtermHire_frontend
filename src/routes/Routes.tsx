@@ -174,7 +174,7 @@ export default () => {
       onClick={() => {
         isOpen ? toggleSideBar(false) : null;
       }}
-      className={`h-svh grid grid-cols-1 grid-rows-[auto_1fr] min-h-svh max-h-svh overflow-y-hidden overflow-x-hidden bg-white`}
+      className={`h-svh grid grid-cols-1 grid-rows-[auto_1fr] min-h-svh max-h-svh overflow-y-hidden overflow-x-hidden bg-background`}
     >
       <Routes>
         <Route

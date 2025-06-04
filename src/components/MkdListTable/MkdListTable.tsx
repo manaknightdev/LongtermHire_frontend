@@ -6,7 +6,7 @@ import { NoteModal } from "./NoteModal";
 import {
   MkdListTableRowButtons,
   MkdListTableRowDropdown,
-  MkdListTableRowCol
+  MkdListTableRowCol,
 } from "./index";
 import { DotIcon } from "lucide-react";
 import { NarrowUpArrowIcon } from "@/assets/svgs";
@@ -65,7 +65,7 @@ const MkdListTable = ({
   selectedItems = [],
   allowSortColumns = true,
   noDataComponent,
-  showScrollbar = true
+  showScrollbar = true,
 }: MkdListTableProps) => {
   const [_deleteId, setIdToDelete] = React.useState(null);
   const [_isOneOrMoreRowSelected, setIsOneOrMoreRowSelected] =
@@ -258,7 +258,7 @@ const MkdListTable = ({
         setColumnData((prev: any) => {
           return {
             ...prev,
-            columns: tempColumns
+            columns: tempColumns,
           };
         });
       }
@@ -343,12 +343,12 @@ const MkdListTable = ({
           // className="flex flex-col w-fit min-w-fit max-w-fit"
 
           <table className=" h-fit min-w-full divide-y divide-[#1F1D1A1A] rounded-md">
-            <thead className="bg-white">
+            <thead className="bg-background">
               <tr className="!h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem]">
                 {[actions?.select?.show].includes(true) || rowColumn ? (
                   <>
                     {[actions?.select?.show].includes(true) ? (
-                      <th className="$ bg-white sticky -left-[0.05rem] -top-[0.05rem] z-[19] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem]  px-[.75rem] py-[.5rem] text-xs font-medium capitalize tracking-wider text-black">
+                      <th className="$ bg-table-header-column sticky -left-[0.05rem] -top-[0.05rem] z-[19] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem]  px-[.75rem] py-[.5rem] text-xs font-medium capitalize tracking-wider text-black  dark:text-white">
                         {(actions?.select?.multiple && !actions?.select?.max) ||
                         (actions?.select?.multiple &&
                           actions?.select?.max &&
@@ -363,7 +363,7 @@ const MkdListTable = ({
                                 : false
                             }
                             id="select_all_rows"
-                            className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black shadow focus:outline-none focus:ring-0 sm:!text-base`}
+                            className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black  dark:text-white shadow focus:outline-none focus:ring-0 sm:!text-base`}
                             checked={
                               selectedItems?.length === currentTableData?.length
                             }
@@ -384,7 +384,7 @@ const MkdListTable = ({
                           [actions?.select?.show].includes(true)
                             ? "left-10"
                             : "left-0"
-                        } bg-white z-10 border-b !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider text-black`}
+                        } bg-table-header-column z-10 border-b !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider text-black  dark:text-white`}
                       >
                         Row
                       </th>
@@ -420,7 +420,7 @@ const MkdListTable = ({
                           onDragLeave={(e) => onDragLeave(e)}
                           onDrop={(e) => onDrop(e)}
                           scope="col"
-                          className={`$ bg-white font-iowan sticky -top-[0.05rem] z-[5] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[auto] !min-w-[6.25rem] !max-w-[auto]  shrink-0 grow py-[.5rem] pr-6 text-left text-[1.125rem] font-[700] capitalize leading-[1.25rem] tracking-wider text-black ${
+                          className={`$ bg-table-header-column font-iowan sticky -top-[0.05rem] z-[5] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[auto] !min-w-[6.25rem] !max-w-[auto]  shrink-0 grow py-[.5rem] pr-6 text-left text-[1.125rem] font-[700] capitalize leading-[1.25rem] tracking-wider text-black  dark:text-white ${
                             allowSortColumns && dragging
                               ? "cursor-grabbing"
                               : cell?.isSorted
@@ -464,13 +464,13 @@ const MkdListTable = ({
                   }
                 )}
                 {actionColumn ? (
-                  <th className="$ bg-white sticky border-b -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider text-black">
+                  <th className="$ bg-table-header-column sticky border-b border-border -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider text-black  dark:text-white">
                     Action
                   </th>
                 ) : null}
               </tr>
             </thead>
-            <tbody className="divide-white bg-white divide-y">
+            <tbody className="bg-table-row-column ">
               {currentTableData?.map((row: any, rowIndex: any) => {
                 return (
                   <tr
@@ -480,10 +480,10 @@ const MkdListTable = ({
                     {[actions?.select?.show].includes(true) || rowColumn ? (
                       <>
                         {[actions?.select?.show].includes(true) ? (
-                          <td className="text-sub-500 bg-white sticky -left-[0.05rem] z-10 !h-full !max-h-full  !min-h-full !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem] cursor-pointer whitespace-nowrap px-[.75rem] py-[.5rem] text-sm font-[400] capitalize leading-[1.5rem] tracking-wider">
+                          <td className="text-black dark:text-white bg-table-row-column sticky -left-[0.05rem] z-10 !h-full !max-h-full  !min-h-full !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem] cursor-pointer whitespace-nowrap px-[.75rem] py-[.5rem] text-sm font-[400] capitalize leading-[1.5rem] tracking-wider">
                             <input
                               type="checkbox"
-                              className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black shadow focus:outline-none focus:ring-0 sm:!text-base`}
+                              className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black  dark:text-white shadow focus:outline-none focus:ring-0 sm:!text-base`}
                               name="select_item"
                               checked={
                                 selectedItems?.length &&
@@ -504,7 +504,7 @@ const MkdListTable = ({
                               [actions?.select?.show].includes(true)
                                 ? "left-10"
                                 : "left-0"
-                            } bg-white border-b z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm`}
+                            } bg-table-row-column border-b border-border text-black dark:text-white z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm`}
                           >
                             {rowIndex + 1}
                           </td>
@@ -540,7 +540,7 @@ const MkdListTable = ({
                       }
                     )}
                     {actionColumn ? (
-                      <td className="bg-white sticky border-b -right-[0.05rem] z-[5] !w-fit !min-w-fit !max-w-fit whitespace-nowrap px-[.75rem] py-[.5rem]">
+                      <td className="bg-table-row-column sticky border-b border-border -right-[0.05rem] z-[5] !w-fit !min-w-fit !max-w-fit whitespace-nowrap px-[.75rem] py-[.5rem]">
                         {/* <div className="flex !w-fit !min-w-fit !max-w-fit items-center justify-end"> */}
                         {actionPostion?.includes(ActionLocations.DROPDOWN) ? (
                           <MkdListTableRowDropdown

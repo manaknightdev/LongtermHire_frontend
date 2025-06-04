@@ -5,4 +5,4 @@ export { default as MapView } from "./mapview.png";
 export { default as ScannerCode } from "./scannercode.png";
 export { default as NoDbConfigIllustration } from "./no-db-config.png";
 export { default as DbSyncedGif } from "./db-synced.gif";
-export { default as MKDLOGO } from "./mkd_logo.png";
+export { default as BrandLogo } from "./brand_logo.png";

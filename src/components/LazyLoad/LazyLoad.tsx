@@ -1,6 +1,6 @@
 import React, { memo, Suspense } from "react";
 import { Skeleton } from "@/components/Skeleton";
-import { MKDLOGO } from "@/assets/images";
+import { BrandLogo } from "@/assets/images";
 import { ViewMapType } from "@/components/ViewWrapper";
 
 interface LazyLoadProps {
@@ -9,7 +9,7 @@ interface LazyLoadProps {
   count?: number;
   className?: string;
   circle?: boolean;
-  brand?: boolean;
+  brand?: any;
   view?: ViewMapType["value"];
 }
 
@@ -39,9 +39,9 @@ const LazyLoad = ({
       fallback={
         brand ? (
           <div className="flex h-svh max-h-svh min-h-svh w-full min-w-full max-w-full flex-col items-center justify-center bg-black">
-            <img src={MKDLOGO} className="!h-[12.25rem]" />
+            <img src={BrandLogo} className="!h-[12.25rem]" />
 
-            <span className="text-[2.8125rem] text-white">Wireframe v5</span>
+            <span className="text-[2.8125rem] text-white">{brand}</span>
           </div>
         ) : (
           <Skeleton

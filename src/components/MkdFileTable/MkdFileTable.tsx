@@ -12,10 +12,11 @@ import {
 } from "@/assets/svgs";
 import classes from "./MkdFileTable.module.css";
 import { LazyLoad } from "@/components/LazyLoad";
-import { colors } from "@/utils/config";
 import { Modal } from "@/components/Modal";
 import { MkdFileTableRowCell } from "./index";
 import { getNonNullValue } from "@/utils/utils";
+import { THEME_COLORS } from "@/context/Theme";
+import { useTheme } from "@/hooks/useTheme";
 
 const acceptType = (fileType: string) => {
   switch (fileType) {
@@ -110,6 +111,8 @@ const MkdFileTable = ({
   },
 }: MkdFileTableProps) => {
   const inputRef = useRef(null) as any;
+  const { state } = useTheme();
+  const mode = state?.theme;
 
   const [dataLoading, setDataLoading] = useState(false);
   const [valid, setValid] = useState(true);
@@ -649,7 +652,10 @@ const MkdFileTable = ({
                       >
                         {dataLoading ? (
                           <div className="flex overflow-hidden justify-center w-full h-fit max-h-fit min-h-fit">
-                            <Spinner size={40} color={colors.primary} />
+                            <Spinner
+                              size={40}
+                              color={THEME_COLORS[mode].PRIMARY}
+                            />
                           </div>
                         ) : data.length ? (
                           <table className="min-h-[6.25rem] w-full border border-gray-600">

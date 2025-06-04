@@ -4,7 +4,7 @@ import { useSDK } from "@/hooks/useSDK";
 import { TreeSDKOptions } from "@/utils/TreeSDK";
 
 export const useGetPaginateQuery = (
-  table: keyof typeof queryKeys,
+  table: string,
   options?: TreeSDKOptions,
   config?: {
     enabled?: boolean;
@@ -14,7 +14,7 @@ export const useGetPaginateQuery = (
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     options?: TreeSDKOptions
   ) => {
     const response = await tdk.getPaginate(table, options);
@@ -35,13 +35,13 @@ export const useGetPaginateQuery = (
 };
 
 export const useGetListQuery = (
-  table: keyof typeof queryKeys,
+  table: string,
   options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     options?: TreeSDKOptions
   ) => {
     const response = await tdk.getList(table, options);
@@ -62,14 +62,14 @@ export const useGetListQuery = (
 };
 
 export const useGetManyQuery = (
-  table: keyof typeof queryKeys,
+  table: string,
   ids: number | string | (number | string)[],
   options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     ids: number | string | (number | string)[],
     options?: TreeSDKOptions
   ) => {

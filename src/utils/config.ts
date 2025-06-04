@@ -7,13 +7,18 @@ export const formType = {
   custom: "custom",
 };
 
-export const colors = {
-  primary: "#4F46E5",
-  signup: "signup",
-  add: "add",
-  edit: "edit",
-  search: "search",
-  custom: "custom",
+export const Colors = {
+  DARK: {
+    PRIMARY: "#4F46E5",
+    SECONDARY: "#292929",
+    BACKGROUND: "#121212",
+    // #E0E0E0 #FAFAFA #121212
+  },
+  LIGHT: {
+    PRIMARY: "#4F46E5",
+    SECONDARY: "#4F46E5",
+    BACKGROUND: "#FFFFFF",
+  },
 };
 
 export const optionTypes = {

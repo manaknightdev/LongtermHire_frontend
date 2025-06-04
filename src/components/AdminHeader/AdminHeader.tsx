@@ -7,47 +7,20 @@ import { LazyLoad } from "@/components/LazyLoad";
 import { HeaderLogo } from "@/components/HeaderLogo";
 import { BiExpandVertical } from "react-icons/bi";
 
-const NAV_ITEMS = [
-  // {
-  //   to: "/admin/requirements",
-  //   text: "Requirements",
-  //   icon: <SowIcon />,
-  //   value: "sow",
-  // },
+interface INavItem {
+  to: string;
+  text: string;
+  icon: any;
+  value: string;
+}
+
+const NAV_ITEMS: INavItem[] = [
   {
     to: "/admin/build",
     text: "Build",
     icon: <WireframeIcon />,
     value: "wireframe",
   },
-  // {
-  //   to: "/admin/baas",
-  //   text: (
-  //     <>
-  //       Baas<sup className="text-xs text-[#A8A8A8]">&#40;deprecated&#41;</sup>
-  //     </>
-  //   ),
-  //   icon: <ProjectIcon />,
-  //   value: "baas",
-  // },
-  // {
-  //   to: "/admin/generate-ui/button",
-  //   text: "Generate UI",
-  //   icon: <RiAiGenerate className="text-xl text-[#A8A8A8]" />,
-  //   value: "generate-ui",
-  // },
-  // {
-  //   to: "/admin/generate-query/project_name",
-  //   text: "Generate Query",
-  //   icon: <TbDatabaseEdit className="text-xl text-[#A8A8A8]" />,
-  //   value: "generate-query",
-  // },
-  // {
-  //   to: "/admin/users",
-  //   text: "Users",
-  //   icon: <PiUsersThreeFill className="text-xl text-[#A8A8A8]" />,
-  //   value: "users",
-  // },
 ];
 
 const AdminHeader = () => {
@@ -61,7 +34,7 @@ const AdminHeader = () => {
 
   return (
     <div
-      className={`min-h-full max-h-full h-full z-50 grid grid-rows-[auto_1fr_auto] border border-[#E0E0E0] bg-white pb-4 text-[#A8A8A8] transition-all ${
+      className={`min-h-full max-h-full h-full z-50 grid grid-rows-[auto_1fr_auto] border border-border bg-background pb-4 text-[#A8A8A8] transition-all ${
         isOpen
           ? "fixed w-[15rem] min-w-[15rem] max-w-[15rem] md:relative"
           : "relative w-[4.2rem] min-w-[4.2rem] max-w-[4.2rem] bg-black text-white"
@@ -72,19 +45,12 @@ const AdminHeader = () => {
       <div className="h-full min-full max-full overflow-auto w-auto  py-2">
         <div className="sidebar-list w-auto">
           <ul className="flex flex-wrap px-2 text-sm">
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.map((item: INavItem) => (
               <li className="block w-full list-none" key={item.value}>
                 <NavLink
                   aria-label={item?.to}
                   to={item.to}
-                  className={`${
-                    path == item.value
-                      ? "active-nav"
-                      : item.value === "baas" &&
-                          (path === "project" || path === "deployment")
-                        ? "active-nav"
-                        : ""
-                  }`}
+                  className={`${path == item.value ? "p-[0.75rem] text-text rounded-[0.375rem] bg-side-bar-nav-active text-text-active" : ""}`}
                 >
                   <div className="flex items-center gap-3">
                     {item.icon}

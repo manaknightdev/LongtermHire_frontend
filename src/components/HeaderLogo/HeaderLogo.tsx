@@ -3,7 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { WireframeIcon } from "@/assets/svgs/adminHeader";
-import { MKDLOGO } from "@/assets/images";
+import { BrandLogo } from "@/assets/images";
 import { LazyLoad } from "@/components/LazyLoad";
 import { useContexts } from "@/hooks/useContexts";
 
@@ -32,7 +32,7 @@ const HeaderLogo = () => {
         to="/"
         className={`flex w-full h-full items-center  ${isOpen ? "gap-5 " : "justify-center gap-0"}`}
       >
-        <img className={"h-[70%] object-contain "} src={MKDLOGO} />
+        <img className={"h-[70%] object-contain "} src={BrandLogo} />
         {isOpen ? (
           <h4 className="flex cursor-pointer  items-center  font-sans font-bold">
             MTP - Builder

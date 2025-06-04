@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { MKDLOGO } from "@/assets/images";
+import { BrandLogo } from "@/assets/images";
 
 export default function Navbar({}) {
   const [isOpen, setOpen] = useState(false);
@@ -20,7 +20,7 @@ export default function Navbar({}) {
                   to="/"
                   className={`h-14 min-h-14 max-h-14 flex gap-5 items-center `}
                 >
-                  <img className={"h-[70%] object-contain "} src={MKDLOGO} />
+                  <img className={"h-[70%] object-contain "} src={BrandLogo} />
                   <h4 className="cursor-pointer font-bold">MTP - Builder</h4>
                 </Link>
               </div>

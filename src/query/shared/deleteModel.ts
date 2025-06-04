@@ -4,7 +4,7 @@ import { useSDK } from "@/hooks/useSDK";
 import { useContexts } from "@/hooks/useContexts";
 import { ToastStatusEnum } from "@/utils/Enums";
 
-export const useDeleteModelMutation = (table: keyof typeof queryKeys) => {
+export const useDeleteModelMutation = (table: string) => {
   const { tdk } = useSDK();
   const { showToast, tokenExpireError } = useContexts();
   const queryClient = useQueryClient();

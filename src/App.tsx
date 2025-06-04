@@ -1,6 +1,8 @@
 import { AuthProvider } from "@/context/Auth";
 import { GlobalProvider } from "@/context/Global";
 import { TableProvider } from "@/context/Table";
+import { ThemeProvider } from "@/context/Theme";
+
 // rcovery
 import Main from "@/routes/Routes";
 import "@uppy/core/dist/style.css";
@@ -10,6 +12,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeStyles } from "@/components/ThemeStyles";
 
 import "@fontsource/inter"; // Defaults to weight 400
 import "@fontsource/roboto-mono"; // Defaults to weight 400
@@ -31,29 +34,32 @@ const stripePromise = loadStripe(
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      experimental_prefetchInRender: true
-    }
-  }
+      experimental_prefetchInRender: true,
+    },
+  },
 });
 
 function App(): JSX.Element {
   return (
     <ErrorBoundary fallback={<div>Error</div>} onError={() => {}}>
-      <LazyLoad brand>
-        <AuthProvider>
-          <GlobalProvider>
-            <TableProvider>
-              <QueryClientProvider client={queryClient}>
-                <Router>
-                  <Elements stripe={stripePromise}>
-                    <Main />
-                  </Elements>
-                </Router>
-              </QueryClientProvider>
-            </TableProvider>
-          </GlobalProvider>
-        </AuthProvider>
-      </LazyLoad>
+      <QueryClientProvider client={queryClient}>
+        <LazyLoad brand={"Brand Name Here"}>
+          <ThemeProvider>
+            <ThemeStyles />
+            <AuthProvider>
+              <GlobalProvider>
+                <TableProvider>
+                  <Router>
+                    <Elements stripe={stripePromise}>
+                      <Main />
+                    </Elements>
+                  </Router>
+                </TableProvider>
+              </GlobalProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </LazyLoad>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

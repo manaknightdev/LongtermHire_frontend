@@ -4,14 +4,14 @@ import { useSDK } from "@/hooks/useSDK";
 import { TreeSDKOptions } from "@/utils/TreeSDK";
 
 export const useViewModelQuery = (
-  table: keyof typeof queryKeys,
+  table: string,
   id: string | number,
   options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     id: string | number
   ) => {
     const response = await tdk.getOne(table, id, options);
@@ -26,13 +26,13 @@ export const useViewModelQuery = (
 };
 
 export const useGetOneFilterModelQuery = (
-  table: keyof typeof queryKeys,
+  table: string,
   options?: TreeSDKOptions
 ) => {
   const { tdk } = useSDK();
 
   const queryFn = async (
-    table: keyof typeof queryKeys,
+    table: string,
     options?: TreeSDKOptions
   ) => {
     const response = await tdk.getOneFilter(table, options);

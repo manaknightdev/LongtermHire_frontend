@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MKDLOGO } from "@/assets/images";
+import { BrandLogo } from "@/assets/images";
 
 export const PublicHeader = () => {
   return (
@@ -9,7 +9,7 @@ export const PublicHeader = () => {
           to="/"
           className={`h-14 min-h-14 max-h-14 gap-5 flex items-center `}
         >
-          <img className={"h-[70%] object-contain "} src={MKDLOGO} />
+          <img className={"h-[70%] object-contain "} src={BrandLogo} />
           MTP - Builder
         </Link>
         <div className="flex cursor-pointer items-center rounded-md border border-[#C6C6C6] px-3 py-2 shadow-sm hover:scale-95">

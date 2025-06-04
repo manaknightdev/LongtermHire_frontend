@@ -6,6 +6,8 @@ import { ActionLocations } from "@/utils/Enums";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdPopover } from "@/components/MkdPopover";
 import { RenderDropdownActions, RenderActions } from "./index";
+import { useTheme } from "@/hooks/useTheme"
+import { THEME_COLORS }from "@/context/Theme"
 
 const checkBinding = (action: Action, row: Record<any, any>) => {
   if (action?.bind && ["hide"].includes(action?.bind?.action)) {
@@ -27,6 +29,8 @@ const MkdListTableRowDropdown = ({
   actions,
   actionId = "id"
 }: MkdListTableRowDropdownProps) => {
+  const { state } = useTheme()
+  const mode = state?.theme == "dark" ? "light": "dark" 
   return (
     <>
       {Object.keys(actions).filter(
@@ -43,7 +47,7 @@ const MkdListTableRowDropdown = ({
             display={
               <KebabIcon
                 className="h-[1.5rem] w-[1.5rem] rotate-90"
-                stroke="#1F1D1A"
+                stroke={THEME_COLORS[mode].BACKGROUND}
               />
             }
             // tooltipClasses="!rounded-[.125rem] !min-w-fit !w-fit !max-w-fit !px-0 !right-[3.25rem]  bg-white"

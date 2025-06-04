@@ -16,7 +16,7 @@
     "test:unit": "echo \"Unit tests not implemented yet\"",
     "test:integration": "echo \"Integration tests not implemented yet\"",
     "tw": "npx tailwindcss -i ./src/index.css -o ./src/output.css --watch",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/mkd_logo.png"
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/brand_logo.png"
   },
   "dependencies": {
     "@craftjs/core": "^0.2.0-beta.11",
