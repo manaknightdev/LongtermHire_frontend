@@ -2,6 +2,8 @@ import { MkdButton } from "@/components/MkdButton";
 import { LazyLoad } from "@/components/LazyLoad";
 import "react-modern-calendar-datepicker/lib/DatePicker.css";
 import { Calendar } from "react-modern-calendar-datepicker";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface MkdCalendarProps {
   selectedDay: any;
@@ -18,13 +20,32 @@ const MkdCalendar = ({
   // showTime = true,
   onSave,
 }: MkdCalendarProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
+
   return (
     <>
       <style>
         {`.custom-selected-date {
-          background-color: #000 !important;
-          color: #fff !important;
+          background-color: ${THEME_COLORS[mode].PRIMARY} !important;
+          color: ${THEME_COLORS[mode].TEXT_ON_PRIMARY} !important;
           border-radius: 50% !important;
+        }
+        .Calendar__day:hover {
+          background-color: ${THEME_COLORS[mode].PRIMARY_HOVER} !important;
+          color: ${THEME_COLORS[mode].TEXT_ON_PRIMARY} !important;
+        }
+        .Calendar__monthArrow {
+          color: ${THEME_COLORS[mode].TEXT} !important;
+        }
+        .Calendar__monthText {
+          color: ${THEME_COLORS[mode].TEXT} !important;
+        }
+        .Calendar__day {
+          color: ${THEME_COLORS[mode].TEXT} !important;
+        }
+        .Calendar__weekDay {
+          color: ${THEME_COLORS[mode].TEXT_SECONDARY} !important;
         }`}
       </style>
       <div>

@@ -10,10 +10,10 @@ const SimpleTabs = ({
   tabs = [],
   setView,
   view,
-  viewsMap
+  viewsMap,
 }: SimpleTabsProps) => {
   return (
-    <div className="scrollbar-hide flex !h-fit w-full max-w-full gap-[.25rem] overflow-x-auto rounded-[.625rem]  bg-weak-100 p-[.25rem] md:min-w-[23.6875rem] md:max-w-fit md:overflow-x-clip ">
+    <div className="scrollbar-hide flex !h-fit w-full max-w-full gap-[.25rem] overflow-x-auto rounded-[.625rem] bg-background-active p-[.25rem] md:min-w-[23.6875rem] md:max-w-fit md:overflow-x-clip ">
       <div className="flex shrink-0 items-center justify-between gap-[1.5rem] overflow-x-auto">
         {tabs.map((tab) => (
           <SimpleTab

@@ -6,6 +6,8 @@ import { LazyLoad } from "@/components/LazyLoad";
 import { Modal } from "@/components/Modal";
 import { MkdCalendar } from "@/components/MkdCalendar";
 import { CalendarIcon } from "@/assets/svgs";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface MkdInputProps {
   type?: string;
@@ -54,14 +56,33 @@ const MkdInput = ({
   required = false,
   labelClassName = "",
   customField = false,
-  showErrorMessage = true
+  showErrorMessage = true,
 }: MkdInputProps) => {
   const uniqueId = useId();
+  const { state } = useTheme();
+  const mode = state?.theme;
+
+  // Theme styles
+  const inputStyles = {
+    backgroundColor: THEME_COLORS[mode].INPUT,
+    color: THEME_COLORS[mode].TEXT,
+    borderColor: THEME_COLORS[mode].BORDER,
+  };
+
+  const disabledStyles = {
+    backgroundColor: THEME_COLORS[mode].INPUT_DISABLED,
+    color: THEME_COLORS[mode].TEXT_DISABLED,
+    borderColor: THEME_COLORS[mode].BORDER,
+  };
+
+  const labelStyles = {
+    color: THEME_COLORS[mode].TEXT,
+  };
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [inputData, setInputData] = useState({
     modal: null as string | null,
-    showModal: false
+    showModal: false,
   });
 
   const onToggleModal = (modal: string | null, toggle: boolean) => {
@@ -79,7 +100,8 @@ const MkdInput = ({
           <>
             {label && (
               <label
-                className={`mb-2 block cursor-pointer text-[.875rem] font-bold ${labelClassName}`}
+                style={labelStyles}
+                className={`mb-2 block cursor-pointer text-[.875rem] font-bold transition-colors duration-200 ${labelClassName}`}
                 htmlFor={uniqueId}
               >
                 {label}
@@ -99,11 +121,12 @@ const MkdInput = ({
         ) : type === "textarea" ? (
           <>
             <textarea
-              className={`focus:shadow-outline font-inter w-full appearance-none rounded border px-3 py-2 leading-tight text-black shadow focus:outline-none ${className} ${
+              style={disabled ? disabledStyles : inputStyles}
+              className={`focus:shadow-outline font-inter w-full appearance-none rounded border px-3 py-2 leading-tight shadow focus:outline-none focus:border-primary transition-colors duration-200 ${className} ${
                 name && errors && errors?.[name] && errors?.[name]?.message
                   ? "!border-red-500"
-                  : "border-gray-200"
-              } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                  : ""
+              } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
               disabled={disabled}
               id={uniqueId}
               cols={cols}
@@ -113,10 +136,10 @@ const MkdInput = ({
               {...(value ? { value: value } : null)}
               {...(register
                 ? register(name, {
-                    ...(required && customField ? { required: true } : null)
+                    ...(required && customField ? { required: true } : null),
                   })
                 : {
-                    onChange: onChange
+                    onChange: onChange,
                   })}
             ></textarea>
           </>
@@ -144,22 +167,24 @@ const MkdInput = ({
                 placeholder={placeholder}
                 {...(register
                   ? register(name, {
-                      ...(required && customField ? { required: true } : null)
+                      ...(required && customField ? { required: true } : null),
                     })
                   : {
-                      onChange: onChange
+                      onChange: onChange,
                     })}
-                className={`focus:shadow-outline font-inter !h-4 !w-4 cursor-pointer appearance-none rounded border leading-tight text-primary shadow focus:outline-none focus:ring-0 ${className} ${
+                style={disabled ? disabledStyles : inputStyles}
+                className={`focus:shadow-outline font-inter !h-4 !w-4 cursor-pointer appearance-none rounded border leading-tight text-primary shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
                   name && errors && errors?.[name] && errors?.[name]?.message
                     ? "!border-red-500"
-                    : "border-gray-200"
+                    : ""
                 } ${
                   type === "color" ? "min-h-[3.125rem] min-w-[6.25rem]" : ""
-                } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
               />
             )}
             <label
-              className={`font-inter mb-2 block h-full cursor-pointer whitespace-nowrap text-[.9375rem] font-bold capitalize text-black ${labelClassName}`}
+              style={labelStyles}
+              className={`font-inter mb-2 block h-full cursor-pointer whitespace-nowrap text-[.9375rem] font-bold capitalize transition-colors duration-200 ${labelClassName}`}
               htmlFor={uniqueId}
             >
               {label}
@@ -175,16 +200,17 @@ const MkdInput = ({
             placeholder={placeholder}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null)
+                  ...(required && customField ? { required: true } : null),
                 })
               : {
-                  onChange: onChange
+                  onChange: onChange,
                 })}
-            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none truncate rounded-[.625rem]  border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0  ${className} ${
+            style={disabled ? disabledStyles : inputStyles}
+            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
               name && errors && errors?.[name] && errors?.[name]?.message
                 ? "!border-red-500"
-                : "border-gray-200"
-            }  ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                : ""
+            } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
           >
             <option></option>
             {options.map((option, key) => (
@@ -204,16 +230,17 @@ const MkdInput = ({
                 placeholder={placeholder}
                 {...(register
                   ? register(name, {
-                      ...(required && customField ? { required: true } : null)
+                      ...(required && customField ? { required: true } : null),
                     })
                   : {
-                      onChange: onChange
+                      onChange: onChange,
                     })}
-                className={`focus:shadow-outline font-inter h-[3rem] w-full truncate rounded-[.625rem]  border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0  ${className} ${
+                style={disabled ? disabledStyles : inputStyles}
+                className={`focus:shadow-outline font-inter h-[3rem] w-full truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
                   name && errors && errors?.[name] && errors?.[name]?.message
                     ? "!border-red-500"
-                    : "border-gray-200"
-                } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                    : ""
+                } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
               >
                 <option></option>
                 {options.map((option, key) => (
@@ -239,10 +266,10 @@ const MkdInput = ({
             {...(value ? { value: value } : null)}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null)
+                  ...(required && customField ? { required: true } : null),
                 })
               : {
-                  onChange: onChange
+                  onChange: onChange,
                 })}
             step={"0.01"}
             min={"0.00"}
@@ -261,11 +288,12 @@ const MkdInput = ({
 
               (e.target as HTMLInputElement).value = value; // Update the input value
             }}
-            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+            style={disabled ? disabledStyles : inputStyles}
+            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
               name && errors && errors?.[name] && errors?.[name]?.message
                 ? "!border-red-500"
-                : "border-gray-200"
-            } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                : ""
+            } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
           />
         ) : ["custom_date"].includes(type) ? (
           <div
@@ -287,17 +315,17 @@ const MkdInput = ({
               {...(value ? { value: value } : null)}
               {...(register
                 ? register(name, {
-                    ...(required && customField ? { required: true } : null)
+                    ...(required && customField ? { required: true } : null),
                   })
                 : {
-                    onChange: onChange
+                    onChange: onChange,
                   })}
               {...(type === "number" ? { step: "0.01" } : null)}
               min={type === "number" ? "0.00" : undefined} //
-              className={`focus:shadow-outline bg-brown-main-bg h-[3rem] w-full appearance-none truncate rounded-sm border-[.125rem] border-[#1f1d1a]  text-center text-sm font-normal leading-tight text-[#1f1d1a] shadow focus:outline-none focus:ring-0 ${className} ${
+              className={`focus:shadow-outline bg-input h-[3rem] w-full appearance-none truncate rounded-sm border-[.125rem] border-border text-center text-sm font-normal leading-tight text-text shadow focus:outline-none focus:ring-0 ${className} ${
                 name && errors && errors?.[name] && errors?.[name]?.message
                   ? "!border-red-500"
-                  : "border-gray-200"
+                  : "border-border"
               }`}
             />
             {/* p-[.75rem_1rem_.75rem_1rem] */}
@@ -316,25 +344,26 @@ const MkdInput = ({
             {...(value ? { value: value } : null)}
             {...(register
               ? register(name, {
-                  ...(required && customField ? { required: true } : null)
+                  ...(required && customField ? { required: true } : null),
                 })
               : {
-                  onChange: onChange
+                  onChange: onChange,
                 })}
             {...(type === "number" ? { step: "0.01" } : null)}
             min={type === "number" ? "0.00" : undefined} //
-            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+            style={disabled ? disabledStyles : inputStyles}
+            className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
               name && errors && errors?.[name] && errors?.[name]?.message
                 ? "!border-red-500"
-                : "border-gray-200"
-            } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+                : ""
+            } ${disabled ? "cursor-not-allowed" : "hover:border-border-hover"}`}
           />
         )}
 
         {showErrorMessage && name && errors && errors?.[name] && (
           <p className="text-field-error absolute inset-x-0 top-[90%] m-auto mt-2 text-[.8rem] italic text-red-500">
             {stringCaser.Capitalize(errors?.[name]?.message, {
-              separator: " "
+              separator: " ",
             })}
           </p>
         )}
@@ -350,7 +379,7 @@ const MkdInput = ({
             modalDialog:
               "!px-0 !rounded-[.125rem] h-fit min-h-fit max-h-fit !w-full !max-w-full !min-w-full ",
             modalContent: `!z-10 !mt-0 overflow-hidden !pt-0`,
-            modal: "h-full"
+            modal: "h-full",
           }}
         >
           {inputData.showModal && ["custom_date"].includes(inputData.modal!) ? (

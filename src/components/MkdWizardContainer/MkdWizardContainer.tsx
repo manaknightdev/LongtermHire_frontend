@@ -42,14 +42,14 @@ const MkdWizardContainer = ({
       </div>
       <div className="flex w-full items-center justify-between">
         <button
-          className="rounded-md bg-blue-700 px-6 py-2"
+          className="rounded-md bg-primary hover:bg-primary-hover active:bg-primary-active disabled:bg-primary-disabled disabled:cursor-not-allowed px-6 py-2 text-white transition-colors duration-200"
           onClick={handlePreviousClick}
           disabled={activeIndex === 0}
         >
           Previous
         </button>
         <button
-          className="rounded-md bg-blue-700 px-6 py-2"
+          className="rounded-md bg-primary hover:bg-primary-hover active:bg-primary-active disabled:bg-primary-disabled disabled:cursor-not-allowed px-6 py-2 text-white transition-colors duration-200"
           onClick={handleNextClick}
           disabled={activeIndex === childrenArray.length - 1}
         >

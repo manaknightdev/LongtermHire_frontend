@@ -3,10 +3,14 @@ import { useSDK } from "@/hooks/useSDK";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 const MagicLoginVerifyPage: React.FC = ({}) => {
   const { sdk } = useSDK();
   const { authDispatch: dispatch } = useContexts();
+  const { state } = useTheme();
+  const mode = state?.theme;
 
   const navigate = useNavigate();
   const [search] = useSearchParams();
@@ -18,7 +22,7 @@ const MagicLoginVerifyPage: React.FC = ({}) => {
       if (!result.error) {
         dispatch({
           type: "LOGIN",
-          payload: result as any
+          payload: result as any,
         });
         navigate(`/${result.role}/dashboard`);
       } else {
@@ -35,9 +39,17 @@ const MagicLoginVerifyPage: React.FC = ({}) => {
     })();
   }, []); // Added dependency array to prevent infinite loop
 
+  const containerStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND,
+    color: THEME_COLORS[mode].PRIMARY,
+  };
+
   return (
     <>
-      <div className="flex justify-center items-center min-w-full min-h-screen">
+      <div
+        className="flex justify-center items-center min-w-full min-h-screen transition-colors duration-200"
+        style={containerStyles}
+      >
         <svg
           className="w-24 h-24 animate-spin"
           fill="currentColor"

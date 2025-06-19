@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import {  BiSolidLeftArrowAlt } from "react-icons/bi";
+import { BiSolidLeftArrowAlt } from "react-icons/bi";
 
 const justification = {
   right: "justify-end",
@@ -45,7 +45,7 @@ const ModalSidebar = ({
   side = "right",
   classes = { modalBody: "" },
 }: ModalSidebarProps) => {
-  const modalRef = useRef(null) as any
+  const modalRef = useRef(null) as any;
 
   // useEffect(() => {
   //   const handleClickOutside = (e) => {
@@ -71,7 +71,7 @@ const ModalSidebar = ({
 
   useEffect(() => {
     if (isModalActive && modalRef) {
-      modalRef?.current?.focus() 
+      modalRef?.current?.focus();
     }
   }, [isModalActive]);
 
@@ -86,15 +86,15 @@ const ModalSidebar = ({
       onMouseDown={onClose as any}
       className={`${justification[side]} transition-all ${
         isModalActive ? open[side] : closed[side]
-      } scrollable-container fixed left-0 right-0 top-0 z-[9999999999] flex h-full w-full items-center overflow-y-auto overflow-x-hidden bg-[#292828d2] p-3 backdrop:blur-md md:inset-0 md:h-full`}
+      } scrollable-container fixed left-0 right-0 top-0 z-[9999999999] flex h-full w-full items-center overflow-y-auto overflow-x-hidden bg-black/50 p-3 backdrop-blur-sm md:inset-0 md:h-full`}
     >
       {/* Modal Content */}
       <div
         ref={modalRef}
         autoFocus
-        className={`${customMinWidthInTw} scrollable-container relative z-[9999] grid h-full max-h-full min-h-full bg-white ${
+        className={`${customMinWidthInTw} scrollable-container relative z-[9999] grid h-full max-h-full min-h-full bg-background ${
           showHeader ? "grid-rows-[auto_1fr]" : "grid-rows-1"
-        } bg-weak-100 items-center overflow-y-auto rounded-[.625rem] border-0  pt-0 shadow-xl transition-all ${
+        } items-center overflow-y-auto rounded-[.625rem] border-0 pt-0 shadow-xl transition-all ${
           isModalActive ? open[side] : closed[side]
         }`}
       >
@@ -121,7 +121,7 @@ const ModalSidebar = ({
               </div>
             )}
 
-            <div className="grow text-center text-lg capitalize text-white">
+            <div className="grow text-center text-lg capitalize text-text">
               {title}
             </div>
             {closePosition == 2 && (

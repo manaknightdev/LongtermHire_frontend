@@ -50,7 +50,7 @@ const MkdButton = ({
       onClick={onClickHandle}
       className={`${animate && "animate-wiggle"} ${
         classes.button
-      } relative flex h-[2.125rem] w-fit min-w-fit  items-center justify-center overflow-hidden rounded-md border border-primary bg-primary px-[.6125rem]  py-[.5625rem] font-['Inter'] text-sm font-medium leading-none text-white shadow-md shadow-primary  ${className}`}
+      } relative flex h-[2.125rem] w-fit min-w-fit  items-center justify-center overflow-hidden rounded-md border border-primary bg-primary px-[.6125rem]  py-[.5625rem] font-['Inter'] text-sm font-medium leading-none text-white  ${className}`}
     >
       {loading ? null : icon}
       {showPlus ? "+" : null} {showChildren ? children : null}

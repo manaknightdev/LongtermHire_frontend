@@ -439,7 +439,7 @@ const MkdFileTable = ({
           <div className="flex flex-col justify-start py-4">
             <input
               disabled={dataLoading}
-              className="w-[20%] cursor-pointer rounded bg-primary p-4 text-white"
+              className="w-[20%] cursor-pointer rounded bg-primary p-4 text-white hover:bg-primary-hover transition-colors duration-200"
               type="file"
               accept={acceptType(fileType)}
               ref={inputRef}
@@ -474,7 +474,7 @@ const MkdFileTable = ({
                 <div
                   title={uploadedFile?.name as any}
                   onClick={() => setShowFileContent(true)}
-                  className={`text-truncate group flex min-h-[3.125rem] grow cursor-pointer flex-col items-start justify-start overflow-hidden truncate text-ellipsis px-2 text-center text-black`}
+                  className={`text-truncate group flex min-h-[3.125rem] grow cursor-pointer flex-col items-start justify-start overflow-hidden truncate text-ellipsis px-2 text-center text-text`}
                 >
                   <span
                     className={`${classes.view_shadow} z-5 absolute ${
@@ -497,7 +497,7 @@ const MkdFileTable = ({
                         ? "Click to View"
                         : "Click to View"}
                   </span>
-                  <div className="font-inter text-[.875rem] font-medium lowercase leading-[1.25rem] text-black">
+                  <div className="font-inter text-[.875rem] font-medium lowercase leading-[1.25rem] text-text">
                     {uploadedFile?.name}
                   </div>
                   <div className="flex gap-2 justify-start items-center">
@@ -542,8 +542,8 @@ const MkdFileTable = ({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`flex h-[12rem] min-h-[12rem] w-full cursor-pointer flex-col items-center justify-between gap-[1rem] rounded-[.75rem] border border-dashed p-[2rem] font-inter hover:border-green-500 md:w-full  md:min-w-full md:max-w-full ${
-                  dragging ? "border-green-500" : "border-soft-200"
+                className={`flex h-[12rem] min-h-[12rem] w-full cursor-pointer flex-col items-center justify-between gap-[1rem] rounded-[.75rem] border border-dashed p-[2rem] font-inter hover:border-accent md:w-full  md:min-w-full md:max-w-full transition-colors duration-200 ${
+                  dragging ? "border-accent" : "border-border"
                 }`}
                 onClick={() => inputRef.current.click()}
               >
@@ -556,12 +556,12 @@ const MkdFileTable = ({
                     </span>{" "}
                     File or drag & drop it here.
                   </div>
-                  <div className="text-[.75rem] font-bold text-soft-400">
+                  <div className="text-[.75rem] font-bold text-secondary">
                     <span className="uppercase">{fileType}</span> formats, up to
                     50 MB.
                   </div>
                 </div>
-                <div className="flex h-[2rem] w-full cursor-pointer items-center justify-center rounded-[.5rem] border border-soft-200 bg-white text-[.875rem]  font-[500] leading-[1.25rem] text-sub-500">
+                <div className="flex h-[2rem] w-full cursor-pointer items-center justify-center rounded-[.5rem] border border-border bg-background text-[.875rem] font-[500] leading-[1.25rem] text-secondary hover:bg-background-hover transition-colors duration-200">
                   Browse File
                 </div>
               </div>
@@ -658,11 +658,11 @@ const MkdFileTable = ({
                             />
                           </div>
                         ) : data.length ? (
-                          <table className="min-h-[6.25rem] w-full border border-gray-600">
+                          <table className="min-h-[6.25rem] w-full border border-border bg-table">
                             <thead className="min-h-[50px]">
                               <tr className="w-fit">
-                                <th className="px-6 py-3 text-sm font-medium tracking-wider text-left text-gray-500 uppercase border border-gray-600"></th>
-                                <th className="px-6 py-3 text-sm font-medium tracking-wider text-left text-gray-500 uppercase border border-gray-600">
+                                <th className="px-6 py-3 text-sm font-medium tracking-wider text-left text-text uppercase border border-border bg-table-header"></th>
+                                <th className="px-6 py-3 text-sm font-medium tracking-wider text-left text-text uppercase border border-border bg-table-header">
                                   SN
                                 </th>
                                 {data.length ? (

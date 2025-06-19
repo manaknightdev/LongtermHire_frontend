@@ -97,5 +97,6 @@ export interface Action {
     | ActionLocations.TABLE
   >;
   icon?: ReactNode | any;
+  offlineEnabled?: boolean;
   [key: string]: any; // allow for additional properties
 }

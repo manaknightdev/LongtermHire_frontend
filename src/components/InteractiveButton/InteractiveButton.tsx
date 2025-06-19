@@ -10,11 +10,11 @@ interface InteractiveButtonProps {
   type?: "button" | "submit" | "reset";
   className?: string;
   loaderclasses?: string;
-  onClick?: (e?:any) => void;
+  onClick?: (e?: any) => void;
   color?: string;
   loaderType?: LoaderTypes;
   buttonRef?: Ref<HTMLButtonElement>;
-  size?: number
+  size?: number;
 }
 
 const InteractiveButton = ({
@@ -29,7 +29,7 @@ const InteractiveButton = ({
   color = "#ffffff",
   loaderType = LoaderTypes.BEAT,
   buttonRef = null,
-  size= 10
+  size = 10,
 }: InteractiveButtonProps) => {
   const id = useId();
 
@@ -51,20 +51,22 @@ const InteractiveButton = ({
       disabled={disabled}
       className={`${animated && "!animate-wiggle"} ${
         classes.button
-      } relative flex h-[2.125rem] w-fit min-w-fit items-center justify-center gap-2 overflow-hidden rounded-md border border-primaryBlue bg-indigo-600 px-[.6125rem]  py-[.5625rem] font-['Inter'] text-sm font-medium leading-none text-white shadow-md shadow-indigo-600  ${className}`}
+      } relative flex h-[2.125rem] w-fit min-w-fit items-center justify-center gap-2 overflow-hidden rounded-md border border-primary bg-primary px-[.6125rem] py-[.5625rem] font-['Inter'] text-sm font-medium leading-none text-white shadow-md hover:bg-primary-hover active:bg-primary-active disabled:bg-primary-disabled disabled:border-primary-disabled disabled:cursor-not-allowed transition-colors duration-200 ${className}`}
       onAnimationEnd={() => setAnimated(false)}
       onClick={onClickHandle}
     >
       <>
         {children}
 
-        <MkdLoader
-          size={size}
-          color={color}
-          loading={loading}
-          type={loaderType}
-          className={loaderclasses}
-        />
+        {loading && (
+          <MkdLoader
+            size={size}
+            color={color}
+            loading={loading}
+            type={loaderType}
+            className={loaderclasses}
+          />
+        )}
       </>
     </button>
   );

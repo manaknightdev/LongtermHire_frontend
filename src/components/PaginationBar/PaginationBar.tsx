@@ -30,7 +30,7 @@ const PaginationBar = ({
   startSize = 500,
   multiplier = 100,
   updateCurrentPage,
-  canChangeLimit = true
+  canChangeLimit = true,
 }: PaginationBarProps) => {
   const [showAboveFive, setShowAboveFive] = useState(false);
 
@@ -47,28 +47,17 @@ const PaginationBar = ({
   }, [canPreviousPage, currentPage, updateCurrentPage]);
 
   return (
-    <div className=" flex h-fit w-full flex-col items-center justify-between gap-[1.5rem]  pl-2 md:flex-row">
-      {/* <div className="flex w-full justify-between md:flex">
-        <div className="">
-          <span>
-            Page{" "}
-            <strong>
-              {+currentPage} of {pageCount}
-            </strong>{" "}
-          </span>
-        </div>
-
-      </div> */}
+    <div className="flex h-fit w-full flex-col items-center justify-between gap-[1.5rem] pl-2 md:flex-row">
       <div className="flex w-fit items-center justify-between gap-[1.5rem] ">
         <div className="block md:block">
-          <span>
+          <span className="!text-text">
             Page{" "}
-            <strong>
+            <strong className="!text-text">
               {+currentPage} of {pageCount}
             </strong>{" "}
           </span>
         </div>
-        <div className="">
+        <div>
           <LimitSelect
             pageSize={pageSize}
             multiplier={multiplier}
@@ -79,32 +68,24 @@ const PaginationBar = ({
         </div>
       </div>
 
-      <div className="flex h-[2.5rem] grow items-center justify-end gap-[.375rem]  ">
+      <div className="flex h-[2.5rem] grow items-center justify-end gap-[.375rem]">
         <button
           type="button"
           onClick={previousPage}
           disabled={!canPreviousPage}
-          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded`}
+          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded hover:bg-background-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 bg-background border border-border text-icon`}
         >
-          {/* <DoubleChevronRightIcon className="rotate-180" /> */}
           <NarrowUpArrowIcon
             className="h-[.875rem] -rotate-90"
-            fill="black"
-            stroke="black"
+            fill="currentColor"
+            stroke="currentColor"
           />
         </button>
-        {/* <button
-          type="button"
-          disabled
-          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded`}
-        >
-          <ChevronRightIcon className="rotate-180" />
-        </button> */}
 
         {showAboveFive ? (
           <button
             type="button"
-            className={`h-[2rem] w-[2rem] rounded border shadow-md`}
+            className={`h-[2rem] w-[2rem] rounded border border-border bg-background shadow-md hover:bg-background-hover transition-colors duration-200 text-icon`}
             onClick={() => setShowAboveFive(false)}
           >
             ...
@@ -124,8 +105,10 @@ const PaginationBar = ({
                   <button
                     type="button"
                     disabled={page === currentPage}
-                    className={`h-[2rem] w-[2rem] rounded border shadow-md ${
-                      currentPage === page ? "bg-weak-100" : ""
+                    className={`h-[2rem] w-[2rem] rounded border border-border bg-background shadow-md hover:bg-background-hover disabled:cursor-not-allowed transition-colors duration-200 ${
+                      currentPage === page
+                        ? "bg-primary text-white"
+                        : "text-text"
                     }`}
                     key={page}
                     onClick={() => updateCurrentPage(page)}
@@ -139,8 +122,10 @@ const PaginationBar = ({
                   <button
                     type="button"
                     disabled={page === currentPage}
-                    className={`h-[2rem] w-[2rem] rounded border shadow-md ${
-                      currentPage === page ? "bg-weak-100" : ""
+                    className={`h-[2rem] w-[2rem] rounded border border-border bg-background shadow-md hover:bg-background-hover disabled:cursor-not-allowed transition-colors duration-200 ${
+                      currentPage === page
+                        ? "bg-primary text-white"
+                        : "text-text"
                     }`}
                     key={page}
                     onClick={() => updateCurrentPage(page)}
@@ -163,17 +148,16 @@ const PaginationBar = ({
                         <button
                           type="button"
                           disabled={page === currentPage}
-                          className={` h-[2rem] w-fit min-w-[2rem] max-w-fit rounded border px-2 shadow-md ${
+                          className={`h-[2rem] w-fit min-w-[2rem] max-w-fit rounded border border-border px-2 shadow-md ${
                             currentPage === page ? "bg-weak-100" : ""
                           }`}
                           key={page}
-                          // onClick={() => setShowAboveFive(true)}
                         >
                           ...
                         </button>
                       }
-                      backgroundColor="#FFF0E5"
-                      tooltipClasses={`items-center flex  flex-col gap-2 h-[31.25rem] min-h-[31.25rem] max-h-[31.25rem] w-fit min-w-fit max-w-fit overflow-auto`}
+                      backgroundColor="var(--background-color)"
+                      tooltipClasses={`items-center flex flex-col gap-2 h-[31.25rem] min-h-[31.25rem] max-h-[31.25rem] w-fit min-w-fit max-w-fit overflow-auto`}
                     >
                       {pageCount !== undefined &&
                         Array.from({ length: Number(pageCount) }).map(
@@ -184,7 +168,7 @@ const PaginationBar = ({
                                 <button
                                   type="button"
                                   disabled={page === currentPage}
-                                  className={`!m-auto flex h-[2rem] w-auto min-w-[2rem] max-w-fit items-center justify-center rounded border p-2 leading-[1.5rem] shadow-md ${
+                                  className={`!m-auto flex h-[2rem] w-auto min-w-[2rem] max-w-fit items-center justify-center rounded border border-border p-2 leading-[1.5rem] shadow-md ${
                                     currentPage === page ? "bg-weak-100" : ""
                                   }`}
                                   key={page}
@@ -210,7 +194,7 @@ const PaginationBar = ({
                   <button
                     type="button"
                     disabled={pageCount === currentPage}
-                    className={`h-[2rem] w-[2rem] rounded border shadow-md ${
+                    className={`h-[2rem] w-[2rem] rounded border border-border shadow-md ${
                       currentPage === pageCount ? "bg-weak-100" : ""
                     }`}
                     key={page}
@@ -220,72 +204,22 @@ const PaginationBar = ({
                   </button>
                 );
               }
-
-              // if (
-              //   showAboveFive &&
-              //   pageCount > 5 &&
-              //   pageCount >= 8 &&
-              //   page > 5
-              // ) {
-              //   return (
-              //     <button
-              //       type="button"
-              //       disabled={page === currentPage}
-              //       className={`h-[2rem] w-[2rem] rounded border shadow-md ${
-              //         currentPage === page ? "bg-weak-100" : ""
-              //       }`}
-              //       key={page}
-              //       onClick={() => updateCurrentPage(page)}
-              //     >
-              //       {page}
-              //     </button>
-              //   );
-              // }
-              // return (
-              //   <button
-              //     className={`h-[2rem] w-[2rem] rounded border shadow-md ${
-              //       currentPage === page ? "bg-weak-100" : ""
-              //     }`}
-              //     key={page}
-              //   >
-              //     {page}
-              //   </button>
-              // );
             })}
         </div>
 
-        {/* <button
-          type="button"
-          disabled
-          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded`}
-        >
-          <ChevronRightIcon />
-        </button> */}
         <button
           type="button"
           onClick={nextPage}
           disabled={!canNextPage}
-          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded`}
+          className={`flex h-[2rem] w-[2rem] items-center justify-center rounded hover:bg-background-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 bg-background border border-border text-icon`}
         >
-          {/* <DoubleChevronRightIcon /> */}
           <NarrowUpArrowIcon
             className="h-[.875rem] rotate-90"
-            fill="black"
-            stroke="black"
+            fill="currentColor"
+            stroke="currentColor"
           />
         </button>
       </div>
-      {/*  */}
-
-      {/* <div className="hidden md:hidden">
-        <LimitSelect
-          pageSize={pageSize}
-          updatePageSize={updatePageSize}
-          multiplier={multiplier}
-          startSize={startSize}
-          canChangeLimit={canChangeLimit}
-        />
-      </div> */}
     </div>
   );
 };

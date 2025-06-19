@@ -1,6 +1,7 @@
 import React from "react";
-
 import { motion } from "framer-motion";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 export interface LoadingIndicatorProps {
   dotsClasses?: string;
@@ -10,30 +11,46 @@ export interface LoadingIndicatorProps {
 
 const containerVariant = {
   start: {
-    transition: { staggerChildren: 0.2 }
+    transition: { staggerChildren: 0.2 },
   },
   end: {
-    transition: { staggerChildren: 0.2 }
-  }
+    transition: { staggerChildren: 0.2 },
+  },
 };
 
 const dotsVariants = {
   start: {
-    y: "0%"
+    y: "0%",
   },
   end: {
-    y: "100%"
-  }
+    y: "100%",
+  },
 };
 
 const loadingTransition = {
   duration: 0.4,
   yoyo: Infinity,
-  ease: "easeIn"
+  ease: "easeIn",
 };
 
-const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ dotsClasses, size, style }) => {
-  const dotsStyles = `block w-[${size ?? 9}px] h-[${size ?? 9}px] bg-slate-900 rounded-md shrink-0 ${dotsClasses ?? ""}`;
+const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
+  dotsClasses,
+  size,
+  style,
+}) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
+
+  const dotSize = size ?? 9;
+  const dotStyles = {
+    width: `${dotSize}px`,
+    height: `${dotSize}px`,
+    backgroundColor: THEME_COLORS[mode].PRIMARY,
+    borderRadius: "6px",
+    flexShrink: 0,
+    display: "block",
+  };
+
   return (
     <motion.div
       variants={containerVariant}
@@ -43,17 +60,20 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ dotsClasses, size, 
       style={{ ...style }}
     >
       <motion.span
-        className={dotsStyles}
+        className={dotsClasses}
+        style={dotStyles}
         variants={dotsVariants}
         transition={loadingTransition}
       />
       <motion.span
-        className={dotsStyles}
+        className={dotsClasses}
+        style={dotStyles}
         variants={dotsVariants}
         transition={loadingTransition}
       />
       <motion.span
-        className={dotsStyles}
+        className={dotsClasses}
+        style={dotStyles}
         variants={dotsVariants}
         transition={loadingTransition}
       />

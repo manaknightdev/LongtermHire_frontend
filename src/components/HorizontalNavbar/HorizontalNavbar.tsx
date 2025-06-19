@@ -1,6 +1,8 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -23,8 +25,20 @@ export default function HorizontalNavbar({
   secondaryComponent,
   renderSecondaryComponent,
 }: HorizontalNavbarProps) {
+  const { state } = useTheme();
+  const mode = state?.theme;
+
+  const navStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND_SECONDARY,
+    borderBottomColor: THEME_COLORS[mode].BORDER,
+  };
+
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure
+      as="nav"
+      className="border-b transition-colors duration-200"
+      style={navStyles}
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">

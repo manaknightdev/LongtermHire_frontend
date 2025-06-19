@@ -1,3 +1,6 @@
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
+
 interface ExportButtonProps {
   onClick: (e?: any) => void;
   className?: string;
@@ -10,11 +13,28 @@ const ExportButton = ({
   showIcon = true,
   showText = true,
 }: ExportButtonProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
+
+  const buttonStyles = {
+    backgroundColor: THEME_COLORS[mode].PRIMARY,
+    borderColor: THEME_COLORS[mode].PRIMARY,
+    color: THEME_COLORS[mode].TEXT_ON_PRIMARY,
+    boxShadow: `0 4px 6px -1px ${THEME_COLORS[mode].PRIMARY}40`,
+  };
+
   return (
     <>
       <button
         onClick={onClick}
-        className={`relative flex h-[2.125rem] w-fit min-w-fit items-center  justify-center gap-2 overflow-hidden rounded-md border border-primaryBlue bg-indigo-600 px-[.6125rem]  py-[.5625rem] font-['Inter'] text-sm font-medium leading-none text-white shadow-md shadow-indigo-600 ${className}`}
+        className={`relative flex h-[2.125rem] w-fit min-w-fit items-center justify-center gap-2 overflow-hidden rounded-md border px-[.6125rem] py-[.5625rem] font-['Inter'] text-sm font-medium leading-none transition-all duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 ${className}`}
+        style={buttonStyles}
+        onFocus={(e) => {
+          e.currentTarget.style.boxShadow = `0 0 0 2px ${THEME_COLORS[mode].PRIMARY}40`;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.boxShadow = `0 4px 6px -1px ${THEME_COLORS[mode].PRIMARY}40`;
+        }}
       >
         {showIcon && (
           <svg

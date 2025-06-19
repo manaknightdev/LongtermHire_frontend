@@ -13,10 +13,10 @@ const Tabs = ({
   setView,
   view,
   viewsMap,
-  tabClassName
+  tabClassName,
 }: TabsProps) => {
   return (
-    <div className="scrollbar-hide flex !h-[3rem] w-full max-w-full overflow-x-auto shadow-sm shadow-soft-200 md:overflow-x-clip ">
+    <div className="scrollbar-hide flex !h-[3rem] w-full max-w-full overflow-x-auto shadow-sm shadow-border md:overflow-x-clip ">
       <div className="flex h-full shrink-0 items-center justify-between gap-[1.5rem]">
         {tabs.map((tab) => (
           <Tab

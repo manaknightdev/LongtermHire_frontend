@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# These Rules outline the main architectural flow for this project
+## Base Rules
+
+## Styling
+- Always use Tailwind classes for styles
+
+## Core Components
+Use these pre-built components instead of creating new ones:
+
+### Form Components
+- [InteractiveButton.tsx](mdc:src/components/InteractiveButton/InteractiveButton.tsx) - For all button implementations
+- [MkdInputV2.tsx](mdc:src/components/MkdInputV2/MkdInputV2.tsx) - For all input fields including custom types like mapping dropdown
+- [MkdPasswordInput.tsx](mdc:src/components/MkdPasswordInput/MkdPasswordInput.tsx) - For password fields with toggle view
+- [MkdTabContainer.tsx](mdc:src/components/MkdTabContainer/MkdTabContainer.tsx) - For tabbed interfaces
+- [MkdWizardContainer.tsx](mdc:src/components/MkdWizardContainer/MkdWizardContainer.tsx) - For wizard/multi-step forms
+
+### Layout Components
+- [ViewWrapper.tsx](mdc:src/components/ViewWrapper/ViewWrapper.tsx) - For page layouts
+- [SimpleViewWrapper.tsx](mdc:src/components/SimpleViewWrapper/SimpleViewWrapper.tsx) - For simple page layouts
+- [AdminWrapper.tsx](mdc:src/components/AdminWrapper/AdminWrapper.tsx) - For admin page layouts
+- [PublicWrapper.tsx](mdc:src/components/PublicWrapper/PublicWrapper.tsx) - For public page layouts
+- other in the format [Role]Wrapper.tsx could exist for other role wrappers
+
+### Data Display Components
+- [V3Wrapper.tsx](mdc:src/components/MkdListTable/V3Wrapper/V3Wrapper.tsx) - For data tables - it implements [MkdListTable.v3.tsx](mdc:src/components/MkdListTable/V3/MkdListTable.v3.tsx)
+- [MkdSimpleTable.tsx](mdc:src/components/MkdSimpleTable/MkdSimpleTable.tsx) - For simple data tables
+- [MkdFileTable.tsx](mdc:src/components/MkdFileTable/MkdFileTable.tsx) - For file uploading and parsing CSV or exel file and show the list
+- [PaginationBar.tsx](mdc:src/components/PaginationBar/PaginationBar.tsx) - For pagination
+
+### UI Components
+- [Modal.tsx](mdc:src/components/Modal/Modal.tsx) - For modal dialogs
+- [ModalSidebar.tsx](mdc:src/components/ModalSidebar/ModalSidebar.tsx) - For side panels
+- [ActionConfirmationModal.tsx](mdc:src/components/ActionConfirmationModal/ActionConfirmationModal.tsx) for confirmation dialogs
+- [SnackBar.tsx](mdc:src/components/SnackBar/SnackBar.tsx) - For notifications
+- [MkdLoader.tsx](mdc:src/components/MkdLoader/MkdLoader.tsx) - For loading states
+- [Skeleton.tsx](mdc:src/components/Skeleton/Skeleton.tsx) - For loading placeholders
+
+## Project Structure
+
+### Pages
+- Create pages in `src/pages` following the structure:
+  ```
+  pages/
+    [Role]/
+      [Add|Edit|View|Auth|List|Custom]/
+        **.tsx
+  ```
+- All pages must be exported via [LazyLoad.ts](mdc:src/routes/LazyLoad.ts) file and imported into [Routes.tsx](mdc:src/routes/Routes.tsx) 
+- Use appropriate wrapper components based on page type (AdminWrapper, PublicWrapper, etc.)
+
+### Hooks
+- Create hooks in `src/hooks/[hookName]` with:
+  - `index.ts` - Export the hook
+  - `[hookName].tsx` - Hook implementation
+- Available core hooks:
+  - `useContexts` - For auth and global context
+  - `useProfile` - For user profile management
+  - `useSDK` - For direct SDK interactions
+
+### Queries
+- Use the query system in `src/query` for data fetching and mutations
+- Follow the existing query structure and patterns
+
+### Components
+- All components must be wrapped with `LazyLoad`
+- Export components from their respective `index.ts` files
+- Follow the component structure:
+  ```
+  components/
+    [ComponentName]/
+      index.ts
+      [ComponentName].tsx
+      [ComponentName].types.ts (if needed)
+  ```
+
+### TypeScript
+- Use interfaces from `src/interfaces`
+- Use enums from `src/utils/Enums`
+- Properly type all components, hooks, and functions
+
+## Form Handling
+- Use react-hook-form with yup and yupResolver
+- Integrate with [MkdInputV2.tsx](mdc:src/components/MkdInputV2/MkdInputV2.tsx) components
+- Follow form validation patterns
+
+## Code Organization
+- Keep UI code separate from functionality using hooks
+- Create reusable components for repeated patterns
+- Break down complex components into smaller, manageable pieces
+- Use proper TypeScript types and interfaces
+
+- Follow the established project structure and patterns

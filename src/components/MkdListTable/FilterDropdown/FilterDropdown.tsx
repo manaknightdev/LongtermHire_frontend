@@ -1,16 +1,14 @@
 import { memo, useState } from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import {
-  FilterOptions,
-  FilterJoinDropdown,
-  FilterDateRange
-} from "./index";
+import { FilterOptions, FilterJoinDropdown, FilterDateRange } from "./index";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdButton } from "@/components/MkdButton";
 import { InteractiveButton } from "@/components/InteractiveButton";
 import { StringCaser } from "@/utils/utils";
 import { MkdInput } from "@/components/MkdInput";
 import { Column } from "@/interfaces";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface FilterDropdownProps {
   onSubmit: () => void;
@@ -38,19 +36,27 @@ const FilterDropdown = ({
   onColumnClick,
   setOptionValue,
   removeSelectedOption,
-  onClose
+  onClose,
 }: FilterDropdownProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
   const [_showFilterOptions, setShowFilterOptions] = useState(false);
   const stringCaser = new StringCaser();
   // console.log("selectedOptions >>", selectedOptions);
   return (
-    <div className="filter-form-holder  z-[9999999] grid h-full max-h-full min-h-full w-full min-w-full max-w-full grid-cols-1 grid-rows-[auto_1fr_auto_auto] overflow-hidden rounded-md bg-white p-5 shadow-xl">
+    <div
+      style={{
+        backgroundColor: THEME_COLORS[mode].BACKGROUND,
+        boxShadow: `0 25px 50px -12px ${THEME_COLORS[mode].SHADOW}40`,
+      }}
+      className="filter-form-holder z-[9999999] grid h-full max-h-full min-h-full w-full min-w-full max-w-full grid-cols-1 grid-rows-[auto_1fr_auto_auto] overflow-hidden rounded-md p-5 transition-colors duration-200"
+    >
       <div className="relative flex items-center justify-end">
         <MkdButton
           type="button"
           // onClick={() => setShowFilterOptions((prev) => !prev)}
           // disabled={true}
-          className={`!shadow-none peer !h-fit !max-h-fit !min-h-fit w-fit !border-0  !bg-white !p-0 !py-0 font-[700] !text-black !underline`}
+          className={`!shadow-none peer !h-fit !max-h-fit !min-h-fit w-fit !border-0 !bg-transparent !p-0 !py-0 font-[700] !text-primary !underline`}
         >
           Add Filter
         </MkdButton>
@@ -79,7 +85,8 @@ const FilterDropdown = ({
           {selectedOptions?.map((option, index) => (
             <div
               key={index}
-              className="mb-2 grid w-full grid-cols-[1fr_auto] items-end justify-between gap-2 text-gray-600"
+              style={{ color: THEME_COLORS[mode].TEXT_SECONDARY }}
+              className="mb-2 grid w-full grid-cols-[1fr_auto] items-end justify-between gap-2 transition-colors duration-200"
             >
               {option?.config?.format &&
               ["date_range"].includes(option?.config?.format) ? (
@@ -106,15 +113,21 @@ const FilterDropdown = ({
                           <>
                             <div className="grid w-full grid-cols-1 items-start justify-start">
                               <label
-                                className="mb-2 block cursor-pointer text-left text-sm font-bold text-gray-700"
+                                style={{ color: THEME_COLORS[mode].TEXT }}
+                                className="mb-2 block cursor-pointer text-left text-sm font-bold transition-colors duration-200"
                                 htmlFor={option?.uid}
                               >
                                 {stringCaser.Capitalize(columnData?.accessor, {
-                                  separator: "space"
+                                  separator: "space",
                                 })}
                               </label>
                               <select
-                                className="!h-[3rem] !max-h-[3rem] !min-h-[3rem] appearance-none rounded-md border !border-soft-200 outline-0 focus:border-primary focus:ring-primary"
+                                style={{
+                                  backgroundColor: THEME_COLORS[mode].INPUT,
+                                  color: THEME_COLORS[mode].TEXT,
+                                  borderColor: THEME_COLORS[mode].BORDER,
+                                }}
+                                className="!h-[3rem] !max-h-[3rem] !min-h-[3rem] appearance-none rounded-md border outline-0 focus:border-primary focus:ring-primary transition-colors duration-200"
                                 onChange={(e) => {
                                   setOptionValue &&
                                     setOptionValue(
@@ -170,7 +183,7 @@ const FilterDropdown = ({
                               label={stringCaser.Capitalize(
                                 columnData?.accessor,
                                 {
-                                  separator: " "
+                                  separator: " ",
                                 }
                               )}
                               placeholder="Enter value..."
@@ -184,7 +197,7 @@ const FilterDropdown = ({
                                   );
                               }}
                               labelClassName="text-left"
-                              className="!h-[3rem] !max-h-[3rem] !min-h-[3rem] !w-full !min-w-full !max-w-full !rounded-md !border !border-soft-200 !px-3 !py-2 !leading-tight !text-gray-700 !outline-none focus:border-soft-200 focus:ring-soft-200"
+                              className="!h-[3rem] !max-h-[3rem] !min-h-[3rem] !w-full !min-w-full !max-w-full !rounded-md !border !border-border !px-3 !py-2 !leading-tight !text-text !outline-none focus:border-primary focus:ring-primary"
                             />
                           </LazyLoad>
                         </div>
@@ -197,7 +210,12 @@ const FilterDropdown = ({
               ) : null}
 
               <RiDeleteBin5Line
-                className="cursor-pointer self-end text-2xl !text-sub-500"
+                style={{
+                  color:
+                    THEME_COLORS[mode].DANGER ||
+                    THEME_COLORS[mode].TEXT_SECONDARY,
+                }}
+                className="cursor-pointer self-end text-2xl transition-colors duration-200"
                 onClick={() => {
                   removeSelectedOption([option?.uid]);
                 }}
@@ -211,7 +229,7 @@ const FilterDropdown = ({
           type="button"
           onClick={() => onClose()}
           // disabled={true}
-          className="!text-black !grow self-end !bg-transparent font-bold"
+          className="!text-text !grow self-end !bg-transparent font-bold"
         >
           Cancel
         </MkdButton>
@@ -239,7 +257,7 @@ const FilterDropdown = ({
             removeSelectedOption(selectedOptions?.map((item) => item?.uid))
           }
           disabled={selectedOptions?.length === 0 ? true : false}
-          className={`!shadow-none !text-black w-fit !border-0 !bg-white font-[700] !underline`}
+          className={`!shadow-none !text-text w-fit !border-0 !bg-transparent font-[700] !underline`}
         >
           Clear all Filters
         </MkdButton>

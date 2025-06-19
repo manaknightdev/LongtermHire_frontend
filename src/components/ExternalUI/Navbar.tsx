@@ -10,7 +10,7 @@ export default function Navbar({}) {
   };
 
   return (
-    <div className="fixed top-0 z-10 mx-auto w-full bg-[rgb(255,255,255,0.6)] px-0 py-3 backdrop-blur-sm md:px-8">
+    <div className="fixed top-0 z-10 mx-auto w-full bg-background/60 px-0 py-3 backdrop-blur-sm md:px-8">
       <div className="m-0 w-full">
         <div className="">
           <div className="mx-auto px-5 md:container md:px-4">

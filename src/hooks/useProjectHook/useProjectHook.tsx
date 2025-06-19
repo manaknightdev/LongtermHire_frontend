@@ -26,7 +26,7 @@ export const useProjectHook = ({ onSuccess }: UseProjectHookProps) => {
         .matches(/^[a-zA-Z0-9 ]*$/, "Only strings and numbers are allowed")
         .required("name is required"),
       hostname: yup.string().required("hostname is required"),
-      slug: yup.string().required("slug is required")
+      slug: yup.string().required("slug is required"),
     })
     .required();
 
@@ -36,9 +36,9 @@ export const useProjectHook = ({ onSuccess }: UseProjectHookProps) => {
     setError,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const { slug } = watch();
@@ -48,7 +48,7 @@ export const useProjectHook = ({ onSuccess }: UseProjectHookProps) => {
       const payload = {
         name: _data.name,
         slug: _data.slug,
-        hostname: _data.hostname
+        hostname: _data.hostname,
       };
 
       const result = await createProject(payload);
@@ -63,7 +63,7 @@ export const useProjectHook = ({ onSuccess }: UseProjectHookProps) => {
     } catch (error: any) {
       setError("slug", {
         type: "manual",
-        message: error.message
+        message: error.message,
       });
       showToast(error.message, 4000, ToastStatusEnum.ERROR);
       tokenExpireError(error.message);
@@ -80,6 +80,6 @@ export const useProjectHook = ({ onSuccess }: UseProjectHookProps) => {
     register,
     handleSubmit,
     onSubmit,
-    isPending
+    isPending,
   };
 };

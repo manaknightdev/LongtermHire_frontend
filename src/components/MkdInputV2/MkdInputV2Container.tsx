@@ -1,5 +1,5 @@
 import React from "react";
-import { MkdInputV2Type, useMkdInputV2Context } from "./MkdInputV2Context";
+import { useMkdInputV2Context } from "./MkdInputV2Context";
 
 // Container component props
 interface MkdInputV2ContainerProps

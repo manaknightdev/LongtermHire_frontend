@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useSDK } from "@/hooks/useSDK";
 // import { MkdButton } from "@/components/MkdButton";
-// import { LazyLoad } from "@/components/LazyLoad";
 // import { MkdInputV2HookFormExample } from "@/components/MkdInputV2";
 // import MkdListTableWithQueryExample from "@/components/MkdListTable/MkdListTableWithQuery.example";
 
@@ -35,39 +34,7 @@ const TestUpload = () => {
 
   return (
     <div className={`h-full min-h-full max-h-full overflow-auto`}>
-      {/* <div className="flex flex-col items-center space-y-4 p-4">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-          id="fileInput"
-        />{" "}
-        <label
-          htmlFor="fileInput"
-          className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 hover:border-blue-500"
-        >
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="max-h-48 max-w-full"
-            />
-          ) : (
-            <div className="text-center">
-              <p>Click to select an image</p>{" "}
-              <p className="text-sm text-gray-500">or drag and drop here</p>
-            </div>
-          )}
-        </label>{" "}
-        <MkdButton onClick={handleUpload} disabled={!file} className="mt-4">
-          Upload Image{" "}
-        </MkdButton>
-      </div> */}
-
-      {/* <LazyLoad>
-        <MkdListTableWithQueryExample />
-      </LazyLoad> */}
+     
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import React from "react";
 import { useMkdInputV2Context } from "./MkdInputV2Context";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 // Label component props
 interface MkdInputV2LabelProps
@@ -13,19 +15,26 @@ const MkdInputV2Label: React.FC<MkdInputV2LabelProps> = ({
   ...props
 }) => {
   const { id, required, type } = useMkdInputV2Context();
+  const { state } = useTheme();
+  const mode = state?.theme;
 
   // For radio, checkbox, color, toggle types, we use a different label style
   const isSpecialType = ["radio", "checkbox", "color", "toggle"].includes(
     type!
   );
 
+  const labelStyles = {
+    color: THEME_COLORS[mode].TEXT,
+  };
+
   return (
     <label
       htmlFor={id}
+      style={labelStyles}
       className={`${
         isSpecialType
-          ? "font-inter block h-full cursor-pointer whitespace-nowrap text-[.9375rem] font-bold capitalize text-black"
-          : "block cursor-pointer text-[.875rem] font-bold"
+          ? "font-inter block h-full cursor-pointer whitespace-nowrap text-[.9375rem] font-bold capitalize transition-colors duration-200"
+          : "block cursor-pointer text-[.875rem] font-bold transition-colors duration-200"
       } ${className}`}
       {...props}
     >

@@ -42,7 +42,8 @@ test.describe("Navigation", () => {
     await expect(page).toHaveURL(new RegExp(TEST_CONSTANTS.ROUTES.PROFILE));
 
     // Navigate back to dashboard using NavLink
-    await page.getByLabel("/admin/build").click();
+    // await page.getByLabel("/admin/build").click();
+    await page.locator('a[href="/admin/build"]').click();
     console.log("Dashboard Link Clicked >>");
 
     // Wait for dashboard to load

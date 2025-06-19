@@ -90,12 +90,12 @@ const MkdTableWrapper = ({
   useDefaultColumns = false,
   showYScrollbar = false,
   showXScrollbar = false,
-  showScrollbar = true
+  showScrollbar = true,
 }: MkdTableWrapperProps) => {
   // Fetch data using React Query
   const { data: enhancedData, isLoading } = useEnhancedTableData({
     table,
-    processes
+    processes,
   });
 
   const externalData = useMemo(() => {
@@ -113,7 +113,7 @@ const MkdTableWrapper = ({
       pages: enhancedData?.num_pages,
       data: enhancedData?.data ?? [],
       limit: enhancedData?.limit,
-      total: enhancedData?.total
+      total: enhancedData?.total,
     } as ExternalData;
   }, [
     enhancedData?.data,
@@ -121,7 +121,7 @@ const MkdTableWrapper = ({
     enhancedData?.page,
     enhancedData?.num_pages,
     enhancedData?.total,
-    enhancedData?.limit
+    enhancedData?.limit,
   ]);
 
   return (

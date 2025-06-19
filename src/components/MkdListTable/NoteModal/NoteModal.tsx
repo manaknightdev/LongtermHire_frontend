@@ -1,6 +1,8 @@
 import { Modal } from "@/components/Modal";
 import { MkdButton } from "@/components/MkdButton";
 import { InteractiveButton } from "@/components/InteractiveButton";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface NoteModalProps {
   onClose: () => void;
@@ -9,6 +11,8 @@ interface NoteModalProps {
 }
 
 export const NoteModal = ({ onClose, isOpen, note }: NoteModalProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
   return (
     <Modal
       isOpen={isOpen}
@@ -30,7 +34,10 @@ export const NoteModal = ({ onClose, isOpen, note }: NoteModalProps) => {
             >
               <div className="w-full gap-5 overflow-y-auto pb-10 ">
                 <div className="w-full space-y-5 px-5">
-                  <div className="font-inter text-justify text-lg font-medium leading-snug tracking-wider">
+                  <div
+                    style={{ color: THEME_COLORS[mode].TEXT }}
+                    className="font-inter text-justify text-lg font-medium leading-snug tracking-wider transition-colors duration-200"
+                  >
                     {note}
                   </div>
                 </div>

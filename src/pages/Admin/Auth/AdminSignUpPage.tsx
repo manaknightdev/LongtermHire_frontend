@@ -10,6 +10,8 @@ import { InteractiveButton } from "@/components/InteractiveButton";
 import { MkdInput } from "@/components/MkdInput";
 import { LazyLoad } from "@/components/LazyLoad";
 import { MkdPasswordInput } from "@/components/MkdPasswordInput";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface AdminSignUpProps {
   role?: string;
@@ -17,6 +19,8 @@ interface AdminSignUpProps {
 
 const AdminSignUpPage = ({ role = RoleEnum.SUPER_ADMIN }: AdminSignUpProps) => {
   const { sdk } = useSDK();
+  const { state } = useTheme();
+  const mode = state?.theme;
 
   const { authDispatch: dispatch, showToast } = useContexts();
 
@@ -30,16 +34,16 @@ const AdminSignUpPage = ({ role = RoleEnum.SUPER_ADMIN }: AdminSignUpProps) => {
   const schema = yup
     .object({
       email: yup.string().email().required(),
-      password: yup.string().required()
+      password: yup.string().required(),
     })
     .required();
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
 
   const onSubmit = async (data: yup.InferType<typeof schema>) => {
@@ -50,7 +54,7 @@ const AdminSignUpPage = ({ role = RoleEnum.SUPER_ADMIN }: AdminSignUpProps) => {
       if (!result.error) {
         dispatch({
           type: "LOGIN",
-          payload: result as any
+          payload: result as any,
         });
 
         showToast("Succesfully Registered", 4000, ToastStatusEnum.SUCCESS);
@@ -63,7 +67,7 @@ const AdminSignUpPage = ({ role = RoleEnum.SUPER_ADMIN }: AdminSignUpProps) => {
             const field = keys[i];
             setError(field as any, {
               type: "manual",
-              message: result.validation[field]
+              message: result.validation[field],
             });
           }
         }
@@ -75,14 +79,30 @@ const AdminSignUpPage = ({ role = RoleEnum.SUPER_ADMIN }: AdminSignUpProps) => {
         type: "manual",
         message: error?.response?.data?.message
           ? error?.response?.data?.message
-          : error?.message
+          : error?.message,
       });
     }
   };
 
+  const containerStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND,
+  };
+
+  const cardStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND,
+    borderColor: THEME_COLORS[mode].BORDER,
+    boxShadow: `0 10px 15px -3px ${THEME_COLORS[mode].SHADOW}20, 0 4px 6px -2px ${THEME_COLORS[mode].SHADOW}10`,
+  };
+
   return (
-    <div className="m-auto flex justify-center items-center w-full h-full max-h-full min-h-full">
-      <div className="my-12 flex w-[90%] flex-col items-center rounded-lg border  border-[#a8a8a8] p-6 shadow-md md:w-[22.8125rem]">
+    <div
+      className="m-auto flex justify-center items-center w-full h-full max-h-full min-h-full transition-colors duration-200"
+      style={containerStyles}
+    >
+      <div
+        className="my-12 flex w-[90%] flex-col items-center rounded-lg border p-6 transition-all duration-200 md:w-[22.8125rem]"
+        style={cardStyles}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="25"

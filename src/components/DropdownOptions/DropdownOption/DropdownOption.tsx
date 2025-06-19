@@ -1,4 +1,6 @@
 import React from "react";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface DropdownOptionProps {
   icon: React.ReactNode;
@@ -14,10 +16,21 @@ const DropdownOption = ({
   style = {},
   className = "",
 }: DropdownOptionProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
+
+  const optionStyles = {
+    color: THEME_COLORS[mode].TEXT,
+    ...style,
+  };
+
+  const hoverStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND_SECONDARY,
+  };
   return (
     <div
-      style={style}
-      className={`hover:text[#262626] flex w-full cursor-pointer items-center gap-3 rounded-md px-4 py-3 capitalize text-[#262626] hover:bg-[#F4F4F4] ${className}`}
+      style={optionStyles}
+      className={`flex w-full cursor-pointer items-center gap-3 rounded-md px-4 py-3 capitalize transition-colors duration-200 hover:bg-background-secondary ${className}`}
       onClick={(e) => {
         onClick(e);
       }}

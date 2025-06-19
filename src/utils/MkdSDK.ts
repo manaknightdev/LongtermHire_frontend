@@ -158,6 +158,14 @@ export default class MkdSDK {
   }
 
   /**
+   * Get current base URL
+   * @returns Base URL
+   */
+  getBaseUrl(): string {
+    return this._baseurl;
+  }
+
+  /**
    * Get current project ID
    * @returns Project ID
    */
@@ -244,7 +252,7 @@ export default class MkdSDK {
   }
 
   // Flexible header generation
-  private getHeader(
+  getHeader(
     additionalHeaders?: Record<string, string> | null,
     exlude?: Array<string>
   ): Headers {

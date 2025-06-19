@@ -3,14 +3,14 @@ import {
   StringCaser,
   generateUUID,
   getCorrectOperator,
-  getCorrectValueTypeFormat
+  getCorrectValueTypeFormat,
 } from "@/utils/utils";
 import { PaginationBar } from "@/components/PaginationBar";
 import {
   MkdListTable,
   TableFilter,
   OverlayTableActions,
-  TableActions
+  TableActions,
 } from "@/components/MkdListTable";
 
 import { MkdButton } from "@/components/MkdButton";
@@ -31,7 +31,7 @@ import {
   ExternalData,
   FilterState,
   ModalState,
-  PaginationState
+  PaginationState,
 } from "@/interfaces";
 import { ActionLocations, DisplayEnum } from "@/utils/Enums";
 import { TreeSDKOptions } from "@/utils/TreeSDK";
@@ -97,27 +97,27 @@ const MkdListTableV2 = ({
       multiple: true,
       action: null,
       locations: [ActionLocations.DROPDOWN],
-      children: "View"
+      children: "View",
     },
     edit: {
       show: true,
       multiple: true,
       action: null,
       locations: [ActionLocations.DROPDOWN],
-      children: "Edit"
+      children: "Edit",
     },
     delete: {
       show: true,
       multiple: true,
       action: null,
       locations: [ActionLocations.DROPDOWN],
-      children: "Delete"
+      children: "Delete",
     },
     select: {
       show: true,
       multiple: true,
       action: null,
-      locations: []
+      locations: [],
     },
     add: {
       show: true,
@@ -127,7 +127,7 @@ const MkdListTableV2 = ({
       showChildren: true,
       children: "Add",
       type: "",
-      className: ""
+      className: "",
     },
     export: {
       show: true,
@@ -135,8 +135,8 @@ const MkdListTableV2 = ({
       action: null,
       showText: false,
       className: "",
-      locations: []
-    }
+      locations: [],
+    },
   },
   actionPostion = [ActionLocations.DROPDOWN], // "dropwdown" | "ontop" | "overlay" | "buttons"
   actionId = "id",
@@ -161,7 +161,7 @@ const MkdListTableV2 = ({
   canChangeLimit = true,
   // selectedItemsRef = null,
   useDefaultColumns = false,
-  showScrollbar = true
+  showScrollbar = true,
 }: MkdListTableV2Props) => {
   const { projectId } = useSDK();
   const queryClient = useQueryClient();
@@ -169,13 +169,13 @@ const MkdListTableV2 = ({
   const {
     globalState: { columModel },
     tableState: tableProperty,
-    setTableState: setTableProperty
+    setTableState: setTableProperty,
   } = useContexts();
 
   const tableState: ExternalData = useMemo(() => {
     return {
       ...externalData,
-      data: externalData?.data ?? []
+      data: externalData?.data ?? [],
     } as ExternalData;
   }, [externalData]);
 
@@ -186,7 +186,7 @@ const MkdListTableV2 = ({
         selectedOptions: [],
         selectedItems: [],
         runFilter: false,
-        enabled: true
+        enabled: true,
       } as FilterState,
       paginationState: {
         pageSize: defaultPageSize,
@@ -194,7 +194,7 @@ const MkdListTableV2 = ({
         currentPage: 1,
         dataTotal: 0,
         canPreviousPage: false,
-        canNextPage: false
+        canNextPage: false,
       } as PaginationState,
       columnState: {
         columnId: 0,
@@ -202,12 +202,12 @@ const MkdListTableV2 = ({
         columnsReady: false,
         data: [],
         order: "id",
-        direction: "desc"
+        direction: "desc",
       } as ColumnDataState,
       modalState: {
         deleteLoading: false,
         popoverShown: false,
-        showDeleteModal: false
+        showDeleteModal: false,
       } as ModalState,
       queryOptions: {
         join: join,
@@ -216,8 +216,8 @@ const MkdListTableV2 = ({
         filter: [],
         size: defaultPageSize,
         page: 1,
-        role: tableRole
-      } as TreeSDKOptions
+        role: tableRole,
+      } as TreeSDKOptions,
     }),
     [defaultPageSize, join, tableRole, defaultColumns, useDefaultColumns]
   );
@@ -228,18 +228,18 @@ const MkdListTableV2 = ({
     columnState,
     modalState,
     queryOptions,
-    reload
+    reload,
   } = tableProperty?.[table] ?? initialTableState;
 
   const [internalState, setInternalState] = useState<Record<string, any>>({
     searchValue: "",
-    isSearchDirty: false
+    isSearchDirty: false,
   });
 
   const refreshData = useCallback(() => {
     const data = {
       ...tableProperty?.[table]?.filterState,
-      enabled: true
+      enabled: true,
     };
 
     setTableProperty(table, { ...tableProperty?.[table], filterState: data });
@@ -247,7 +247,7 @@ const MkdListTableV2 = ({
     queryClient.invalidateQueries({
       queryKey: [queryKeys?.[table]?.paginate, table],
       exact: false,
-      refetchType: "active"
+      refetchType: "active",
     });
   }, [tableProperty, table, setTableProperty, queryClient]);
 
@@ -262,7 +262,7 @@ const MkdListTableV2 = ({
         ),
         runFilter: ["value"].includes(field)
           ? true
-          : tableProperty?.[table]?.filterState?.runFilter
+          : tableProperty?.[table]?.filterState?.runFilter,
       };
       setTableProperty(table, { ...tableProperty?.[table], filterState: data });
     },
@@ -277,7 +277,7 @@ const MkdListTableV2 = ({
           table
         ]?.filterState?.selectedOptions?.filter(
           (item: any) => !uids.includes(item?.uid)
-        )
+        ),
       };
       setTableProperty(table, { ...tableProperty?.[table], filterState: data });
     },
@@ -291,15 +291,15 @@ const MkdListTableV2 = ({
         config: options,
         accessor: column,
         uid: generateUUID(),
-        operator: operator ?? operations.CONTAINS
+        operator: operator ?? operations.CONTAINS,
       };
 
       const data = {
         ...tableProperty?.[table]?.filterState,
         selectedOptions: [
           ...(tableProperty?.[table]?.filterState?.selectedOptions ?? []),
-          filter
-        ]
+          filter,
+        ],
       };
 
       setTableProperty(table, { ...tableProperty?.[table], filterState: data });
@@ -375,11 +375,11 @@ const MkdListTableV2 = ({
       const searchFilter = computeSearchFilter();
       const filterData = {
         ...tableProperty?.[table]?.filterState,
-        enabled: true
+        enabled: true,
       };
       const data = {
         ...tableProperty?.[table]?.queryOptions,
-        filter: [...filters, ...defaultFilter, ...searchFilter]
+        filter: [...filters, ...defaultFilter, ...searchFilter],
       };
 
       console.log("queryOptions >>", tableProperty?.[table]?.queryOptions);
@@ -387,7 +387,7 @@ const MkdListTableV2 = ({
         ...tableProperty?.[table],
         queryOptions: data,
         filterState: filterData,
-        reload: false
+        reload: false,
       });
     },
     [
@@ -396,7 +396,7 @@ const MkdListTableV2 = ({
       setTableProperty,
       defaultFilter,
       processFilters,
-      computeSearchFilter
+      computeSearchFilter,
     ]
   );
 
@@ -411,7 +411,7 @@ const MkdListTableV2 = ({
           searchValue: e?.target?.value,
           isSearchDirty: !internalState?.isSearchDirty
             ? true
-            : internalState?.isSearchDirty
+            : internalState?.isSearchDirty,
         });
       }
     },
@@ -424,12 +424,12 @@ const MkdListTableV2 = ({
       console.log("updateCurrentPage >>", page);
       const data = {
         ...tableProperty?.[table]?.queryOptions,
-        page: page
+        page: page,
       };
       setTableProperty(table, {
         ...tableProperty?.[table],
         queryOptions: data,
-        reload: true
+        reload: true,
       });
     },
     [table, tableProperty, setTableProperty]
@@ -439,12 +439,12 @@ const MkdListTableV2 = ({
     (limit: React.SetStateAction<number>) => {
       const data = {
         ...tableProperty?.[table]?.queryOptions,
-        size: limit
+        size: limit,
       };
       setTableProperty(table, {
         ...tableProperty?.[table],
         queryOptions: data,
-        reload: true
+        reload: true,
       });
     },
     [table, tableProperty, setTableProperty]
@@ -544,12 +544,12 @@ const MkdListTableV2 = ({
             })}
 
             {showSearch ? (
-              <div className="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-black px-2 py-1 focus-within:border-gray-400">
-                <BiSearch className="text-xl text-black" />
+              <div className="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-border px-2 py-1 focus-within:border-primary transition-colors duration-200">
+                <BiSearch className="text-xl text-icon" />
                 <input
                   type="text"
                   placeholder={`Search`}
-                  className="w-full border-none p-0 placeholder:text-left focus:outline-none"
+                  className="w-full border-none p-0 placeholder:text-left focus:outline-none bg-transparent text-text placeholder:text-secondary"
                   style={{ boxShadow: "0 0 transparent" }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -602,7 +602,7 @@ const MkdListTableV2 = ({
                           {stringCaser.Capitalize(
                             key === "delete" ? "Remove" : key,
                             {
-                              separator: " "
+                              separator: " ",
                             }
                           )}
                         </>
@@ -664,13 +664,13 @@ const MkdListTableV2 = ({
         setSelectedItems={(items) =>
           setTableProperty(table, {
             ...tableProperty,
-            filterState: { ...filterState, selectedItems: items }
+            filterState: { ...filterState, selectedItems: items },
           })
         }
         setShowDeleteModal={(show) =>
           setTableProperty(table, {
             ...tableProperty,
-            modalState: { ...modalState, showDeleteModal: show }
+            modalState: { ...modalState, showDeleteModal: show },
           })
         }
         loading={columModel?.loading || tableState?.loading}

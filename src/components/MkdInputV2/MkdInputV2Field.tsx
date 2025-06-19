@@ -74,11 +74,11 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
       : {
           onChange,
         }),
-    className: `focus:shadow-outline font-inter w-full appearance-none rounded border px-3 py-2 leading-tight text-black shadow focus:outline-none ${className} ${
+    className: `focus:shadow-outline font-inter w-full appearance-none rounded border px-3 py-2 leading-tight text-text bg-input shadow focus:outline-none focus:border-primary transition-colors duration-200 ${className} ${
       name && errors && errors?.[name] && errors?.[name]?.message
         ? "!border-red-500"
-        : "border-gray-200"
-    } ${disabled ? "appearance-none bg-gray-200" : ""}`,
+        : "border-border"
+    } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`,
   };
 
   // Loading state
@@ -104,13 +104,13 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
           {...commonProps}
           type={type}
           checked={checked}
-          className={`focus:shadow-outline font-inter !h-4 !w-4 cursor-pointer appearance-none rounded border leading-tight text-primary shadow focus:outline-none focus:ring-0 ${className} ${
+          className={`focus:shadow-outline font-inter !h-4 !w-4 cursor-pointer appearance-none rounded border leading-tight text-primary bg-input shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
             name && errors && errors?.[name] && errors?.[name]?.message
               ? "!border-red-500"
-              : "border-gray-200"
+              : "border-border"
           } ${
             type === "color" ? "min-h-[3.125rem] min-w-[6.25rem]" : ""
-          } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+          } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`}
           autoComplete="new-password"
           aria-autocomplete="none"
         />
@@ -143,11 +143,11 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
     return (
       <select
         {...commonProps}
-        className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+        className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-text bg-input shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
           name && errors && errors?.[name] && errors?.[name]?.message
             ? "!border-red-500"
-            : "border-gray-200"
-        } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+            : "border-border"
+        } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`}
       >
         <option></option>
         {options?.map((option: string | number | boolean, key: number) => (
@@ -172,11 +172,11 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
     return (
       <select
         {...commonProps}
-        className={`focus:shadow-outline font-inter h-[3rem] w-full truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+        className={`focus:shadow-outline font-inter h-[3rem] w-full truncate rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-text bg-input shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
           name && errors && errors?.[name] && errors?.[name]?.message
             ? "!border-red-500"
-            : "border-gray-200"
-        } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+            : "border-border"
+        } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`}
       >
         <option></option>
         {mapping &&
@@ -211,11 +211,11 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
 
           (e.target as HTMLInputElement).value = value; // Update the input value
         }}
-        className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+        className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-text bg-input shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
           name && errors && errors?.[name] && errors?.[name]?.message
             ? "!border-red-500"
-            : "border-gray-200"
-        } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+            : "border-border"
+        } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`}
         autoComplete="new-password"
         aria-autocomplete="none"
       />
@@ -236,10 +236,10 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
             {...commonProps}
             type={type}
             disabled={true}
-            className={`focus:shadow-outline bg-brown-main-bg h-[3rem] w-full appearance-none truncate rounded-sm border-[.125rem] border-[#1f1d1a] text-center text-sm font-normal leading-tight text-[#1f1d1a] shadow focus:outline-none focus:ring-0 ${className} ${
+            className={`focus:shadow-outline h-[3rem] w-full appearance-none truncate rounded-sm border-[.125rem] border-border bg-input text-center text-sm font-normal leading-tight text-text shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
               name && errors && errors?.[name] && errors?.[name]?.message
                 ? "!border-red-500"
-                : "border-gray-200"
+                : "border-border"
             }`}
             autoComplete="new-password"
             aria-autocomplete="none"
@@ -284,11 +284,11 @@ const MkdInputV2Field: React.FC<MkdInputV2FieldProps> = ({
     <input
       {...commonProps}
       type={type}
-      className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border p-[.625rem] px-3 py-2 leading-tight text-black shadow focus:outline-none focus:ring-0 ${className} ${
+      className={`focus:shadow-outline font-inter h-[3rem] w-full appearance-none rounded-[.625rem] border bg-input p-[.625rem] px-3 py-2 leading-tight text-text shadow focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200 ${className} ${
         name && errors && errors?.[name] && errors?.[name]?.message
           ? "!border-red-500"
-          : "border-gray-200"
-      } ${disabled ? "appearance-none bg-gray-200" : ""}`}
+          : "border-border"
+      } ${disabled ? "appearance-none bg-input-disabled text-text-disabled cursor-not-allowed" : "hover:border-border-hover"}`}
       autoComplete="new-password"
       aria-autocomplete="none"
     />

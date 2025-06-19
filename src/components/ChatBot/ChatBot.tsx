@@ -44,7 +44,7 @@ function ChatBot() {
             toggleComponentVisibility={toggleComponentVisibility}
           />
         ) : null}
-        <div className="dark hidden flex-shrink-0 bg-gray-900 md:flex md:w-[260px] md:flex-col">
+        <div className="dark hidden flex-shrink-0 bg-background md:flex md:w-[260px] md:flex-col">
           <div className="flex h-full min-h-0 flex-col ">
             <Sidebar
               setCurrentRoom={setCurrentRoom}

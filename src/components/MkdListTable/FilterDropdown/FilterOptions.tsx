@@ -1,6 +1,8 @@
 import { StringCaser } from "@/utils/utils";
 import { useSDK } from "@/hooks/useSDK";
 import { Column } from "@/interfaces";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 const excludedFields = [
   "row",
@@ -21,7 +23,7 @@ const excludedFields = [
   "allowed customers",
   "allowed customer",
   "allowed_customers",
-  "allowed_customer"
+  "allowed_customer",
 ];
 
 interface FilterOptionsProps {
@@ -33,6 +35,8 @@ interface FilterOptionsProps {
 
 const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
   const { operations } = useSDK();
+  const { state } = useTheme();
+  const mode = state?.theme;
   const stringCaser = new StringCaser();
 
   return (
@@ -40,9 +44,12 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
       style={{
         maxHeight: "31.25rem",
         height: "fit-content",
-        overflowY: "auto"
+        overflowY: "auto",
+        backgroundColor: THEME_COLORS[mode].BACKGROUND,
+        color: THEME_COLORS[mode].TEXT_SECONDARY,
+        boxShadow: `0 4px 6px -1px ${THEME_COLORS[mode].SHADOW}20, 0 2px 4px -1px ${THEME_COLORS[mode].SHADOW}10`,
       }}
-      className="absolute top-[-2000%] z-10 m-auto w-[12.5rem] min-w-[12.5rem] max-w-[12.5rem] bg-white p-2 text-gray-600 opacity-0 shadow-md transition-all hover:top-[80%] hover:opacity-100 focus:top-[80%] focus:opacity-100 peer-focus:top-[80%] peer-focus:opacity-100 peer-focus-visible:top-[80%] peer-focus-visible:opacity-100"
+      className="absolute top-[-2000%] z-10 m-auto w-[12.5rem] min-w-[12.5rem] max-w-[12.5rem] p-2 opacity-0 transition-all hover:top-[80%] hover:opacity-100 focus:top-[80%] focus:opacity-100 peer-focus:top-[80%] peer-focus:opacity-100 peer-focus-visible:top-[80%] peer-focus-visible:opacity-100"
     >
       {columns
         .map((column) => {
@@ -56,7 +63,8 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
               <button
                 type="button"
                 key={column?.header}
-                className={`h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] text-black`}
+                style={{ color: THEME_COLORS[mode].TEXT }}
+                className={`h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] transition-colors duration-200 hover:bg-background-secondary`}
                 onClick={() => {
                   if (column.join) {
                     onColumnClick && onColumnClick(column?.header);
@@ -66,7 +74,7 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
                 }}
               >
                 {stringCaser.Capitalize(column?.header, {
-                  separator: ""
+                  separator: "",
                 })}
               </button>
             );
@@ -82,7 +90,8 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
                 <button
                   type="button"
                   key={column.header}
-                  className={` h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] text-black`}
+                  style={{ color: THEME_COLORS[mode].TEXT }}
+                  className={` h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] transition-colors duration-200 hover:bg-background-secondary`}
                   onClick={() => {
                     if (column.join) {
                       onColumnClick &&
@@ -93,7 +102,7 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
                   }}
                 >
                   {stringCaser.Capitalize(column.header, {
-                    separator: ""
+                    separator: "",
                   })}
                 </button>
               );
@@ -103,10 +112,11 @@ const FilterOptions = ({ columns = [], onColumnClick }: FilterOptionsProps) => {
 
       <button
         type="button"
-        className={`h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] text-black`}
+        style={{ color: THEME_COLORS[mode].TEXT }}
+        className={`h-[2.25rem] w-full cursor-pointer text-left font-inter text-[.875rem] font-[400] capitalize leading-[1.25rem] tracking-[-0.006em] transition-colors duration-200 hover:bg-background-secondary`}
         onClick={() => {
           onColumnClick?.("created_at", operations?.BETWEEN, {
-            format: "date_range"
+            format: "date_range",
           });
         }}
       >

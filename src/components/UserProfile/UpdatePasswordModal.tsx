@@ -113,9 +113,9 @@ const UpdatePasswordModal = ({
                     <MkdPasswordInput
                       name={"password"}
                       label={"Password"}
-                      className={"grow"}
                       // errors={errors}
                       register={register}
+                      containerClassName={"grow"}
                     />
                     {errors && errors?.password && (
                       <p className="text-field-error m-auto mt-2 text-[.8rem] italic text-red-500">
@@ -127,9 +127,9 @@ const UpdatePasswordModal = ({
                     <MkdPasswordInput
                       name={"confirm"}
                       label={"Confirm Password"}
-                      className={"grow"}
                       // errors={errors}
                       register={register}
+                      containerClassName={"grow"}
                     />
                     {errors && errors?.confirm && (
                       <p className="text-field-error m-auto mt-2 text-[.8rem] italic text-red-500">

@@ -181,7 +181,7 @@ export default () => {
           path="/admin/profile"
           element={
             <PrivateRoute
-              access={"admin"}
+              access={["admin", "super_admin"]}
               path={"/admin/profile"}
               element={
                 <AdminWrapper>

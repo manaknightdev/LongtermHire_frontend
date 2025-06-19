@@ -10,7 +10,7 @@ const SnackBar = () => {
   return show ? (
     <div
       id="mkd-toast"
-      className={`fixed right-5 top-10 z-[100000000001] flex max-h-[90px] min-h-[70px] w-full max-w-xs items-center justify-between rounded-lg bg-white px-4 py-2 text-sm shadow-2xl dark:text-gray-400 `}
+      className={`fixed right-5 top-10 z-[100000000001] flex max-h-[90px] min-h-[70px] w-full max-w-xs items-center justify-between rounded-lg bg-background border border-border px-4 py-2 text-sm shadow-2xl text-text `}
       role="alert"
     >
       <div className="mr-8 flex items-center gap-4">
@@ -90,13 +90,14 @@ const SnackBar = () => {
             </svg>
           )}
         </span>
-        <span className="max-h-[60px] max-w-[200px] truncate whitespace-pre-wrap font-medium text-[#525252]">
+        <span className="max-h-[60px] max-w-[200px] truncate whitespace-pre-wrap font-medium text-text">
           {globalMessage}
         </span>
       </div>
 
       <button
         aria-label="Close"
+        className="hover:opacity-70 transition-opacity duration-200"
         onClick={() => {
           dispatch({
             type: "SNACKBAR",
@@ -116,7 +117,7 @@ const SnackBar = () => {
         >
           <path
             d="M15 5L5 15M5 5L15 15"
-            stroke="#A8A8A8"
+            stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"

@@ -11,6 +11,8 @@ import { LazyLoad } from "@/components/LazyLoad";
 import { useSDK } from "@/hooks/useSDK";
 import { MkdPasswordInput } from "@/components/MkdPasswordInput";
 import MkdInputV2 from "@/components/MkdInputV2";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface AdminLoginPageProps {
   role?: string;
@@ -20,6 +22,8 @@ const AdminLoginPage = ({
   role = RoleEnum.SUPER_ADMIN,
 }: AdminLoginPageProps) => {
   const { sdk } = useSDK();
+  const { state } = useTheme();
+  const mode = state?.theme;
 
   const { authDispatch: dispatch, showToast } = useContexts();
 
@@ -96,12 +100,45 @@ const AdminLoginPage = ({
     window.open(result, "_self"); //  "sharer",  "toolbar=0,status=0,width=650,height=400,"
   };
 
+  const cardStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND,
+    borderColor: THEME_COLORS[mode].BORDER,
+    boxShadow: `0 10px 15px -3px ${THEME_COLORS[mode].SHADOW}20, 0 4px 6px -2px ${THEME_COLORS[mode].SHADOW}10`,
+  };
+
+  const welcomeTextStyles = {
+    color: THEME_COLORS[mode].TEXT,
+  };
+
+  const linkStyles = {
+    color: THEME_COLORS[mode].PRIMARY,
+  };
+
+  const secondaryTextStyles = {
+    color: THEME_COLORS[mode].TEXT_SECONDARY,
+  };
+
+  const checkboxStyles = {
+    accentColor: THEME_COLORS[mode].PRIMARY,
+  };
+
+  const googleButtonStyles = {
+    backgroundColor: THEME_COLORS[mode].BACKGROUND_SECONDARY,
+    borderColor: THEME_COLORS[mode].BORDER,
+    color: THEME_COLORS[mode].TEXT,
+  };
+
   return (
     <main
-      className="flex justify-center min-h-svh max-h-svh h-svh flex-col bg-cover bg-no-repeat items-center"
-      style={{ backgroundImage: `url(${LoginBgNew})` }}
+      className="flex justify-center min-h-svh max-h-svh h-svh flex-col bg-cover bg-no-repeat items-center transition-colors duration-200"
+      style={{
+        backgroundColor: THEME_COLORS[mode].BACKGROUND,
+      }}
     >
-      <div className="flex justify-center w-[90%] flex-col items-center rounded-lg border  border-[#a8a8a8] p-6 shadow-md md:w-[22.8125rem]">
+      <div
+        className="flex justify-center w-[90%] flex-col items-center rounded-lg border p-6 transition-all duration-200 md:w-[22.8125rem]"
+        style={cardStyles}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="25"
@@ -118,7 +155,12 @@ const AdminLoginPage = ({
             fill="#4F46E5"
           />
         </svg>
-        <div className="text-xl font-semibold text-[#262626]">Welcome Back</div>
+        <div
+          className="text-xl font-semibold transition-colors duration-200"
+          style={welcomeTextStyles}
+        >
+          Welcome Back
+        </div>
 
         <div className="flex mb-5 items-center text-sm">
           <span className="mr-1 text-[#525252]">Don’t have account? </span>{" "}
@@ -166,18 +208,27 @@ const AdminLoginPage = ({
             </LazyLoad>
           </div>
           <div className="my-2 flex justify-between text-sm">
-            <div className="flex items-center text-[#525252]">
+            <div
+              className="flex items-center transition-colors duration-200"
+              style={secondaryTextStyles}
+            >
               <label
-                className={`flex h-[1.5rem] items-center justify-center gap-3 py-1 text-black`}
+                className="flex h-[1.5rem] items-center justify-center gap-3 py-1 transition-colors duration-200"
+                style={{ color: THEME_COLORS[mode].TEXT }}
               >
                 <input
                   type="checkbox"
-                  className={`h-[1.5rem] w-[1.5rem] cursor-pointer rounded-[0.5rem]  text-[#4F46E5] accent-[#4F46E5] outline-0 focus:outline-none focus:ring-0`}
+                  className="h-[1.5rem] w-[1.5rem] cursor-pointer rounded-[0.5rem] outline-0 focus:outline-none focus:ring-0 transition-colors duration-200"
+                  style={checkboxStyles}
                 />
                 <div className="h-full cursor-pointer">Remember me</div>
               </label>
             </div>
-            <Link to={`/admin/forgot`} className="text-[#4F46E5]">
+            <Link
+              to={`/admin/forgot`}
+              className="transition-colors duration-200 hover:opacity-80"
+              style={linkStyles}
+            >
               Forgot password
             </Link>
           </div>
@@ -190,12 +241,18 @@ const AdminLoginPage = ({
             Sign in
           </InteractiveButton>
         </form>
-        <div className="w-full text-[1rem] text-black text-center">OR</div>
+        <div
+          className="w-full text-[1rem] text-center transition-colors duration-200"
+          style={{ color: THEME_COLORS[mode].TEXT }}
+        >
+          OR
+        </div>
 
-        <div className="oauth flex w-full flex-col gap-[2rem] text-[#344054] ">
+        <div className="oauth flex w-full flex-col gap-[2rem]">
           <button
             onClick={() => socialLogin("google")}
-            className="my-2 flex h-[2.75rem] min-w-[70%] cursor-pointer items-center justify-center gap-3 rounded-sm border-2  px-4"
+            className="my-2 flex h-[2.75rem] min-w-[70%] cursor-pointer items-center justify-center gap-3 rounded-sm border-2 px-4 transition-all duration-200 hover:opacity-80 hover:scale-105"
+            style={googleButtonStyles}
           >
             <img
               src={
@@ -203,7 +260,10 @@ const AdminLoginPage = ({
               }
               className="h-[18px] w-[18px]"
             />
-            <span className="text-[1rem] text-[#525252] font-[600]">
+            <span
+              className="text-[1rem] font-[600] transition-colors duration-200"
+              style={secondaryTextStyles}
+            >
               Sign in With Google
             </span>
           </button>

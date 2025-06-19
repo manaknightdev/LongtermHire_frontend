@@ -29,7 +29,7 @@ const Modal = ({
   modalHeader,
   modalCloseClick,
   disableCancel = false,
-  classes = { modal: "h-full", modalDialog: "h-[90%]", modalContent: "" }
+  classes = { modal: "h-full", modalDialog: "h-[90%]", modalContent: "" },
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const stringCaser = new StringCaser();
@@ -69,37 +69,37 @@ const Modal = ({
       ref={modalRef}
       style={{
         zIndex: zIndex ?? 999999999999,
-        backgroundColor: "rgba(0, 0, 0, 0.5)"
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
       }}
       className={`fixed bottom-0 left-0 right-0 top-0 flex w-full scale-0 items-center justify-center bg-[#00000099] p-[1.5rem] backdrop-blur-sm transition-all ${
         isOpen ? "scale-100" : "scale-0"
       } ${classes?.modal}`}
     >
       <div
-        className={`border-primary-black border ${
+        className={`border-border border ${
           page === "ManagePermissionAddRole" ? "w-fit" : "w-[80%]"
-        } bg-white relative overflow-auto rounded-lg pb-5 shadow ${
+        } bg-background relative overflow-auto rounded-lg pb-5 shadow ${
           classes?.modalDialog
         }`}
       >
         {modalHeader && (
           <div
             style={{
-              zIndex: 1
+              zIndex: 1,
             }}
-            className={`bg-white sticky inset-x-0 top-0 m-auto flex w-full justify-between border-b px-5 py-4`}
+            className={`bg-background sticky inset-x-0 top-0 m-auto flex w-full justify-between border-b border-border px-5 py-4`}
           >
-            <div className="font-iowan text-center text-[1.25rem] font-[700] capitalize leading-[1.5rem] tracking-[-1.5%]">
+            <div className="font-iowan text-center text-[1.25rem] font-[700] capitalize leading-[1.5rem] tracking-[-1.5%] text-text">
               {["string"].includes(typeof title)
                 ? stringCaser.Capitalize(title as string, {
-                    separator: " "
+                    separator: " ",
                   })
                 : title}
             </div>
             {disableCancel ? null : (
               <button
                 type="button"
-                className="modal-close cursor-pointer"
+                className="modal-close cursor-pointer text-icon hover:text-icon-hover transition-colors duration-200"
                 onClick={modalCloseClick}
               >
                 <MdClose className="text-xl" />

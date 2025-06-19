@@ -1,4 +1,5 @@
-import Skeleton from 'react-loading-skeleton';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 interface SkeletonLoaderProps {
   className?: string;
@@ -8,7 +9,7 @@ interface SkeletonLoaderProps {
 }
 
 const SkeletonLoader = ({
-  className = '',
+  className = "",
   count = 5,
   counts = [2, 1, 3, 1, 1],
   circle = false,
@@ -16,6 +17,12 @@ const SkeletonLoader = ({
   return (
     <div
       className={`flex overflow-hidden flex-col gap-5 p-4 w-full max-h-screen h-fit min-h-fit ${className}`}
+      style={
+        {
+          "--skeleton-color": "var(--background-active)",
+          "--skeleton-highlight-color": "var(--background-hover)",
+        } as React.CSSProperties
+      }
     >
       {/* <Skeleton circle width={60} height={60} /> */}
       {Array.from({ length: count }).map((_, index) => (
@@ -26,11 +33,11 @@ const SkeletonLoader = ({
             counts[index] && counts[index] > 1
               ? 25
               : index + 1 === count
-              ? 25
-              : 80
+                ? 25
+                : 80
           }
           circle={circle}
-          style={{ marginBottom: '0.6rem' }}
+          style={{ marginBottom: "0.6rem" }}
         />
       ))}
     </div>

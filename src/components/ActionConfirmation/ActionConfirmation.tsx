@@ -11,7 +11,7 @@ import {
   deleteRequest,
   setLoading,
   showToast,
-  updateRequest
+  updateRequest,
 } from "@/context/Global";
 ` `;
 import { AuthContext } from "@/context/Auth";
@@ -54,26 +54,26 @@ export const ActionConfirmation = ({
   table = "",
   input = "input",
   disableCancel = false,
-  inputConfirmation = true
+  inputConfirmation = true,
 }: ActionConfirmationProps) => {
   const schema = yup
     .object({
       ...(["input", "input_create"].includes(mode)
         ? {
-            [input]: yup.string().required()
+            [input]: yup.string().required(),
           }
         : {
             confirm: yup
               .string()
               .required()
-              .oneOf([action], `Confirmation must be "${action}"`)
-          })
+              .oneOf([action], `Confirmation must be "${action}"`),
+          }),
     })
     .required();
 
   const {
     state: { createModel, updateModel, deleteModel },
-    dispatch: globalDispatch
+    dispatch: globalDispatch,
   } = React.useContext(GlobalContext);
   const { dispatch } = React.useContext(AuthContext);
 
@@ -82,9 +82,9 @@ export const ActionConfirmation = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
   });
   const formData = watch();
 
@@ -110,17 +110,17 @@ export const ActionConfirmation = ({
   const requestMode = (mode: string, data: any) => {
     if (["create"].includes(mode)) {
       return createRequest(globalDispatch, dispatch, table, data, {
-        allowToast: false
+        allowToast: false,
       });
     }
     if (["update"].includes(mode)) {
       return updateRequest(globalDispatch, dispatch, table, data?.id, data, {
-        allowToast: false
+        allowToast: false,
       });
     }
     if (["delete"].includes(mode)) {
       return deleteRequest(globalDispatch, dispatch, table, data.id, {
-        allowToast: false
+        allowToast: false,
       });
     }
     if (["custom"].includes(mode)) {
@@ -131,7 +131,7 @@ export const ActionConfirmation = ({
           endpoint: options?.endpoint ?? "",
           method: options?.method ?? RestAPIMethodEnum.POST,
           payload: options?.payload ?? data,
-          allowToast: false
+          allowToast: false,
         },
         RequestItems?.createModel
       );
@@ -146,7 +146,7 @@ export const ActionConfirmation = ({
       data?.id,
       data,
       {
-        allowToast: false
+        allowToast: false,
       }
     );
 
@@ -162,17 +162,17 @@ export const ActionConfirmation = ({
       table,
       {
         ...data,
-        [input]: formData?.[input as keyof typeof formData]
+        [input]: formData?.[input as keyof typeof formData],
       },
       {
-        allowToast: false
+        allowToast: false,
       }
     );
 
     if (!result?.error && onSuccess) {
       onSuccess({
         [input]: formData?.[input as keyof typeof formData],
-        id: result?.data
+        id: result?.data,
       });
     }
   };
@@ -180,7 +180,7 @@ export const ActionConfirmation = ({
   const createData = async (data: any) => {
     if (action === "move") return moveRequest(data);
     const result = await createRequest(globalDispatch, dispatch, table, data, {
-      allowToast: false
+      allowToast: false,
     });
 
     if (!result?.error && onSuccess) {
@@ -195,7 +195,7 @@ export const ActionConfirmation = ({
       table,
       data.id,
       {
-        allowToast: false
+        allowToast: false,
       }
     );
 
@@ -212,7 +212,7 @@ export const ActionConfirmation = ({
         endpoint: options?.endpoint ?? "",
         method: options?.method ?? RestAPIMethodEnum.POST,
         payload: options?.payload ?? data,
-        allowToast: false
+        allowToast: false,
       },
       RequestItems.createModel
     );
@@ -244,7 +244,7 @@ export const ActionConfirmation = ({
       {
         endpoint: "/v3/api/custom/qualitysign/inventory/move",
         method: "POST",
-        payload: data
+        payload: data,
       },
       RequestItems.createModel
     );
@@ -260,7 +260,7 @@ export const ActionConfirmation = ({
     delete: deleteData,
     custom: customData,
     manual: manualData,
-    input: inputData
+    input: inputData,
   };
   const onSubmit = async () => {
     if (multiple) {
@@ -287,7 +287,7 @@ export const ActionConfirmation = ({
     // <div className={`px-5 ${multiple ? "flex justify-center" : ""}`}>
     <div className="mx-auto flex h-fit flex-col items-center justify-start rounded !font-inter leading-snug tracking-wide">
       <form
-        className={`flex h-fit w-full flex-col text-start`}
+        className={`flex h-fit w-full flex-col text-start text-text`}
         onSubmit={handleSubmit(onSubmit, (error) => {
           console.log("ERROR >>", error);
         })}
@@ -317,7 +317,7 @@ export const ActionConfirmation = ({
               errors={errors}
               register={register}
               label={
-                <div className="font-bold text-black">
+                <div className="font-bold text-text">
                   Type{" "}
                   {["input", "input_create"].includes(mode)
                     ? ""
@@ -339,7 +339,7 @@ export const ActionConfirmation = ({
                   updateModel?.loading ||
                   deleteModel?.loading
                 }
-                className="grow self-end !border-soft-200 !bg-transparent font-bold !text-sub-500"
+                className="grow self-end !border-border !bg-transparent font-bold !text-secondary hover:!bg-background-hover transition-colors duration-200"
               >
                 Cancel
               </MkdButton>

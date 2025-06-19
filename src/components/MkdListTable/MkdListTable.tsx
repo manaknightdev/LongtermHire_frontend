@@ -12,6 +12,8 @@ import { DotIcon } from "lucide-react";
 import { NarrowUpArrowIcon } from "@/assets/svgs";
 import { Action, ColumnDataState } from "@/interfaces";
 import { ActionLocations } from "@/utils/Enums";
+import { useTheme } from "@/hooks/useTheme";
+import { THEME_COLORS } from "@/context/Theme";
 
 interface MkdListTableProps {
   onSort: (columnIndex: number) => void;
@@ -67,6 +69,8 @@ const MkdListTable = ({
   noDataComponent,
   showScrollbar = true,
 }: MkdListTableProps) => {
+  const { state } = useTheme();
+  const mode = state?.theme;
   const [_deleteId, setIdToDelete] = React.useState(null);
   const [_isOneOrMoreRowSelected, setIsOneOrMoreRowSelected] =
     React.useState(false);
@@ -325,7 +329,7 @@ const MkdListTable = ({
     );
     setSelectedColumnLength(length ?? 0);
   }, [currentColumnsMemo]);
-
+  // console.log("currentTableData", currentTableData);
   return (
     <LazyLoad count={7} counts={[2, 2, 2, 2, 2, 2]}>
       <div
@@ -342,13 +346,19 @@ const MkdListTable = ({
         ) : columnData?.columns?.length && currentTableData?.length ? (
           // className="flex flex-col w-fit min-w-fit max-w-fit"
 
-          <table className=" h-fit min-w-full divide-y divide-[#1F1D1A1A] rounded-md">
+          <table
+            style={{ borderColor: THEME_COLORS[mode].BORDER }}
+            className=" h-fit min-w-full divide-y divide-border rounded-md"
+          >
             <thead className="bg-background">
               <tr className="!h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem]">
                 {[actions?.select?.show].includes(true) || rowColumn ? (
                   <>
                     {[actions?.select?.show].includes(true) ? (
-                      <th className="$ bg-table-header-column sticky -left-[0.05rem] -top-[0.05rem] z-[19] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem]  px-[.75rem] py-[.5rem] text-xs font-medium capitalize tracking-wider text-black  dark:text-white">
+                      <th
+                        style={{ color: THEME_COLORS[mode].TEXT }}
+                        className="$ bg-table-header-column sticky -left-[0.05rem] -top-[0.05rem] z-[19] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem]  px-[.75rem] py-[.5rem] text-xs font-medium capitalize tracking-wider transition-colors duration-200"
+                      >
                         {(actions?.select?.multiple && !actions?.select?.max) ||
                         (actions?.select?.multiple &&
                           actions?.select?.max &&
@@ -363,7 +373,8 @@ const MkdListTable = ({
                                 : false
                             }
                             id="select_all_rows"
-                            className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black  dark:text-white shadow focus:outline-none focus:ring-0 sm:!text-base`}
+                            style={{ color: THEME_COLORS[mode].TEXT }}
+                            className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight shadow focus:outline-none focus:ring-0 transition-colors duration-200 sm:!text-base`}
                             checked={
                               selectedItems?.length === currentTableData?.length
                             }
@@ -384,7 +395,8 @@ const MkdListTable = ({
                           [actions?.select?.show].includes(true)
                             ? "left-10"
                             : "left-0"
-                        } bg-table-header-column z-10 border-b !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider text-black  dark:text-white`}
+                        } bg-table-header-column z-10 border-b !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[2.65rem] !min-w-[2.65rem] max-w-[auto]  px-[.75rem] py-[.5rem] text-left text-[1.125rem] font-medium capitalize tracking-wider transition-colors duration-200`}
+                        style={{ color: THEME_COLORS[mode].TEXT }}
                       >
                         Row
                       </th>
@@ -420,7 +432,8 @@ const MkdListTable = ({
                           onDragLeave={(e) => onDragLeave(e)}
                           onDrop={(e) => onDrop(e)}
                           scope="col"
-                          className={`$ bg-table-header-column font-iowan sticky -top-[0.05rem] z-[5] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[auto] !min-w-[6.25rem] !max-w-[auto]  shrink-0 grow py-[.5rem] pr-6 text-left text-[1.125rem] font-[700] capitalize leading-[1.25rem] tracking-wider text-black  dark:text-white ${
+                          style={{ color: THEME_COLORS[mode].TEXT }}
+                          className={`$ bg-table-header-column font-iowan sticky -top-[0.05rem] z-[5] !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-[auto] !min-w-[6.25rem] !max-w-[auto]  shrink-0 grow py-[.5rem] pr-6 text-left text-[1.125rem] font-[700] capitalize leading-[1.25rem] tracking-wider transition-colors duration-200 ${
                             allowSortColumns && dragging
                               ? "cursor-grabbing"
                               : cell?.isSorted
@@ -464,7 +477,10 @@ const MkdListTable = ({
                   }
                 )}
                 {actionColumn ? (
-                  <th className="$ bg-table-header-column sticky border-b border-border -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider text-black  dark:text-white">
+                  <th
+                    style={{ color: THEME_COLORS[mode].TEXT }}
+                    className="$ bg-table-header-column sticky border-b border-border -right-[0.05rem] -top-[0.05rem] z-10 !h-[2.65rem] !max-h-[2.65rem] !min-h-[2.65rem] !w-fit !min-w-fit max-w-fit shrink-0 grow  px-[.75rem] py-[.5rem] text-left text-xs font-medium capitalize tracking-wider transition-colors duration-200"
+                  >
                     Action
                   </th>
                 ) : null}
@@ -480,10 +496,14 @@ const MkdListTable = ({
                     {[actions?.select?.show].includes(true) || rowColumn ? (
                       <>
                         {[actions?.select?.show].includes(true) ? (
-                          <td className="text-black dark:text-white bg-table-row-column sticky -left-[0.05rem] z-10 !h-full !max-h-full  !min-h-full !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem] cursor-pointer whitespace-nowrap px-[.75rem] py-[.5rem] text-sm font-[400] capitalize leading-[1.5rem] tracking-wider">
+                          <td
+                            style={{ color: THEME_COLORS[mode].TEXT }}
+                            className="bg-table-row-column sticky -left-[0.05rem] z-10 !h-full !max-h-full  !min-h-full !w-[2.65rem] !min-w-[2.65rem] !max-w-[2.65rem] cursor-pointer whitespace-nowrap px-[.75rem] py-[.5rem] text-sm font-[400] capitalize leading-[1.5rem] tracking-wider transition-colors duration-200"
+                          >
                             <input
                               type="checkbox"
-                              className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight text-black  dark:text-white shadow focus:outline-none focus:ring-0 sm:!text-base`}
+                              style={{ color: THEME_COLORS[mode].TEXT }}
+                              className={`focus:shadow-outline focus:shadow-outline  mr-1 !h-4 !w-4 cursor-pointer  appearance-none  rounded-[.125rem]  text-[.8125rem]  text-sm font-normal leading-tight shadow focus:outline-none focus:ring-0 transition-colors duration-200 sm:!text-base`}
                               name="select_item"
                               checked={
                                 selectedItems?.length &&
@@ -504,7 +524,8 @@ const MkdListTable = ({
                               [actions?.select?.show].includes(true)
                                 ? "left-10"
                                 : "left-0"
-                            } bg-table-row-column border-b border-border text-black dark:text-white z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm`}
+                            } bg-table-row-column border-b border-border z-[5] flex h-full w-[auto] !min-w-[2.65rem] !max-w-[auto] items-center  whitespace-nowrap px-[.75rem] py-[.5rem] text-sm transition-colors duration-200`}
+                            style={{ color: THEME_COLORS[mode].TEXT }}
                           >
                             {rowIndex + 1}
                           </td>

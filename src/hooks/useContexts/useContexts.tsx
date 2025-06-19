@@ -4,7 +4,7 @@ import {
   tokenExpireError as tokenExpiredError,
   AuthState,
   AuthContextType,
-  AuthAction
+  AuthAction,
 } from "@/context/Auth";
 
 import {
@@ -30,18 +30,19 @@ import {
   DeleteRequestOptions,
   CustomRequestOptions,
   GetManyOptions,
-  setLoading as setLoadingGlobal
+  setLoading as setLoadingGlobal,
 } from "@/context/Global";
 import { ToastStatusEnum } from "@/utils/Enums";
 import { Settings } from "@/context/Global/types";
 import { Model, Role } from "@/context/Global/types";
 import { Route } from "@/context/Global/types";
+import { useToast as useNewToast } from "@/hooks/useToast";
 import {
   setTableProperty,
   TableAction,
   TableContext,
   TableContextType,
-  TableState
+  TableState,
 } from "@/context/Table";
 
 interface ApiResponse<T = any> {
@@ -117,12 +118,15 @@ const useContexts = (): UseContextsResult => {
     updateNode,
     updateModels,
     updateRoles,
-    updateRoutes
+    updateRoutes,
   } = useContext<GlobalContextType>(GlobalContext);
   const { state: authState, dispatch: authDispatch } =
     useContext<AuthContextType>(AuthContext);
   const { state: tableState, dispatch: tableDispatch } =
     useContext<TableContextType>(TableContext);
+
+  // Use the new toast system if available, fallback to old system
+  const newToast = useNewToast();
 
   const showToast = useCallback(
     (
@@ -130,9 +134,20 @@ const useContexts = (): UseContextsResult => {
       duration = 5000,
       status: ToastStatusEnum = ToastStatusEnum.SUCCESS
     ) => {
-      toast(globalDispatch, message, duration, status);
+      // Try to use new toast system first, fallback to old system
+      try {
+        if (newToast && newToast.showToast) {
+          newToast.showToast(message, duration, status);
+        } else {
+          // Fallback to old system
+          toast(globalDispatch, message, duration, status);
+        }
+      } catch (error) {
+        // Fallback to old system if new toast fails
+        toast(globalDispatch, message, duration, status);
+      }
     },
-    [globalDispatch]
+    [globalDispatch, newToast]
   );
 
   const setGlobalState = useCallback(
@@ -303,8 +318,8 @@ const useContexts = (): UseContextsResult => {
       updateNode: updateNode || (() => {}),
       updateModels: updateModels || (() => {}),
       updateRoles: updateRoles || (() => {}),
-      updateRoutes: updateRoutes || (() => {})
-    }
+      updateRoutes: updateRoutes || (() => {}),
+    },
   };
 };
 
