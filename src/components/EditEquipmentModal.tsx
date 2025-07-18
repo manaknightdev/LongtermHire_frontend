@@ -1,0 +1,233 @@
+import React, { useState, useEffect } from "react";
+import { ClipLoader } from "react-spinners";
+import Modal from "./Modal";
+
+const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = false }) => {
+  const [formData, setFormData] = useState({
+    categoryId: "",
+    category: "",
+    equipmentId: "",
+    equipmentName: "",
+    basePrice: "",
+    minimumDuration: "3 Months",
+    availability: true,
+    description: "",
+  });
+
+  // Update form data when equipment prop changes
+  useEffect(() => {
+    if (equipment) {
+      setFormData({
+        categoryId: equipment.category_id || "",
+        category: equipment.category_name || "",
+        equipmentId: equipment.equipment_id || "",
+        equipmentName: equipment.equipment_name || "",
+        basePrice: equipment.base_price || "",
+        minimumDuration: equipment.minimum_duration || "3 Months",
+        availability: equipment.availability === 1 || equipment.availability === true,
+        description: equipment.description || "",
+      });
+    }
+  }, [equipment]);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Prepare data for API
+    const equipmentData = {
+      categoryId: formData.categoryId,
+      category: formData.category,
+      equipmentId: formData.equipmentId,
+      equipmentName: formData.equipmentName,
+      basePrice: formData.basePrice,
+      minimumDuration: formData.minimumDuration,
+      availability: formData.availability ? 1 : 0,
+      description: formData.description,
+    };
+
+    try {
+      await onSubmit(equipmentData);
+    } catch (error) {
+      // Error handling is done in parent component
+      console.error("Form submission error:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    onClose();
+    // Reset form to original equipment data
+    if (equipment) {
+      setFormData({
+        categoryId: equipment.category_id || "",
+        category: equipment.category_name || "",
+        equipmentId: equipment.equipment_id || "",
+        equipmentName: equipment.equipment_name || "",
+        basePrice: equipment.base_price || "",
+        minimumDuration: equipment.minimum_duration || "3 Months",
+        availability: equipment.availability === 1 || equipment.availability === true,
+        description: equipment.description || "",
+      });
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit Equipment"
+      width="672px"
+      height="700px"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6" style={{ width: "606px" }}>
+          {/* Category ID */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Category ID*
+            </label>
+            <input
+              type="text"
+              name="categoryId"
+              value={formData.categoryId}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter category ID"
+            />
+          </div>
+
+          {/* Category Name */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Category Name*
+            </label>
+            <input
+              type="text"
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter category name"
+            />
+          </div>
+
+          {/* Equipment ID */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Equipment ID*
+            </label>
+            <input
+              type="text"
+              name="equipmentId"
+              value={formData.equipmentId}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter equipment ID"
+            />
+          </div>
+
+          {/* Equipment Name */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Equipment Name*
+            </label>
+            <input
+              type="text"
+              name="equipmentName"
+              value={formData.equipmentName}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter equipment name"
+            />
+          </div>
+
+          {/* Base Price */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Base Price*
+            </label>
+            <input
+              type="text"
+              name="basePrice"
+              value={formData.basePrice}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter base price (e.g., $2500/month)"
+            />
+          </div>
+
+          {/* Minimum Duration */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Minimum Duration*
+            </label>
+            <select
+              name="minimumDuration"
+              value={formData.minimumDuration}
+              onChange={handleInputChange}
+              required
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+            >
+              <option value="1 Month">1 Month</option>
+              <option value="3 Months">3 Months</option>
+              <option value="6 Months">6 Months</option>
+              <option value="12 Months">12 Months</option>
+            </select>
+          </div>
+
+          {/* Availability */}
+          <div>
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                name="availability"
+                checked={formData.availability}
+                onChange={handleInputChange}
+                className="w-4 h-4 text-[#FDCE06] bg-[#1A1A1A] border-[#333333] rounded focus:ring-[#FDCE06] focus:ring-2"
+              />
+              <span className="text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em]">
+                Available for rent
+              </span>
+            </label>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 pt-6">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="flex-1 h-[48px] bg-transparent border border-[#333333] rounded-[8px] text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] hover:border-[#555555] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 h-[48px] bg-[#FDCE06] rounded-[8px] text-[#1A1A1A] font-[Inter] font-medium text-[14px] leading-[1.21em] hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <ClipLoader color="#1A1A1A" size={20} />
+              ) : (
+                "Update Equipment"
+              )}
+            </button>
+          </div>
+        </div>
+      </form>
+    </Modal>
+  );
+};
+
+export default EditEquipmentModal;

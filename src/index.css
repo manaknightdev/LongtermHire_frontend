@@ -1,271 +1,35 @@
+/* @import "tailwindcss"; */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  transition: all 0.5s ease-in-out;
-}
-html {
-  font-size: 0.875rem;
-}
-::-webkit-scrollbar {
-  width: 0.625rem;
-  border-radius: 0.75rem;
+@theme {
+  --font-inter: "Inter", sans-serif;
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: #a8a8a8;
-  border-radius: 0.75rem;
-}
-body {
-  position: relative;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-.react-toggle {
-  touch-action: pan-x;
-
-  display: inline-block;
-  position: relative;
-  cursor: pointer;
-  background-color: transparent;
-  border: 0;
-  padding: 0;
-
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.react-toggle-screenreader-only {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 0.0625rem;
-  margin: -0.0625rem;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 0.0625rem;
-}
-
-.react-toggle--disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-  -webkit-transition: opacity 0.25s;
-  transition: opacity 0.25s;
-}
-
-.react-toggle-track {
-  width: 3.125rem;
-  height: 1.5rem;
-  padding: 0;
-  border-radius: 1.875rem;
-  background-color: #e4f1f7;
-  -webkit-transition: all 0.2s ease;
-  -moz-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-}
-
-.react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track {
-  background-color: #eeeeee;
-}
-
-.react-toggle--checked .react-toggle-track,
-.react-toggle--checked .react-toggle-track:hover {
-  background-color: #4f46e5;
-}
-
-.react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
-  background-color: #4f46e5;
-}
-
-.react-toggle-track-check {
-  position: absolute;
-  width: 0.875rem;
-  height: 0.625rem;
-  top: 0rem;
-  bottom: 0rem;
-  margin-top: auto;
-  margin-bottom: auto;
-  line-height: 0;
-  left: 0.5rem;
-  opacity: 0;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
-.react-toggle--checked .react-toggle-track-check {
-  opacity: 1;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
-.react-toggle-track-x {
-  position: absolute;
-  width: 0.625rem;
-  height: 0.625rem;
-  top: 0rem;
-  bottom: 0rem;
-  margin-top: auto;
-  margin-bottom: auto;
-  line-height: 0;
-  right: 0.625rem;
-  opacity: 1;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
-.react-toggle--checked .react-toggle-track-x {
-  opacity: 0;
-}
-
-.react-toggle-thumb {
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-  position: absolute;
-  top: 0.0625rem;
-  left: 0.0625rem;
-  width: 1.375rem;
-  height: 1.375rem;
-  border: 0.0625rem solid #fafafa;
-  border-radius: 50%;
-  background-color: #fafafa;
-
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-
-  -webkit-transition: all 0.25s ease;
-  -moz-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-}
-
-.react-toggle--checked .react-toggle-thumb {
-  left: 1.6875rem;
-  border-color: #4f46e5;
-}
-
-.react-toggle--focus .react-toggle-thumb {
-  -webkit-box-shadow: 0rem 0rem 0.1875rem 0.125rem #4f46e5;
-  -moz-box-shadow: 0rem 0rem 0.1875rem 0.125rem #4f46e5;
-  box-shadow: 0rem 0rem 0.125rem 0.1875rem #4f46e5;
-}
-
-.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
-  -webkit-box-shadow: 0rem 0rem 0.3125rem 0.3125rem #4f46e5;
-  -moz-box-shadow: 0rem 0rem 0.3125rem 0.3125rem #4f46e5;
-  box-shadow: 0rem 0rem 0.3125rem 0.3125rem #4f46e5;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.custom-tooltip {
-  max-width: 200px; /* Set a fixed width */
-  white-space: pre-wrap; /* Allow text to wrap to the next line */
-  word-wrap: break-word; /* Break long words */
-}
-.sidebar-holder {
-  width: 100%;
-  min-width: 15rem;
-  max-width: 15rem;
-  position: relative;
-  background: #151515;
-  color: #fff;
-  z-index: 2;
-  /* transition: all 0.3s; */
-  min-height: 100vh;
-  overflow: hidden;
-  transition: 0.2s;
-}
-.open-nav {
-  min-width: 0rem !important;
-  max-width: 0rem !important;
-  width: 0 !important;
-  transition: 0.2s;
-  opacity: 0;
-}
-
-.sidebar-list ul li a {
-  padding: 0.625rem;
-  display: block;
-  width: 100%;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition: 0.2s ease-in;
-  text-transform: capitalize;
-}
-
-.sidebar-list .active-nav {
-  padding: 0.75rem;
-  color: #262626;
-  border-radius: 0.375rem;
-  background: #f4f4f4;
-}
-
-.sidebar-list .active-nav:hover {
-  background: #f4f4f4;
-}
-
-.sidebar-list ul li a:hover {
-  color: #262626;
-}
-
-.page-header {
-  width: 100%;
-  padding: 1.25rem;
-  background: white;
-}
-.page-header span {
-  cursor: pointer;
-  display: block;
-  width: fit-content;
-  font-size: 1.25rem;
-}
-
-.center-svg {
-  aspect-ratio: 1/1;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.2em !important;
-}
-
-.uppy-Dashboard-inner {
-  width: 100% !important;
-}
-
-@media screen and (max-width: 47.9375rem) {
-  .sidebar-holder {
-    width: 100%;
-    min-width: 12.5rem;
-    max-width: 12.5rem;
-    position: fixed;
-    top: 0;
-    left: 0;
+@layer base {
+  body {
+    @apply font-["inter"];
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
-  .page-header span {
-    margin-left: auto;
+
+  /* Custom scrollbar styling for dark theme */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-[#1a1b1c];
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#4a4b4c] rounded-full hover:bg-[#5a5b5c];
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4b4c #1a1b1c;
   }
 }

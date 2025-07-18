@@ -1,87 +1,143 @@
-import { AuthProvider } from "@/context/Auth";
-import { GlobalProvider } from "@/context/Global";
-import { TableProvider } from "@/context/Table";
-import { ThemeProvider } from "@/context/Theme";
-import { OfflineProvider } from "@/context/Offline";
-import { ToastProvider, ToastContainer } from "@/components/Toast";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AdminSidebar from "./AdminSidebar";
+import DashboardMain from "./DashboardMain";
+import Login from "./Login";
+import Incoming from "./Incoming";
+import ClientManagement from "./ClientManagement";
+import EquipmentManagement from "./EquipmentManagement";
+import PricingManagement from "./PricingManagement";
+import ContentManagement from "./ContentManagement";
+import Profile from "./Profile";
+import Chat from "./components/Chat";
+import PrivateRoute from "./components/PrivateRoute";
+import ClientPrivateRoute from "./components/ClientPrivateRoute";
 
-// rcovery
-import Main from "@/routes/Routes";
-import "@uppy/core/dist/style.css";
-import "@uppy/dashboard/dist/style.css";
-import { BrowserRouter as Router } from "react-router-dom";
-import "react-loading-skeleton/dist/skeleton.css";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ThemeStyles } from "@/components/ThemeStyles";
-import { createOfflineQueryClient } from "@/query/offline/offlineQueryClient";
-// import { OfflineIndicator } from "@/components/OfflineIndicator";
-import { OfflineNotifications } from "@/components/OfflineNotifications";
-import { OfflineStatusBar } from "@/components/OfflineStatusBar";
-// import { OfflineDebugger } from "@/components/OfflineDebugger";
+// Client Portal Components
+import ClientLogin from "./client/ClientLogin";
+import ClientDashboard from "./client/ClientDashboard";
+import ClientProfile from "./client/ClientProfile";
+import ForgotPassword from "./client/ForgotPassword";
+import VerifyOTP from "./client/VerifyOTP";
+import ResetPassword from "./client/ResetPassword";
 
-import "@fontsource/inter"; // Defaults to weight 400
-import "@fontsource/roboto-mono"; // Defaults to weight 400
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-
-import Hotjar from "@hotjar/browser";
-import { LazyLoad } from "@/components/LazyLoad";
-
-const siteId = 5128711;
-const hotjarVersion = 6;
-
-Hotjar.init(siteId, hotjarVersion);
-
-const stripePromise = loadStripe(
-  "pk_test_51Ll5ukBgOlWo0lDUrBhA2W7EX2MwUH9AR5Y3KQoujf7PTQagZAJylWP1UOFbtH4UwxoufZbInwehQppWAq53kmNC00UIKSmebO"
-);
-
-// Create an offline-aware query client
-const queryClient = createOfflineQueryClient();
-
-function App(): JSX.Element {
+function DashboardLayout({ children }) {
   return (
-    <ErrorBoundary fallback={<div>Error</div>} onError={() => {}}>
-      <QueryClientProvider client={queryClient}>
-        <LazyLoad brand={"Brand Name Here"}>
-          <ThemeProvider>
-            <ThemeStyles />
-            <OfflineProvider
-              enableNotifications={true}
-              enableAutoSync={true}
-              config={{
-                enableOfflineMode: true,
-                maxRetries: 3,
-                syncInterval: 30000,
-                enableOptimisticUpdates: true,
-                enableBackgroundSync: true,
-              }}
-            >
-              <ToastProvider>
-                <AuthProvider>
-                  <GlobalProvider>
-                    <TableProvider>
-                      <Router>
-                        <Elements stripe={stripePromise}>
-                          <Main />
-                          {/* Offline UI Components */}
+    <div className="flex min-h-screen bg-[#292A2B]">
+      <AdminSidebar />
+      <main
+        className="flex-1 overflow-y-auto mb-10 md:mb-20 lg:ml-[256px] lg:w-[calc(100vw - 256px)]"
+        style={{
+          height: "100vh",
+        }}
+      >
+        {children}
+      </main>
+    </div>
+  );
+}
 
-                          <OfflineStatusBar position="top" />
-                          <OfflineNotifications position="top-right" />
-                          {/* <OfflineDebugger /> */}
-                          <ToastContainer />
-                        </Elements>
-                      </Router>
-                    </TableProvider>
-                  </GlobalProvider>
-                </AuthProvider>
-              </ToastProvider>
-            </OfflineProvider>
-          </ThemeProvider>
-        </LazyLoad>
-      </QueryClientProvider>
-    </ErrorBoundary>
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Admin Routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <DashboardMain />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/client-management"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <ClientManagement />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/equipment-management"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <EquipmentManagement />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/pricing-management"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <PricingManagement />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/content-management"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <ContentManagement />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <Chat />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute allowedRoles={["super_admin"]}>
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route path="/incoming" element={<Incoming />} />
+
+        {/* Client Portal Routes */}
+        <Route path="/client/login" element={<ClientLogin />} />
+        <Route
+          path="/client/dashboard"
+          element={
+            <ClientPrivateRoute>
+              <ClientDashboard />
+            </ClientPrivateRoute>
+          }
+        />
+        <Route
+          path="/client/profile"
+          element={
+            <ClientPrivateRoute>
+              <ClientProfile />
+            </ClientPrivateRoute>
+          }
+        />
+        <Route path="/client/forgot-password" element={<ForgotPassword />} />
+        <Route path="/client/verify-otp" element={<VerifyOTP />} />
+        <Route path="/client/reset-password" element={<ResetPassword />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

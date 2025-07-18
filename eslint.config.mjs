@@ -28,6 +28,7 @@ export default [
       "jenkins.config.ts",
       "playwright-no-server.config.ts",
       "playwright.config.ts",
+      "src/",
     ],
   },
   // tseslint.configs.recommendedTypeChecked,

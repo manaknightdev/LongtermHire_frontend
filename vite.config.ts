@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import { defineConfig, UserConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa";
-import viteCompression from "vite-plugin-compression";
+// import viteCompression from "vite-plugin-compression";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -79,10 +79,11 @@ const config: UserConfig = {
   plugins: [
     react(),
     VitePWA(pwaConfig),
-    viteCompression({
-      algorithm: "brotliCompress",
-      filter: /\.(js|mjs|json|css|html|svg)$/i,
-    }),
+    // viteCompression({
+    //   algorithm: "brotliCompress",
+    //   filter: /\.(js|mjs|json|css|html)$/i,
+    //   deleteOriginFile: false,
+    // }),
   ],
   build: {
     outDir: OUTPUT_DIRECTORY,

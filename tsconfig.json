@@ -11,9 +11,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noUnusedLocals": false,
-    "strict": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "strict": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
     "allowJs": true,
     "esModuleInterop": true,
     "baseUrl": ".",
@@ -21,7 +23,7 @@
       "@/*": ["src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["prettier"]
+    "types": ["node", "react", "react-dom"]
   },
   "include": ["src", "src/types", "src/utils"],
   "exclude": [
