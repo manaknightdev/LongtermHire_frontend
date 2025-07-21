@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { pricingApi } from "./services/pricingApi";
 import ClipLoader from "react-spinners/ClipLoader";

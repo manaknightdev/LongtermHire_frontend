@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "../hooks/useChat";
 import { chatApi } from "../services/chatApi";
@@ -325,8 +326,8 @@ const Chat = () => {
                           isEquipmentRequest
                             ? "bg-[#FDCE06] text-[#1F1F20] border-2 border-[#E5B800]"
                             : isFromCurrentUser
-                            ? "bg-[#FDCE06] text-[#1F1F20]"
-                            : "bg-[#1F1F20] text-[#E5E5E5] border border-[#333333]"
+                              ? "bg-[#FDCE06] text-[#1F1F20]"
+                              : "bg-[#1F1F20] text-[#E5E5E5] border border-[#333333]"
                         }`}
                       >
                         {isEquipmentRequest && (

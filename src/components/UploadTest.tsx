@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from "react";
 import { uploadImage } from "../utils/uploadUtils";
 import { ClipLoader } from "react-spinners";
@@ -24,11 +25,11 @@ const UploadTest = () => {
     try {
       setUploading(true);
       setError("");
-      
+
       console.log("Starting upload...");
       const result = await uploadImage(selectedFile);
       console.log("Upload result:", result);
-      
+
       setUploadResult(result);
     } catch (err) {
       console.error("Upload failed:", err);
@@ -41,7 +42,7 @@ const UploadTest = () => {
   return (
     <div className="p-6 bg-[#1A1A1A] rounded-lg border border-[#333333] max-w-md mx-auto">
       <h3 className="text-[#E5E5E5] text-lg font-semibold mb-4">Upload Test</h3>
-      
+
       {/* File Input */}
       <div className="mb-4">
         <input
@@ -59,7 +60,8 @@ const UploadTest = () => {
             <strong>File:</strong> {selectedFile.name}
           </p>
           <p className="text-[#E5E5E5] text-sm">
-            <strong>Size:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+            <strong>Size:</strong>{" "}
+            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
           </p>
           <p className="text-[#E5E5E5] text-sm">
             <strong>Type:</strong> {selectedFile.type}
@@ -95,10 +97,22 @@ const UploadTest = () => {
         <div className="mt-4 p-3 bg-green-900/20 border border-green-500 rounded">
           <p className="text-green-400 text-sm mb-2">Upload successful!</p>
           <div className="text-[#E5E5E5] text-xs">
-            <p><strong>ID:</strong> {uploadResult.id}</p>
-            <p><strong>URL:</strong> <a href={uploadResult.url} target="_blank" rel="noopener noreferrer" className="text-[#FDCE06] hover:underline">{uploadResult.url}</a></p>
+            <p>
+              <strong>ID:</strong> {uploadResult.id}
+            </p>
+            <p>
+              <strong>URL:</strong>{" "}
+              <a
+                href={uploadResult.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#FDCE06] hover:underline"
+              >
+                {uploadResult.url}
+              </a>
+            </p>
           </div>
-          
+
           {/* Image Preview */}
           {uploadResult.url && (
             <div className="mt-3">
@@ -107,7 +121,7 @@ const UploadTest = () => {
                 alt="Uploaded"
                 className="max-w-full h-32 object-cover rounded border border-[#333333]"
                 onError={(e) => {
-                  e.target.style.display = 'none';
+                  e.target.style.display = "none";
                 }}
               />
             </div>

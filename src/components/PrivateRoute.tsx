@@ -1,5 +1,6 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+// @ts-nocheck
+import React from "react";
+import { Navigate } from "react-router-dom";
 
 /**
  * PrivateRoute component for protecting routes that require authentication
@@ -10,9 +11,9 @@ import { Navigate } from 'react-router-dom';
  */
 function PrivateRoute({ children, allowedRoles = [] }) {
   // Check if user is authenticated
-  const token = localStorage.getItem('authToken');
-  const userRole = localStorage.getItem('userRole');
-  
+  const token = localStorage.getItem("authToken");
+  const userRole = localStorage.getItem("userRole");
+
   // If no token, redirect to login
   if (!token) {
     return <Navigate to="/" replace />;

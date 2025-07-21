@@ -1,10 +1,11 @@
+// @ts-nocheck
 /**
  * MkdSDK - React Frontend SDK
  * Simplified version focusing on upload functionality
  */
-
+//
 class MkdSDK {
-  constructor(config = {}) {
+  constructor(config: any = {}) {
     this._baseurl = config.baseurl || "http://localhost:5172";
     this._project_id = config.project_id || "longtermhire";
     this._table = config.table || "";

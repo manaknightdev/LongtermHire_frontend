@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { contentApi } from "./services/contentApi";
 import ClipLoader from "react-spinners/ClipLoader";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 
 function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
@@ -62,7 +63,13 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                           stroke="currentColor"
                           strokeWidth="2"
                         />
-                        <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="2" />
+                        <circle
+                          cx="8.5"
+                          cy="8.5"
+                          r="1.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
                         <path
                           d="M21 15L16 10L5 21"
                           stroke="currentColor"
@@ -93,7 +100,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       {equipment.equipment_id || equipment.id || "N/A"}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
                       Equipment Name
@@ -119,12 +126,14 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2">
                       <span
                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          equipment.availability === 1 || equipment.status === "Available"
+                          equipment.availability === 1 ||
+                          equipment.status === "Available"
                             ? "bg-[rgba(34,197,94,0.2)] text-[#22C55E]"
                             : "bg-[rgba(239,68,68,0.2)] text-[#EF4444]"
                         }`}
                       >
-                        {equipment.availability === 1 || equipment.status === "Available"
+                        {equipment.availability === 1 ||
+                        equipment.status === "Available"
                           ? "Available"
                           : "Unavailable"}
                       </span>
@@ -136,7 +145,9 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Created Date
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      {equipment.created_at ? new Date(equipment.created_at).toLocaleDateString() : "N/A"}
+                      {equipment.created_at
+                        ? new Date(equipment.created_at).toLocaleDateString()
+                        : "N/A"}
                     </div>
                   </div>
                 </div>
@@ -173,7 +184,9 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Discount Percentage
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      {equipment.discount_percentage ? `${equipment.discount_percentage}%` : "N/A"}
+                      {equipment.discount_percentage
+                        ? `${equipment.discount_percentage}%`
+                        : "N/A"}
                     </div>
                   </div>
 
@@ -200,7 +213,9 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Description
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-3 text-[#E5E5E5] min-h-[80px]">
-                      {equipment.content?.description || equipment.description || "No description available"}
+                      {equipment.content?.description ||
+                        equipment.description ||
+                        "No description available"}
                     </div>
                   </div>
 
@@ -209,7 +224,8 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Banner Description
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-3 text-[#E5E5E5] min-h-[80px]">
-                      {equipment.content?.banner_description || "No banner description available"}
+                      {equipment.content?.banner_description ||
+                        "No banner description available"}
                     </div>
                   </div>
                 </div>

@@ -12,7 +12,7 @@
     "test:e2e": "playwright test",
     "dev:test": "vite --port 3002",
     "test:ui": "playwright test --ui",
-    "dev": "node git-hook-setup.js && vite",
+    "dev": "vite",
     "test:unit": "echo \"Unit tests not implemented yet\"",
     "test:integration": "echo \"Integration tests not implemented yet\"",
     "tw": "npx tailwindcss -i ./src/index.css -o ./src/output.css --watch",

@@ -13,88 +13,88 @@ const commandConfigMap = {
     requireArgument: false,
     requirements: {
       arguments: [],
-      message: ""
+      message: "",
     },
     action() {
       return [null, "git init"];
-    }
+    },
   },
   branch: {
     requireArgument: true,
     requirements: {
       arguments: ["branch name"],
-      message: "branch=<branch name> \n eg. branch=pws"
+      message: "branch=<branch name> \n eg. branch=pws",
     },
     action(value) {
       return [null, `git branch ${value}`];
-    }
+    },
   },
   checkout: {
     requireArgument: true,
     requirements: {
       arguments: ["branch name"],
-      message: "checkout=<branch name> \n eg. checkout=pws"
+      message: "checkout=<branch name> \n eg. checkout=pws",
     },
     action(value) {
       return [null, `git checkout ${value}`];
-    }
+    },
   },
   merge: {
     requireArgument: true,
     requirements: {
       arguments: ["branch name"],
-      message: "merge=<branch name> \n eg. merge=pws"
+      message: "merge=<branch name> \n eg. merge=pws",
     },
     action(value) {
       return [null, `git merge ${value}`];
-    }
+    },
   },
   "add-remote": {
     requireArgument: true,
     requirements: {
       arguments: ["remote name", "remote url"],
       message:
-        'add-remote=<remote name> <remote url> \n eg. add-remote="remotename https://github.com/username/reponame.git"'
+        'add-remote=<remote name> <remote url> \n eg. add-remote="remotename https://github.com/username/reponame.git"',
     },
     action(remoteName, remoteUrl) {
       return [null, `git remote add ${remoteName} ${remoteUrl}`];
-    }
+    },
   },
   "rm-remote": {
     requireArgument: true,
     requirements: {
       arguments: ["remote name"],
-      message: "rm-remote=<remote name> \n eg. rm-remote=pws"
+      message: "rm-remote=<remote name> \n eg. rm-remote=pws",
     },
     action(remoteName) {
       return [null, `git remote remove ${remoteName}`];
-    }
+    },
   },
   add: {
     requireArgument: true,
     requirements: {
       arguments: ["file path"],
-      message: "add=<file path> \n eg. add=."
+      message: "add=<file path> \n eg. add=.",
     },
     action(filePath) {
       return [null, `git add ${filePath}`];
-    }
+    },
   },
   commit: {
     requireArgument: true,
     requirements: {
       arguments: ["commit message"],
-      message: 'commit=<commit message> \n eg. commit="commit message"'
+      message: 'commit=<commit message> \n eg. commit="commit message"',
     },
     action(commitMessage) {
       return [null, `git commit -m "${commitMessage}"`];
-    }
+    },
   },
   pull: {
     requireArgument: false,
     requirements: {
       arguments: ["remote name", "branch name"],
-      message: 'pull=<remote name> <branch name> \n eg. pull="origin main"'
+      message: 'pull=<remote name> <branch name> \n eg. pull="origin main"',
     },
     action(remoteName = null, branchName = null) {
       if (getNonNullValue(remoteName) && !getNonNullValue(branchName)) {
@@ -108,15 +108,15 @@ const commandConfigMap = {
         null,
         `git pull ${remoteName ? `${remoteName}` : ""} ${
           branchName ? `${branchName}` : ""
-        }`
+        }`,
       ];
-    }
+    },
   },
   push: {
     requireArgument: false,
     requirements: {
       arguments: ["remote name", "branch name"],
-      message: 'push=<remote name> <branch name> \n eg. push="origin main"'
+      message: 'push=<remote name> <branch name> \n eg. push="origin main"',
     },
     action(remoteName = null, branchName = null) {
       if (getNonNullValue(remoteName) && !getNonNullValue(branchName)) {
@@ -130,10 +130,10 @@ const commandConfigMap = {
         null,
         `git push ${remoteName ? `${remoteName}` : ""} ${
           branchName ? `${branchName}` : ""
-        }`
+        }`,
       ];
-    }
-  }
+    },
+  },
 };
 // const allowedCommands = [
 //   "init",
@@ -225,7 +225,7 @@ const startGitProcess = async () => {
       return reject("No command to execute");
     }
 
-    const [error, message] = await runCommands(commands, 0);
+    const [error, message] = (await runCommands(commands, 0)) as [any, any];
     if (error) {
       return reject(error);
     }

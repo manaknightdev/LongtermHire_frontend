@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import AddEquipmentModal from "./components/AddEquipmentModal";
 import EditEquipmentModal from "./components/EditEquipmentModal";

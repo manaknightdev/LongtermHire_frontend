@@ -15,7 +15,6 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
     "allowJs": true,
     "esModuleInterop": true,
     "baseUrl": ".",
@@ -25,7 +24,14 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["src", "src/types", "src/utils"],
+  "include": [
+    "src",
+    "src/types",
+    "src/utils",
+    "git-hook-setup.ts",
+    "git-script.ts",
+    "postcss.config.ts"
+  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts",

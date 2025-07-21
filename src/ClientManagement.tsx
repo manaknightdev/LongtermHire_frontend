@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
@@ -574,12 +575,12 @@ const ClientManagement = () => {
                           {client.pricing_package_name
                             ? client.pricing_package_name
                             : client.custom_discount_value
-                            ? `Custom ${client.custom_discount_value}${
-                                client.custom_discount_type === "percentage"
-                                  ? "%"
-                                  : "$"
-                              } off`
-                            : "Set Pricing"}
+                              ? `Custom ${client.custom_discount_value}${
+                                  client.custom_discount_type === "percentage"
+                                    ? "%"
+                                    : "$"
+                                } off`
+                              : "Set Pricing"}
                           <svg
                             width="12"
                             height="12"

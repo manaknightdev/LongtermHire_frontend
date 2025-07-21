@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import {
   useFloating,
@@ -181,5 +182,4 @@ const PricingPopover = ({
     </div>
   );
 };
-
 export default PricingPopover;

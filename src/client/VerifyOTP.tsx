@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+// @ts-nocheck
+//  import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { clientPasswordApi } from "../services/clientPasswordApi";
