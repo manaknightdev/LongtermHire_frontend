@@ -85,11 +85,23 @@ const config: UserConfig = {
     //   deleteOriginFile: false,
     // }),
   ],
+  assetsInclude: [
+    "**/*.svg",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.woff",
+    "**/*.woff2",
+    "**/*.ttf",
+    "**/*.eot",
+  ],
   build: {
     outDir: OUTPUT_DIRECTORY,
     sourcemap: false,
     rollupOptions: {
-      external: ["fsevents"],
+      external: ["fsevents", "@tailwindcss/oxide"],
       output: {
         manualChunks: {
           vendor: vendorPackages,
@@ -97,6 +109,7 @@ const config: UserConfig = {
         },
       },
     },
+    assetsInlineLimit: 0, // Don't inline any assets
   },
   resolve: {
     alias: {
