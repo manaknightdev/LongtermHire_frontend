@@ -21,16 +21,32 @@ const PricingManagement = () => {
     }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log("Search data:", searchData);
     setCurrentPage(1); // Reset to first page when searching
-    fetchPricingPackages(1, searchData);
+    try {
+      await fetchPricingPackages(1, searchData);
+      toast.success("Search completed!");
+    } catch (error) {
+      console.error("Search error:", error);
+      toast.error("Search failed. Please try again.");
+    }
   };
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     fetchPricingPackages(newPage, searchData);
+  };
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchData({
+      packageId: "",
+      packageName: "",
+    });
+    setCurrentPage(1);
+    fetchPricingPackages(1, {});
   };
 
   const [packageData, setPackageData] = useState([]);
@@ -194,36 +210,46 @@ const PricingManagement = () => {
             />
           </div>
 
-          {/* Search Button */}
-          <div className="flex flex-col justify-end">
-            <button
-              onClick={handleSearch}
-              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-medium text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
-              style={{ height: "42px" }}
-            >
-              Search
-            </button>
+          {/* Search Buttons */}
+          <div className="flex flex-col justify-end gap-2 md:col-span-2 lg:col-span-1">
+            <div className="flex gap-2">
+              <button
+                onClick={handleSearch}
+                disabled={loading}
+                className="flex-1 bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-medium text-[14px] px-4 py-3 rounded-md hover:bg-[#E5B800] transition-colors disabled:opacity-50"
+                style={{ height: "42px" }}
+              >
+                {loading ? "Searching..." : "Search"}
+              </button>
+              {/* <button
+                onClick={handleClearSearch}
+                disabled={loading}
+                className="bg-[#6B7280] text-[#E5E5E5] font-[Inter] font-medium text-[14px] px-4 py-3 rounded-md hover:bg-[#4B5563] transition-colors disabled:opacity-50"
+                style={{ height: "42px" }}
+              >
+                Clear
+              </button> */}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Add Package Button */}
-      <div className="mb-6">
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-medium text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
-        >
-          Add Pricing Package
-        </button>
-      </div>
 
       {/* Pricing Packages Table */}
       <section className="bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden">
         <div className="p-6">
-          <h3 className="text-[#E5E5E5] font-[Inter] font-semibold text-[20px] leading-[1.2em] mb-6">
-            Pricing Packages
-          </h3>
-
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-[#E5E5E5] font-[Inter] font-semibold text-[20px] leading-[1.2em] mb-6">
+              Pricing Packages
+            </h3>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-medium text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
+            >
+              Add Pricing Package
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -290,11 +316,11 @@ const PricingManagement = () => {
                 ) : (
                   packageData.map((pkg, index) => (
                     <tr
-                      key={pkg.id}
+                      key={pkg.package_id}
                       className={index > 0 ? "border-t border-[#333333]" : ""}
                     >
                       <td className="text-[#E5E5E5] font-[Inter] text-[14px] py-3 px-4">
-                        {pkg.id}
+                        {pkg.package_id}
                       </td>
                       <td className="text-[#E5E5E5] font-[Inter] text-[14px] py-3 px-4">
                         {pkg.name}

@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import Modal from "./Modal";
 
-const EditClientModal = ({ isOpen, onClose, onSubmit, client, loading = false }) => {
+const EditClientModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  client,
+  loading = false,
+}) => {
   const [formData, setFormData] = useState({
     clientName: "",
     companyName: "",
@@ -24,10 +30,20 @@ const EditClientModal = ({ isOpen, onClose, onSubmit, client, loading = false })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // Phone number validation - only allow digits
+    if (name === "phone") {
+      const digitsOnly = value.replace(/\D/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: digitsOnly,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -126,7 +142,8 @@ const EditClientModal = ({ isOpen, onClose, onSubmit, client, loading = false })
               Phone
             </label>
             <input
-              type="tel"
+              type="text"
+              inputMode="tel"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from "react";
 
-function ContentDetailsModal({ isOpen, onClose, content }) {
+function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
   if (!isOpen || !content) return null;
 
   return (
@@ -201,8 +201,9 @@ function ContentDetailsModal({ isOpen, onClose, content }) {
           </button>
           <button
             onClick={() => {
-              // Handle edit action
-              console.log("Edit content:", content);
+              if (onEdit) {
+                onEdit(content);
+              }
               onClose();
             }}
             className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-medium"

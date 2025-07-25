@@ -45,29 +45,17 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#292A2B]">
-      {/* Main Frame - Transparent container with exact Figma dimensions */}
-      <div
-        className="border-2 min-h-screen border-[#E5E7EB] flex flex-col"
-        style={{
-          width: "100%",
-
-          borderRadius: "8px",
-        }}
-      >
+    <div className="min-h-screen flex items-center justify-center bg-[#292A2B] p-4">
+      {/* Main Frame - Responsive container */}
+      <div className="w-full  min-h-screen  flex flex-col rounded-lg overflow-hidden">
         {/* Header Section */}
-        <header
-          className="relative border-b border-[#333333] flex items-start"
-          style={{ height: "101px" }}
-        >
+        <header className="relative border-b border-[#333333] flex items-start h-[101px] min-h-[101px] flex-shrink-0">
           {/* Logo positioned at top-left */}
           <img
             src="/login-logo.png"
             alt="Equipment Rental Logo"
-            className="absolute"
+            className="absolute max-w-[240px] max-h-[135px] w-auto h-auto"
             style={{
-              width: "240px",
-              height: "135px",
               top: "-17px",
               left: "0px",
             }}
@@ -75,37 +63,12 @@ function Login() {
         </header>
 
         {/* Main Section */}
-        <main
-          className="flex-1 flex items-center justify-center"
-          style={{ height: "687px" }}
-        >
-          {/* Login Form Container - Exact Figma dimensions */}
-          <div
-            className="bg-[#1F1F20] border border-[#333333] flex flex-col"
-            style={{
-              width: "448px",
-              height: "371px",
-              borderRadius: "8px",
-            }}
-          >
+        <main className="flex-1 flex items-center justify-center p-4 min-h-0">
+          {/* Login Form Container - Responsive dimensions */}
+          <div className="bg-[#1F1F20] border border-[#333333] flex flex-col rounded-lg w-full max-w-md mx-auto">
             {/* Title Section */}
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: "398px",
-                height: "36px",
-                marginLeft: "25px",
-                marginTop: "25px",
-              }}
-            >
-              <h2
-                className="text-[#E5E5E5] font-[Inter] text-center"
-                style={{
-                  fontSize: "30px",
-                  fontWeight: "400",
-                  lineHeight: "1.2em",
-                }}
-              >
+            <div className="flex items-center justify-center p-6 pb-4">
+              <h2 className="text-[#E5E5E5] font-[Inter] text-center text-2xl sm:text-3xl font-normal">
                 Login
               </h2>
             </div>
@@ -113,91 +76,43 @@ function Login() {
             {/* Form Section */}
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col"
-              style={{
-                width: "398px",
-                height: "253px",
-                marginLeft: "25px",
-                marginTop: "32px",
-              }}
+              className="flex flex-col px-6 pb-6 space-y-6"
             >
               {/* Input Fields Container */}
-              <div
-                className="flex flex-col bg-transparent"
-                style={{
-                  width: "398px",
-                  height: "147px",
-                  borderRadius: "6px",
-                  boxShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
-                }}
-              >
+              <div className="flex flex-col space-y-4">
                 {/* Email Field */}
-                <div style={{ width: "398px", height: "66px" }}>
-                  {/* Email Label */}
+                <div>
                   <label
                     htmlFor="email"
-                    className="block text-[#E5E5E5] font-[Inter]"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "400",
-                      lineHeight: "1.21em",
-                      marginTop: "1px",
-                      marginBottom: "11px",
-                    }}
+                    className="block text-[#E5E5E5] font-[Inter] text-sm font-normal mb-3"
                   >
                     Email:
                   </label>
-                  {/* Email Input */}
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3"
-                    style={{
-                      width: "398px",
-                      height: "38px",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      lineHeight: "1.43em",
-                    }}
+                    className="w-full h-[38px] bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3 rounded-md text-sm"
                     placeholder="Enter Email Address"
                     required
                   />
                 </div>
 
                 {/* Password Field */}
-                <div
-                  style={{ width: "398px", height: "82px", marginTop: "-1px" }}
-                >
-                  {/* Password Label */}
+                <div>
                   <label
                     htmlFor="password"
-                    className="block text-[#E5E5E5] font-[Inter]"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "400",
-                      lineHeight: "1.21em",
-                      marginTop: "17px",
-                      marginBottom: "11px",
-                    }}
+                    className="block text-[#E5E5E5] font-[Inter] text-sm font-normal mb-3"
                   >
                     Password:
                   </label>
-                  {/* Password Input */}
                   <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3"
-                    style={{
-                      width: "398px",
-                      height: "38px",
-                      borderRadius: "6px",
-                      fontSize: "14px",
-                      lineHeight: "1.43em",
-                    }}
+                    className="w-full h-[38px] bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3 rounded-md text-sm"
                     placeholder="Enter Password"
                     required
                   />
@@ -205,42 +120,18 @@ function Login() {
               </div>
 
               {/* Remember Me Section */}
-              <div
-                className="flex items-center"
-                style={{
-                  width: "398px",
-                  height: "20px",
-                  marginTop: "24px",
-                }}
-              >
-                <div
-                  className="flex items-center"
-                  style={{ width: "121.234375px", height: "20px" }}
-                >
-                  {/* Checkbox */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
                   <input
                     id="remember"
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="bg-white border-black border-opacity-50 rounded-sm focus:ring-0"
-                    style={{
-                      width: "16px",
-                      height: "16px",
-                      marginTop: "2px",
-                      boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                      borderWidth: "0.5px",
-                    }}
+                    className="w-4 h-4 bg-white border-black border-opacity-50 rounded-sm focus:ring-0 shadow-sm"
                   />
-                  {/* Label */}
                   <label
                     htmlFor="remember"
-                    className="text-[#E5E5E5] font-[Inter] ml-2"
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "400",
-                      lineHeight: "1.21em",
-                    }}
+                    className="text-[#E5E5E5] font-[Inter] ml-2 text-sm font-normal"
                   >
                     Remember Me
                   </label>
@@ -248,45 +139,31 @@ function Login() {
 
                 {/* Error Message */}
                 {error && (
-                  <span className="ml-auto text-red-400 text-sm font-[Inter]">
+                  <span className="text-red-400 text-sm font-[Inter]">
                     {error}
                   </span>
                 )}
               </div>
 
               {/* Submit Button */}
-              <div
-                style={{
-                  width: "398px",
-                  height: "38px",
-                  marginTop: "24px",
-                }}
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full h-[38px] border text-[#1F1F20] font-[Inter] transition-colors flex items-center justify-center gap-2 rounded-md text-sm font-semibold ${
+                  loading
+                    ? "bg-[#9CA3AF] border-[#9CA3AF] cursor-not-allowed"
+                    : "bg-[#FDCE06] border-[#FDCE06] hover:bg-[#e6b800]"
+                }`}
               >
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full h-full border text-[#1F1F20] font-[Inter] transition-colors flex items-center justify-center gap-2 ${
-                    loading
-                      ? "bg-[#9CA3AF] border-[#9CA3AF] cursor-not-allowed"
-                      : "bg-[#FDCE06] border-[#FDCE06] hover:bg-[#e6b800]"
-                  }`}
-                  style={{
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    lineHeight: "1.21em",
-                  }}
-                >
-                  {loading ? (
-                    <>
-                      <ClipLoader color="#1F1F20" size={14} />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </button>
-              </div>
+                {loading ? (
+                  <>
+                    <ClipLoader color="#1F1F20" size={14} />
+                    Signing in...
+                  </>
+                ) : (
+                  "Login"
+                )}
+              </button>
             </form>
           </div>
         </main>

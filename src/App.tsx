@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import DashboardMain from "./DashboardMain";
 import Login from "./Login";
@@ -21,11 +21,14 @@ import VerifyOTP from "./client/VerifyOTP";
 import ResetPassword from "./client/ResetPassword";
 
 function DashboardLayout({ children }) {
+  const location = useLocation();
+  const isChatPath = location.pathname.startsWith("/chat");
+
   return (
     <div className="flex min-h-screen bg-[#292A2B]">
       <AdminSidebar />
       <main
-        className="flex-1 overflow-y-auto mb-10 md:mb-20 lg:ml-[256px] lg:w-[calc(100vw - 256px)]"
+        className={`flex-1 overflow-y-auto  lg:ml-[256px] lg:w-[calc(100vw - 256px)] ${isChatPath && "!mb-0"}`}
         style={{
           height: "100vh",
         }}

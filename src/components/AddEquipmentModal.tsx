@@ -20,6 +20,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
   ]);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -174,6 +175,8 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                   onChange={(e) =>
                     handleInputChange("category", e.target.value)
                   }
+                  onFocus={() => setIsDropdownOpen(true)}
+                  onBlur={() => setIsDropdownOpen(false)}
                   className={`w-full h-[46px] bg-[#292A2B] border rounded-[6px] text-[#E5E5E5] text-[16px] font-[Inter] px-3 pr-10 outline-none appearance-none cursor-pointer transition-colors ${
                     errors.category
                       ? "border-red-500 focus:border-red-500"
@@ -188,7 +191,13 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                   ))}
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <svg width="15" height="9" viewBox="0 0 15 9" fill="none">
+                  <svg
+                    width="15"
+                    height="9"
+                    viewBox="0 0 15 9"
+                    fill="none"
+                    className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : "rotate-0"}`}
+                  >
                     <path d="M7.5 0L15 9L0 9L7.5 0Z" fill="#E5E5E5" />
                   </svg>
                 </div>

@@ -179,7 +179,7 @@ const ContentManagement = () => {
           {/* Equipment ID Field */}
           <div className="flex flex-col">
             <label className="text-[#9CA3AF] font-[Inter] font-medium text-sm leading-[1.21em] mb-2">
-              Equipment ID
+              Content ID
             </label>
             <input
               type="text"
@@ -240,7 +240,7 @@ const ContentManagement = () => {
             <thead className="bg-[#292A2B]">
               <tr>
                 <th className="text-left text-[#E5E5E5] font-[Inter] font-bold text-sm px-3 py-3">
-                  Equipment ID
+                  Content ID
                   <span className="inline-block w-2 h-3.5 ml-1">
                     <svg
                       width="8.75"
@@ -416,7 +416,7 @@ const ContentManagement = () => {
                             index === 0 || index === 4 ? "9.9px" : "10.4px",
                         }}
                       >
-                        {item.id}
+                        {item.equipment_id || item.id}
                       </div>
                     </td>
                     <td
@@ -696,6 +696,7 @@ const ContentManagement = () => {
           setSelectedContent(null);
         }}
         content={selectedContent}
+        onEdit={handleEditContent}
       />
 
       {/* Toast Container */}

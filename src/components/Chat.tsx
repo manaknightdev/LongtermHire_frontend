@@ -16,6 +16,7 @@ const Chat = () => {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState("");
+  const [showSidebar, setShowSidebar] = useState(false);
 
   // Refs for scroll management
   const messagesEndRef = useRef(null);
@@ -118,6 +119,8 @@ const Chat = () => {
     clearMessages();
     loadMessages(conversation.id);
     startPolling(conversation.id);
+    // Close sidebar on mobile when conversation is selected
+    setShowSidebar(false);
   };
 
   // Handle sending messages
@@ -160,6 +163,13 @@ const Chat = () => {
         return;
       }
 
+      // Check if conversation already exists
+      if (clientToUse.has_conversation === 1) {
+        console.error("Conversation already exists with this client");
+        return;
+      }
+      console.log(clientToUse, clients);
+
       const response = await chatApi.startConversation(
         clientToUse.user_id,
         `Hello ${clientToUse.name}, how can I help you today?`
@@ -177,32 +187,73 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#1F1F20] text-[#E5E5E5]">
+    <div className="flex h-full bg-[#1F1F20] text-[#E5E5E5] relative">
+      {/* Mobile Sidebar Overlay */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       {/* Left Column - Conversations List */}
-      <div className="w-80 bg-[#1F1F20] border-r border-[#333333] flex flex-col">
+      <div
+        className={`
+        ${showSidebar ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0
+        fixed lg:relative
+        top-0 left-0
+        w-80 h-full
+        bg-[#1F1F20] border-r border-[#333333]
+        flex flex-col
+        z-50 lg:z-auto
+        transition-transform duration-300 ease-in-out
+        lg:transition-none
+      `}
+      >
         {/* Header */}
-        <div className="p-6 border-b border-[#333333]">
+        <div className="p-4 sm:p-6 border-b border-[#333333]">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-[#E5E5E5] font-[Inter] font-bold text-2xl leading-tight">
+            <h1 className="text-[#E5E5E5] font-[Inter] font-bold text-xl sm:text-2xl leading-tight">
               Chat
             </h1>
-            <button
-              onClick={() => setShowNewConversationModal(true)}
-              className="bg-[#FDCE06] text-[#1F1F20] px-4 py-2 rounded-lg font-semibold hover:bg-[#E5B800] transition-colors flex items-center gap-2"
-            >
-              New Chat
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowNewConversationModal(true)}
+                className="bg-[#FDCE06] text-[#1F1F20] px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-[#E5B800] transition-colors flex items-center gap-2 text-sm sm:text-base"
               >
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </button>
+                <span className="hidden sm:inline">New Chat</span>
+                <span className="sm:hidden">New</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              {/* Close button for mobile */}
+              <button
+                onClick={() => setShowSidebar(false)}
+                className="lg:hidden text-[#E5E5E5] p-2 hover:bg-[#292A2B] rounded-lg transition-colors"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Search */}
@@ -244,14 +295,14 @@ const Chat = () => {
               <div
                 key={conversation.id}
                 onClick={() => handleSelectConversation(conversation)}
-                className={`p-4 border-b border-[#333333] cursor-pointer hover:bg-[#292A2B] transition-colors ${
+                className={`p-4 border-b border-[#333333] cursor-pointer overflow-hidden hover:bg-[#292A2B] transition-colors ${
                   selectedConversation?.id === conversation.id
                     ? "bg-[#292A2B] border-l-4 border-l-[#FDCE06]"
                     : ""
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex-1">
+                  <div className="flex-1 max-w-[90%]">
                     <h3 className="text-[#E5E5E5] font-medium">
                       {conversation.other_user_name || "Unknown User"}
                     </h3>
@@ -272,7 +323,40 @@ const Chat = () => {
       </div>
 
       {/* Right Column - Chat Messages and Input */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col lg:ml-0">
+        {/* Mobile Header with Hamburger Menu */}
+        <div className="lg:hidden bg-[#1F1F20] border-b border-[#333333] p-4 flex items-center justify-between">
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="text-[#E5E5E5] p-2 hover:bg-[#292A2B] rounded-lg transition-colors"
+          >
+            <svg
+              width="18"
+              height="15"
+              viewBox="0 0 18 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clip-path="url(#clip0_2_1204)">
+                <path
+                  d="M5.9378 10.375C9.0796 10.375 11.6253 8.22031 11.6253 5.5625C11.6253 2.90469 9.0796 0.75 5.9378 0.75C2.796 0.75 0.250299 2.90469 0.250299 5.5625C0.250299 6.61797 0.652252 7.59414 1.33311 8.38984C1.23741 8.64687 1.09522 8.87383 0.94483 9.06523C0.81358 9.23477 0.679596 9.36602 0.581159 9.45625C0.53194 9.5 0.490924 9.53555 0.463581 9.55742C0.449909 9.56836 0.438971 9.57656 0.433502 9.5793L0.428034 9.58477C0.277643 9.69688 0.212018 9.89375 0.272174 10.0715C0.332331 10.2492 0.499127 10.375 0.687799 10.375C1.28389 10.375 1.88546 10.2219 2.38585 10.0332C2.63741 9.9375 2.87256 9.83086 3.07764 9.72148C3.9171 10.1371 4.89327 10.375 5.9378 10.375ZM12.5003 5.5625C12.5003 8.6332 9.79053 10.9465 6.58038 11.2227C7.24483 13.257 9.44874 14.75 12.0628 14.75C13.1073 14.75 14.0835 14.5121 14.9257 14.0965C15.1308 14.2059 15.3632 14.3125 15.6148 14.4082C16.1151 14.5969 16.7167 14.75 17.3128 14.75C17.5015 14.75 17.671 14.627 17.7284 14.4465C17.7858 14.266 17.723 14.0691 17.5698 13.957L17.5644 13.9516C17.5589 13.9461 17.548 13.9406 17.5343 13.9297C17.5069 13.9078 17.4659 13.875 17.4167 13.8285C17.3183 13.7383 17.1843 13.607 17.053 13.4375C16.9026 13.2461 16.7605 13.0164 16.6648 12.7621C17.3456 11.9691 17.7476 10.993 17.7476 9.93477C17.7476 7.39727 15.4261 5.31641 12.4812 5.13594C12.4921 5.27539 12.4976 5.41758 12.4976 5.55977L12.5003 5.5625Z"
+                  fill="#FDCE06"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_2_1204">
+                  <path d="M0.25 0.75H17.75V14.75H0.25V0.75Z" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </button>
+          <h1 className="text-[#E5E5E5] font-[Inter] font-bold text-xl">
+            {selectedConversation
+              ? selectedConversation.other_user_name
+              : "Chat"}
+          </h1>
+          <div className="w-10"></div> {/* Spacer for centering */}
+        </div>
         {selectedConversation ? (
           <>
             {/* Chat Header */}
@@ -282,7 +366,7 @@ const Chat = () => {
                   <h2 className="text-[#E5E5E5] font-semibold text-lg">
                     {selectedConversation.other_user_name || "Unknown User"}
                   </h2>
-                  <p className="text-[#9CA3AF] text-sm">Online</p>
+                  {/* <p className="text-[#9CA3AF] text-sm">Online</p> */}
                 </div>
               </div>
             </div>
@@ -290,7 +374,7 @@ const Chat = () => {
             {/* Messages Area */}
             <div
               ref={messagesEndRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#292A2B]"
+              className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-[#292A2B]"
               style={{ scrollBehavior: "smooth" }}
             >
               {loading ? (
@@ -322,7 +406,7 @@ const Chat = () => {
                       }`}
                     >
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                           isEquipmentRequest
                             ? "bg-[#FDCE06] text-[#1F1F20] border-2 border-[#E5B800]"
                             : isFromCurrentUser
@@ -363,8 +447,8 @@ const Chat = () => {
             </div>
 
             {/* Message Input */}
-            <div className="bg-[#1F1F20] border-t border-[#333333] p-4">
-              <div className="flex items-end gap-3">
+            <div className="bg-[#1F1F20] border-t border-[#333333] p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex-1">
                   <textarea
                     value={messageInput}
@@ -421,8 +505,8 @@ const Chat = () => {
 
       {/* Client Selection Modal */}
       {showNewConversationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 w-full max-w-md">
             <h3 className="text-[#E5E5E5] text-lg font-semibold mb-4">
               Start New Conversation
             </h3>
@@ -437,11 +521,13 @@ const Chat = () => {
                   className="w-full bg-[#292A2B] text-[#E5E5E5] border border-[#333333] rounded-lg px-3 py-2 focus:border-[#FDCE06] focus:outline-none"
                 >
                   <option value="">Choose a client...</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name} ({client.email})
-                    </option>
-                  ))}
+                  {clients
+                    .filter((client) => client.has_conversation === 0)
+                    .map((client) => (
+                      <option key={client.user_id} value={client.user_id}>
+                        {client.name} ({client.email})
+                      </option>
+                    ))}
                 </select>
               </div>
               <div className="flex gap-3">

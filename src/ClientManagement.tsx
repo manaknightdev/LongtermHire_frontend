@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AddClientModal from "./components/AddClientModal";
 import EditClientModal from "./components/EditClientModal";
+import ClientDetailsModal from "./components/ClientDetailsModal";
 import EquipmentPopover from "./components/EquipmentPopover";
 import PricingPopover from "./components/PricingPopover";
 import CustomPackageModal from "./components/CustomPackageModal";
@@ -21,6 +22,8 @@ const ClientManagement = () => {
 
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+  const [isClientDetailsModalOpen, setIsClientDetailsModalOpen] =
+    useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
 
   // Pagination state
@@ -75,10 +78,11 @@ const ClientManagement = () => {
         equipmentApi.getEquipment(),
         pricingApi.getPricingPackages(),
       ]);
-
+      console.log(clientsRes, equipmentRes, pricingRes);
       const clientsData = clientsRes.data || [];
+      const equipmentData = equipmentRes.data || [];
       setClients(clientsData);
-      setEquipment(equipmentRes.data || []);
+      setEquipment(equipmentData);
       setPricingPackages(pricingRes.data || []);
 
       // Update pagination info
@@ -97,10 +101,15 @@ const ClientManagement = () => {
     }
   };
 
+  console.log("Equipment:", equipment);
+  console.log("Clients:", clients);
+  console.log("Pricing Packages:", pricingPackages);
+
   // Load equipment and pricing assignments for all clients
   const loadClientAssignments = async (clientsData) => {
     try {
       const equipmentAssignments = {};
+      const pricingAssignments = {};
 
       for (const client of clientsData) {
         try {
@@ -108,10 +117,51 @@ const ClientManagement = () => {
           const equipmentRes = await clientApi.getClientEquipment(
             client.user_id
           );
+          console.log(equipmentRes);
           if (equipmentRes.data && equipmentRes.data.length > 0) {
-            equipmentAssignments[client.user_id] = equipmentRes.data.map(
-              (item) => item.equipment_id
+            // Map equipment IDs to full equipment objects
+            const clientEquipmentDetails = equipmentRes.data.map(
+              (assignment) => {
+                const fullEquipment = equipment.find(
+                  (eq) => eq.equipment_id == assignment.equipment_id
+                );
+                return (
+                  fullEquipment || {
+                    equipment_id: assignment.equipment_id,
+                    equipment_name: "Unknown Equipment",
+                    category_name: "N/A",
+                  }
+                );
+              }
             );
+            equipmentAssignments[client.user_id] = clientEquipmentDetails;
+          }
+
+          // Load pricing assignments (if client has pricing data)
+          if (client.pricing_package_name || client.custom_discount_value) {
+            let pricingInfo;
+
+            if (client.pricing_package_name) {
+              // Find the full pricing package object
+              const fullPackage = pricingPackages.find(
+                (pkg) => pkg.name === client.pricing_package_name
+              );
+              pricingInfo = fullPackage || {
+                name: client.pricing_package_name,
+                description: `Package: ${client.pricing_package_name}`,
+                package_id: "Unknown",
+              };
+            } else if (client.custom_discount_value) {
+              // Custom discount
+              pricingInfo = {
+                name: "Custom Discount",
+                description: `Custom ${client.custom_discount_value}${client.custom_discount_type === "percentage" ? "%" : "$"} off`,
+                custom_discount_value: client.custom_discount_value,
+                custom_discount_type: client.custom_discount_type,
+              };
+            }
+
+            pricingAssignments[client.user_id] = [pricingInfo];
           }
         } catch (error) {
           console.error(
@@ -123,10 +173,13 @@ const ClientManagement = () => {
       }
 
       setClientEquipment(equipmentAssignments);
+      setClientPricing(pricingAssignments);
     } catch (error) {
       console.error("Error loading client assignments:", error);
     }
   };
+
+  console.log("Equipment data:", equipment);
 
   const handleInviteClient = async (clientData) => {
     try {
@@ -211,6 +264,10 @@ const ClientManagement = () => {
   // Track selected equipment per client
   const [clientEquipment, setClientEquipment] = useState({});
 
+  // Track pricing assignments per client
+  const [clientPricing, setClientPricing] = useState({});
+  console.log("Client Pricing Data:", clientPricing);
+
   // Helper function to get assigned equipment names
   const getAssignedEquipmentNames = (clientUserId) => {
     const assignedIds = clientEquipment[clientUserId] || [];
@@ -252,6 +309,12 @@ const ClientManagement = () => {
   const handleEditClient = (client) => {
     setSelectedClient(client);
     setIsEditClientModalOpen(true);
+  };
+
+  // View client details handler
+  const handleViewClientDetails = (client) => {
+    setSelectedClient(client);
+    setIsClientDetailsModalOpen(true);
   };
 
   const handleUpdateClient = async (clientData) => {
@@ -536,7 +599,7 @@ const ClientManagement = () => {
                                 }`
                               : "Click to assign equipment"
                           }
-                          className={`border rounded-md font-[Inter] font-normal text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
+                          className={`border rounded-md font-[Inter] font-normal text-[12px] leading-[1.25em] line-clamp-2 px-3 py-1 flex items-center gap-2 transition-colors ${
                             clientEquipment[client.user_id]?.length > 0
                               ? "bg-[#FDCE06] border-[#FDCE06] text-[#1F1F20]"
                               : "bg-[#292A2B] border-[#333333] text-[#E5E5E5] hover:border-[#FDCE06]"
@@ -554,8 +617,11 @@ const ClientManagement = () => {
                             fill="none"
                           >
                             <path
-                              d="M0.748047 3.74823L10.5036 9.74935L0.748047 3.74823Z"
-                              fill="currentColor"
+                              d="M3 4.5L6 7.5L9 4.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
                             />
                           </svg>
                         </button>
@@ -565,7 +631,7 @@ const ClientManagement = () => {
                       <div className="flex justify-center">
                         <button
                           onClick={(e) => handlePricingClick(client.user_id, e)}
-                          className={`border rounded-md font-[Inter] font-normal text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
+                          className={`border rounded-md font-[Inter] font-normal line-clamp-2 text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
                             client.pricing_package_name ||
                             client.custom_discount_value
                               ? "bg-[#FDCE06] border-[#FDCE06] text-[#1F1F20]"
@@ -588,8 +654,11 @@ const ClientManagement = () => {
                             fill="none"
                           >
                             <path
-                              d="M0.748047 3.74823L10.5036 9.74935L0.748047 3.74823Z"
-                              fill="currentColor"
+                              d="M3 4.5L6 7.5L9 4.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
                             />
                           </svg>
                         </button>
@@ -597,7 +666,10 @@ const ClientManagement = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex gap-3 items-center justify-center">
-                        <button className="text-[#FDCE06] font-[Inter] font-medium text-[14px] leading-[1.43em] hover:underline transition-all">
+                        <button
+                          onClick={() => handleViewClientDetails(client)}
+                          className="text-[#FDCE06] font-[Inter] font-medium text-[14px] leading-[1.43em] hover:underline transition-all"
+                        >
                           Details
                         </button>
                         <button
@@ -693,6 +765,22 @@ const ClientManagement = () => {
         onSubmit={handleUpdateClient}
         client={selectedClient}
         loading={inviteLoading}
+      />
+
+      {/* Client Details Modal */}
+      <ClientDetailsModal
+        isOpen={isClientDetailsModalOpen}
+        onClose={() => {
+          setIsClientDetailsModalOpen(false);
+          setSelectedClient(null);
+        }}
+        client={selectedClient}
+        clientEquipment={
+          selectedClient ? clientEquipment[selectedClient.user_id] || [] : []
+        }
+        clientPricing={
+          selectedClient ? clientPricing[selectedClient.user_id] || [] : []
+        }
       />
 
       {/* Equipment Popover */}

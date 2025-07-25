@@ -64,10 +64,20 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // Phone number validation - only allow digits
+    if (name === "phone") {
+      const digitsOnly = value.replace(/\D/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [name]: digitsOnly,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   // Handle equipment selection
@@ -315,7 +325,8 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
               </label>
             </div>
             <input
-              type="tel"
+              type="text"
+              inputMode="tel"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}

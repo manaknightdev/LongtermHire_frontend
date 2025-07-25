@@ -57,128 +57,273 @@ function ClientLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#292A2B]">
-      {/* Main Container */}
-      <div className="w-full max-w-md">
-        {/* Logo Section */}
-        <div className="text-center mb-8">
+      {/* Main Frame - Transparent container with exact Figma dimensions */}
+      <div
+        className="border-2 min-h-screen border-[#E5E7EB] flex flex-col"
+        style={{
+          width: "100%",
+          borderRadius: "8px",
+        }}
+      >
+        {/* Header Section */}
+        <header
+          className="relative border-b border-[#333333] flex items-start"
+          style={{ height: "101px" }}
+        >
+          {/* Logo positioned at top-left */}
           <img
             src="/login-logo.png"
             alt="Equipment Rental Logo"
-            className="mx-auto mb-4"
-            style={{ width: "200px", height: "auto" }}
+            className="absolute"
+            style={{
+              width: "240px",
+              height: "135px",
+              top: "-17px",
+              left: "0px",
+            }}
           />
-        </div>
+        </header>
 
-        {/* Login Form Container */}
-        <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-8">
-          {/* Title */}
-          <h2 className="text-[#E5E5E5] font-[Inter] text-center text-2xl font-medium mb-8">
-            Login
-          </h2>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-[#E5E5E5] font-[Inter] text-sm font-medium mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] placeholder-[#9CA3AF] font-[Inter] px-4 focus:outline-none focus:border-[#FDCE06] transition-colors"
-                placeholder="Enter your email address"
-                required
-              />
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-[#E5E5E5] font-[Inter] text-sm font-medium mb-2"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] placeholder-[#9CA3AF] font-[Inter] px-4 focus:outline-none focus:border-[#FDCE06] transition-colors"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 bg-[#292A2B] border border-[#333333] rounded focus:ring-0 focus:ring-offset-0"
-                />
-                <label
-                  htmlFor="remember"
-                  className="ml-2 text-[#E5E5E5] font-[Inter] text-sm"
-                >
-                  Remember me
-                </label>
-              </div>
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className="text-[#FDCE06] font-[Inter] text-sm hover:underline"
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            {/* Success Message */}
-            {success && (
-              <div className="text-green-400 text-sm font-[Inter] text-center">
-                {success}
-              </div>
-            )}
-
-            {/* Error Message */}
-            {error && (
-              <div className="text-red-400 text-sm font-[Inter] text-center">
-                {error}
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full h-12 rounded-md font-[Inter] font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                loading
-                  ? "bg-[#9CA3AF] text-[#666] cursor-not-allowed"
-                  : "bg-[#FDCE06] text-[#1F1F20] hover:bg-[#E5B800]"
-              }`}
+        {/* Main Section */}
+        <main
+          className="flex-1 flex items-center justify-center"
+          style={{ height: "687px" }}
+        >
+          {/* Login Form Container - Exact Figma dimensions */}
+          <div
+            className="bg-[#1F1F20] border border-[#333333] flex flex-col"
+            style={{
+              width: "448px",
+              height: "371px",
+              borderRadius: "8px",
+            }}
+          >
+            {/* Title Section */}
+            <div
+              className="flex items-center justify-center"
+              style={{
+                width: "398px",
+                height: "36px",
+                marginLeft: "25px",
+                marginTop: "25px",
+              }}
             >
-              {loading ? (
-                <>
-                  <ClipLoader color="#666" size={16} />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </button>
-          </form>
+              <h2
+                className="text-[#E5E5E5] font-[Inter] text-center"
+                style={{
+                  fontSize: "30px",
+                  fontWeight: "400",
+                  lineHeight: "1.2em",
+                }}
+              >
+                Login
+              </h2>
+            </div>
 
-          {/* Footer */}
-        </div>
+            {/* Form Section */}
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col"
+              style={{
+                width: "398px",
+                height: "253px",
+                marginLeft: "25px",
+                marginTop: "32px",
+              }}
+            >
+              {/* Input Fields Container */}
+              <div
+                className="flex flex-col bg-transparent"
+                style={{
+                  width: "398px",
+                  height: "147px",
+                  borderRadius: "6px",
+                  boxShadow: "0px 1px 2px 0px rgba(0, 0, 0, 0.05)",
+                }}
+              >
+                {/* Email Field */}
+                <div style={{ width: "398px", height: "66px" }}>
+                  {/* Email Label */}
+                  <label
+                    htmlFor="email"
+                    className="block text-[#E5E5E5] font-[Inter]"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      lineHeight: "1.21em",
+                      marginTop: "1px",
+                      marginBottom: "11px",
+                    }}
+                  >
+                    Email:
+                  </label>
+                  {/* Email Input */}
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3"
+                    style={{
+                      width: "398px",
+                      height: "38px",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      lineHeight: "1.43em",
+                    }}
+                    placeholder="Enter Email Address"
+                    required
+                  />
+                </div>
+
+                {/* Password Field */}
+                <div
+                  style={{ width: "398px", height: "82px", marginTop: "-1px" }}
+                >
+                  {/* Password Label */}
+                  <label
+                    htmlFor="password"
+                    className="block text-[#E5E5E5] font-[Inter]"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      lineHeight: "1.21em",
+                      marginTop: "17px",
+                      marginBottom: "11px",
+                    }}
+                  >
+                    Password:
+                  </label>
+                  {/* Password Input */}
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-[#1C1C1C] border border-[#444444] text-[#E5E5E5] placeholder-[#ADAEBC] font-[Inter] focus:outline-none focus:ring-0 px-3"
+                    style={{
+                      width: "398px",
+                      height: "38px",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      lineHeight: "1.43em",
+                    }}
+                    placeholder="Enter Password"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Remember Me Section */}
+              <div
+                className="flex items-center justify-between"
+                style={{
+                  width: "398px",
+                  height: "20px",
+                  marginTop: "24px",
+                }}
+              >
+                <div
+                  className="flex items-center"
+                  style={{ width: "121.234375px", height: "20px" }}
+                >
+                  {/* Checkbox */}
+                  <input
+                    id="remember"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="bg-white border-black border-opacity-50 rounded-sm focus:ring-0"
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      marginTop: "2px",
+                      boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+                      borderWidth: "0.5px",
+                    }}
+                  />
+                  {/* Label */}
+                  <label
+                    htmlFor="remember"
+                    className="text-[#E5E5E5] font-[Inter] ml-2"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "400",
+                      lineHeight: "1.21em",
+                    }}
+                  >
+                    Remember Me
+                  </label>
+                </div>
+
+                {/* Forgot Password Link */}
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-[#FDCE06] font-[Inter] hover:underline"
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "400",
+                    lineHeight: "1.21em",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              {/* Success Message */}
+              {success && (
+                <div className="text-green-400 text-sm font-[Inter] text-center mt-2">
+                  {success}
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="text-red-400 text-sm font-[Inter] text-center mt-2">
+                  {error}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div
+                style={{
+                  width: "398px",
+                  height: "38px",
+                  marginTop: "24px",
+                }}
+              >
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full h-full border text-[#1F1F20] font-[Inter] transition-colors flex items-center justify-center gap-2 ${
+                    loading
+                      ? "bg-[#9CA3AF] border-[#9CA3AF] cursor-not-allowed"
+                      : "bg-[#FDCE06] border-[#FDCE06] hover:bg-[#e6b800]"
+                  }`}
+                  style={{
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    lineHeight: "1.21em",
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <ClipLoader color="#1F1F20" size={14} />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
       </div>
     </div>
   );

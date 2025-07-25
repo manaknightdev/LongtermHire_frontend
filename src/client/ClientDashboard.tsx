@@ -23,6 +23,7 @@ function ClientDashboard() {
   const [equipment, setEquipment] = useState([]);
   const [error, setError] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatVisible, setIsChatVisible] = useState(true);
   const navigate = useNavigate();
 
   // Refs for scroll management
@@ -211,28 +212,78 @@ function ClientDashboard() {
   const getSliderPosition = () => {
     switch (selectedDuration) {
       case "1 month":
-        return { barWidth: "25%", circleLeft: "20%" }; // Start position
+        return { barWidth: "0%", circleLeft: "0%" }; // Start position
       case "3 months":
-        return { barWidth: "50%", circleLeft: "45%" }; // Middle position
+        return { barWidth: "33.33%", circleLeft: "33.33%" }; // First third
+      case "6 months":
+        return { barWidth: "66.66%", circleLeft: "66.66%" }; // Second third
       case "12 months":
-        return { barWidth: "100%", circleLeft: "95%" }; // End position
+        return { barWidth: "100%", circleLeft: "100%" }; // End position
       default:
-        return { barWidth: "50%", circleLeft: "45%" }; // Default to middle
+        return { barWidth: "33.33%", circleLeft: "33.33%" }; // Default to 3 months
     }
   };
 
-  // Calculate discount based on selected duration
-  const getDiscountAmount = () => {
+  // Handle slider drag functionality
+  const handleSliderInteraction = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+
+    if (percentage <= 16.66) {
+      setSelectedDuration("1 month");
+    } else if (percentage <= 50) {
+      setSelectedDuration("3 months");
+    } else if (percentage <= 83.33) {
+      setSelectedDuration("6 months");
+    } else {
+      setSelectedDuration("12 months");
+    }
+  };
+
+  // Calculate discount percentage based on selected duration
+  const getDiscountPercentage = () => {
     switch (selectedDuration) {
       case "1 month":
-        return 50; // $50 discount for 1 month
+        return 0; // No discount for 1 month
       case "3 months":
-        return 105; // $105 discount for 3 months
+        return 5; // 5% discount for 3 months
+      case "6 months":
+        return 10; // 10% discount for 6 months
       case "12 months":
-        return 500; // $500 discount for 12 months
+        return 20; // 20% discount for 12 months
       default:
-        return 105; // Default to 3 months discount
+        return 5; // Default to 3 months discount
     }
+  };
+
+  // Calculate actual discount amount for selected equipment
+  const getDiscountAmount = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+    if (!selectedEquipmentData || !selectedEquipmentData.base_price) {
+      return 0;
+    }
+
+    // Handle both string and number base_price
+    let basePrice = 0;
+    if (typeof selectedEquipmentData.base_price === "string") {
+      basePrice =
+        parseFloat(selectedEquipmentData.base_price.replace(/[^\d.]/g, "")) ||
+        0;
+    } else if (typeof selectedEquipmentData.base_price === "number") {
+      basePrice = selectedEquipmentData.base_price;
+    } else {
+      // Try to convert to number as fallback
+      basePrice =
+        parseFloat(
+          String(selectedEquipmentData.base_price).replace(/[^\d.]/g, "")
+        ) || 0;
+    }
+
+    const discountPercentage = getDiscountPercentage();
+    return Math.round(basePrice * (discountPercentage / 100));
   };
 
   const handleSendMessage = async () => {
@@ -319,12 +370,12 @@ function ClientDashboard() {
     <div className="min-h-screen bg-[#292A2B] font-[Inter]">
       {/* Header */}
       <header className="bg-[#1F1F20] border-b border-[#333333] px-4 sm:px-8 lg:px-20 py-5">
-        <div className="flex items-center justify-between max-w-[1280px] mx-auto">
+        <div className="flex items-center justify-between  mx-auto">
           <div className="flex items-center">
             <img
               src="/login-logo.png"
               alt="Equipment Rental Logo"
-              className="h-[70px] sm:h-[70px] mr-4 sm:mr-6"
+              className="h-[70px] sm:h-[100px] mr-4 sm:mr-6"
             />
           </div>
           <nav className="flex items-center gap-2 sm:gap-4">
@@ -503,18 +554,52 @@ function ClientDashboard() {
                   <span className="text-[#FFFFFF] text-base sm:text-lg font-semibold">
                     Hire For
                   </span>
-                  <span className="text-[#22C55E] text-base sm:text-lg font-bold">
-                    -${getDiscountAmount()}
-                  </span>
+                  <div className="text-right">
+                    {getDiscountPercentage() > 0 && (
+                      <>
+                        <span className="text-[#22C55E] text-base sm:text-lg font-bold">
+                          -{getDiscountPercentage()}% (${getDiscountAmount()})
+                        </span>
+                        <div className="text-[#9CA3AF] text-xs">
+                          Discount applied
+                        </div>
+                      </>
+                    )}
+                    {getDiscountPercentage() === 0 && (
+                      <span className="text-[#9CA3AF] text-sm">
+                        No discount
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="relative mb-4 sm:mb-6">
-                  <div className="bg-[#E5E5E5] border border-[#B7B5B5] rounded-full h-2 relative">
+                  <div
+                    className="bg-[#E5E5E5] border border-[#B7B5B5] rounded-full h-2 relative cursor-pointer select-none"
+                    onClick={handleSliderInteraction}
+                    onMouseDown={(e) => {
+                      const handleMouseMove = (moveEvent) => {
+                        handleSliderInteraction(moveEvent);
+                      };
+
+                      const handleMouseUp = () => {
+                        document.removeEventListener(
+                          "mousemove",
+                          handleMouseMove
+                        );
+                        document.removeEventListener("mouseup", handleMouseUp);
+                      };
+
+                      document.addEventListener("mousemove", handleMouseMove);
+                      document.addEventListener("mouseup", handleMouseUp);
+                      handleSliderInteraction(e);
+                    }}
+                  >
                     <div
-                      className="absolute left-0 top-0 bg-[#0075FF] rounded-full h-2 transition-all duration-300 ease-in-out"
+                      className="absolute left-0 top-0 bg-[#0075FF] rounded-full h-2 transition-all duration-200 ease-in-out"
                       style={{ width: getSliderPosition().barWidth }}
                     ></div>
                     <div
-                      className="absolute top-[-9px] bg-[#0075FF] rounded-full w-5 h-5 flex items-center justify-center transition-all duration-300 ease-in-out"
+                      className="absolute top-[-9px] bg-[#0075FF] rounded-full w-5 h-5 flex items-center justify-center transition-all duration-200 ease-in-out cursor-grab active:cursor-grabbing"
                       style={{
                         left: getSliderPosition().circleLeft,
                         transform: "translateX(-50%)",
@@ -530,6 +615,16 @@ function ClientDashboard() {
                         <circle cx="9" cy="9" r="3" fill="#0075FF" />
                       </svg>
                     </div>
+                  </div>
+                  <div className="text-[#9CA3AF] text-xs text-center mt-2">
+                    {(() => {
+                      const selectedEquipmentData = equipment.find(
+                        (item) => item.equipment_name === selectedEquipment
+                      );
+                      const minDuration =
+                        selectedEquipmentData?.minimum_duration;
+                      return minDuration ? ` • Min: ${minDuration}` : "";
+                    })()}
                   </div>
                 </div>
                 <div className="flex justify-between text-xs">
@@ -554,6 +649,16 @@ function ClientDashboard() {
                     3 months
                   </button>
                   <button
+                    onClick={() => setSelectedDuration("6 months")}
+                    className={`${
+                      selectedDuration === "6 months"
+                        ? "text-[#FDCE06] font-bold"
+                        : "text-[#9CA3AF]"
+                    } transition-colors`}
+                  >
+                    6 months
+                  </button>
+                  <button
                     onClick={() => setSelectedDuration("12 months")}
                     className={`${
                       selectedDuration === "12 months"
@@ -568,95 +673,137 @@ function ClientDashboard() {
             </div>
 
             {/* Chat Section - Hidden on mobile, shown on desktop */}
-            <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden">
-              <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4">
-                <h3 className="text-[#FFFFFF] text-base font-semibold">
-                  Message Rental Company
-                </h3>
-              </div>
-              <div className="p-4 space-y-4 h-[400px] overflow-y-auto">
-                {messages.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-[#9CA3AF]">
-                      No messages yet. Start the conversation!
-                    </p>
-                  </div>
-                ) : (
-                  messages.map((message) => {
-                    // Get current user ID from localStorage (client side)
-                    const currentUserId = parseInt(
-                      localStorage.getItem("clientUserId")
-                    );
-                    const isCurrentUser =
-                      message.from_user_id === currentUserId;
-
-                    return (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          isCurrentUser ? "justify-end" : "justify-start"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[280px] rounded-lg p-3 ${
-                            isCurrentUser
-                              ? "bg-[#FDCE06] text-[#000000]"
-                              : "bg-[#292A2B] text-[#E5E5E5]"
-                          }`}
-                        >
-                          <p className="text-sm">{message.message}</p>
-                          <p className="text-xs mt-1 opacity-70">
-                            {new Date(message.created_at).toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-              <div className="border-t border-[#333333] p-4">
-                <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-4 py-2">
-                  <textarea
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Type your message... "
-                    className="flex-1 bg-transparent text-[#ADAEBC] text-sm sm:text-base placeholder-[#ADAEBC] placeholder:text-xs outline-none resize-none min-h-[32px] max-h-[100px] overflow-y-auto"
-                    rows={1}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                      }
-                    }}
-                    style={{
-                      scrollbarWidth: "thin",
-                      scrollbarColor: "#444444 transparent",
-                    }}
-                  />
+            {isChatVisible && (
+              <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden">
+                <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4 flex items-center justify-between">
+                  <h3 className="text-[#FFFFFF] text-base font-semibold">
+                    Message Rental Company
+                  </h3>
                   <button
-                    onClick={handleSendMessage}
-                    disabled={sendingMessage || !messageText.trim()}
-                    className="ml-2 bg-[#FDCE06] rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => setIsChatVisible(false)}
+                    className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors p-1"
+                    title="Hide chat"
                   >
-                    {sendingMessage ? (
-                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                      >
-                        <path
-                          d="M2 14L14 8L2 2L2 6L10 8L2 10L2 14Z"
-                          fill="#000000"
-                        />
-                      </svg>
-                    )}
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M15 5L5 15M5 5L15 15"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </button>
                 </div>
+                <div className="p-4 space-y-4 h-[400px] overflow-y-auto">
+                  {messages.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-[#9CA3AF]">
+                        No messages yet. Start the conversation!
+                      </p>
+                    </div>
+                  ) : (
+                    messages.map((message) => {
+                      // Get current user ID from localStorage (client side)
+                      const currentUserId = parseInt(
+                        localStorage.getItem("clientUserId")
+                      );
+                      const isCurrentUser =
+                        message.from_user_id === currentUserId;
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${
+                            isCurrentUser ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-[280px] rounded-lg p-3 ${
+                              isCurrentUser
+                                ? "bg-[#FDCE06] text-[#000000]"
+                                : "bg-[#292A2B] text-[#E5E5E5]"
+                            }`}
+                          >
+                            <p className="text-sm">{message.message}</p>
+                            <p className="text-xs mt-1 opacity-70">
+                              {new Date(
+                                message.created_at
+                              ).toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                <div className="border-t border-[#333333] p-4">
+                  <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-4 py-2">
+                    <textarea
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      placeholder="Type your message... "
+                      className="flex-1 bg-transparent text-[#ADAEBC] text-sm sm:text-base placeholder-[#ADAEBC] placeholder:text-xs outline-none resize-none min-h-[32px] max-h-[100px] overflow-y-auto"
+                      rows={1}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      style={{
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#444444 transparent",
+                      }}
+                    />
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={sendingMessage || !messageText.trim()}
+                      className="ml-2 bg-[#FDCE06] rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {sendingMessage ? (
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                        >
+                          <path
+                            d="M2 14L14 8L2 2L2 6L10 8L2 10L2 14Z"
+                            fill="#000000"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Show Chat Button when chat is hidden */}
+            {!isChatVisible && (
+              <div className="fixed bottom-4 right-4 lg:block hidden z-50">
+                <button
+                  onClick={() => setIsChatVisible(true)}
+                  className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="sm:w-5 sm:h-5"
+                  >
+                    <path
+                      d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
+                      fill="#000000"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </aside>
       </div>

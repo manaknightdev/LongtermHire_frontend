@@ -172,17 +172,25 @@ const EquipmentManagement = () => {
         equipmentId,
         !currentAvailability
       );
-      // Refresh the equipment list
-      await fetchEquipment();
+      // Update the local state instead of refetching all data
+      setEquipment((prevEquipment) =>
+        prevEquipment.map((item) =>
+          item.id === equipmentId
+            ? { ...item, availability: !currentAvailability }
+            : item
+        )
+      );
+      toast.success("Availability updated successfully!");
     } catch (err) {
       console.error("Error updating availability:", err);
       setError("Failed to update availability");
+      toast.error("Failed to update availability");
     }
   };
 
   return (
     <div className="p-4 lg:p-8 bg-[#292A2B] min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-[#E5E5E5] font-inter font-bold text-2xl lg:text-4xl leading-tight">
@@ -191,15 +199,15 @@ const EquipmentManagement = () => {
         </div>
 
         {/* Search Section */}
-        <section className="bg-[#1F1F20] border border-[#333333] rounded-lg mb-8 p-6">
-          <h3 className="text-[#E5E5E5] font-inter font-semibold text-xl lg:text-2xl mb-6">
+        <section className="bg-[#1F1F20] border border-[#333333] rounded-lg p-6 mb-8">
+          <h3 className="text-[#E5E5E5] font-[Inter] font-semibold text-[20px] leading-[1.2em] mb-6">
             Search
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             {/* Category ID */}
             <div className="flex flex-col">
-              <label className="text-[#9CA3AF] font-inter font-medium text-sm mb-2">
+              <label className="text-[#9CA3AF] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
                 Category ID
               </label>
               <input
@@ -208,12 +216,13 @@ const EquipmentManagement = () => {
                 value={searchData.categoryId}
                 onChange={handleInputChange}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
+                style={{ height: "42px" }}
               />
             </div>
 
             {/* Category Name */}
             <div className="flex flex-col">
-              <label className="text-[#9CA3AF] font-inter font-medium text-sm mb-2">
+              <label className="text-[#9CA3AF] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
                 Category Name
               </label>
               <input
@@ -222,12 +231,13 @@ const EquipmentManagement = () => {
                 value={searchData.categoryName}
                 onChange={handleInputChange}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
+                style={{ height: "42px" }}
               />
             </div>
 
             {/* Equipment ID */}
             <div className="flex flex-col">
-              <label className="text-[#9CA3AF] font-inter font-medium text-sm mb-2">
+              <label className="text-[#9CA3AF] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
                 Equipment ID
               </label>
               <input
@@ -236,12 +246,13 @@ const EquipmentManagement = () => {
                 value={searchData.equipmentId}
                 onChange={handleInputChange}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
+                style={{ height: "42px" }}
               />
             </div>
 
             {/* Equipment Name */}
             <div className="flex flex-col">
-              <label className="text-[#9CA3AF] font-inter font-medium text-sm mb-2">
+              <label className="text-[#9CA3AF] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
                 Equipment Name
               </label>
               <input
@@ -250,16 +261,19 @@ const EquipmentManagement = () => {
                 value={searchData.equipmentName}
                 onChange={handleInputChange}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
+                style={{ height: "42px" }}
               />
             </div>
 
             {/* Search Button */}
-            <div className="flex flex-col md:col-span-2 lg:col-span-4 xl:col-span-1">
+            <div className="flex flex-col">
               <button
                 onClick={handleSearch}
-                className="bg-[#333333] rounded-md text-[#FFFFFF] font-inter font-bold text-sm lg:text-base px-6 py-3 hover:bg-[#404040] transition-colors mt-6 xl:mt-0"
+                disabled={loading}
+                className="bg-[#FDCE06] rounded-md text-[#1F1F20] font-[Inter] font-bold text-[16px] leading-[1.19em] px-6 py-3 hover:bg-[#E5B800] transition-colors disabled:opacity-50"
+                style={{ height: "42px" }}
               >
-                Search
+                {loading ? "Searching..." : "Search"}
               </button>
             </div>
           </div>

@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import Modal from "./Modal";
 
-const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = false }) => {
+const EditEquipmentModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  equipment,
+  loading = false,
+}) => {
   const [formData, setFormData] = useState({
     categoryId: "",
     category: "",
@@ -24,7 +30,8 @@ const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = fa
         equipmentName: equipment.equipment_name || "",
         basePrice: equipment.base_price || "",
         minimumDuration: equipment.minimum_duration || "3 Months",
-        availability: equipment.availability === 1 || equipment.availability === true,
+        availability:
+          equipment.availability === 1 || equipment.availability === true,
         description: equipment.description || "",
       });
     }
@@ -72,7 +79,8 @@ const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = fa
         equipmentName: equipment.equipment_name || "",
         basePrice: equipment.base_price || "",
         minimumDuration: equipment.minimum_duration || "3 Months",
-        availability: equipment.availability === 1 || equipment.availability === true,
+        availability:
+          equipment.availability === 1 || equipment.availability === true,
         description: equipment.description || "",
       });
     }
@@ -97,9 +105,8 @@ const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = fa
               type="text"
               name="categoryId"
               value={formData.categoryId}
-              onChange={handleInputChange}
-              required
-              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              readOnly
+              className="w-full h-[48px] bg-[#2A2A2A] border border-[#333333] rounded-[8px] px-4 text-[#9CA3AF] font-[Inter] font-normal text-[14px] leading-[1.21em] cursor-not-allowed"
               placeholder="Enter category ID"
             />
           </div>
@@ -129,9 +136,8 @@ const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = fa
               type="text"
               name="equipmentId"
               value={formData.equipmentId}
-              onChange={handleInputChange}
-              required
-              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              readOnly
+              className="w-full h-[48px] bg-[#2A2A2A] border border-[#333333] rounded-[8px] px-4 text-[#9CA3AF] font-[Inter] font-normal text-[14px] leading-[1.21em] cursor-not-allowed"
               placeholder="Enter equipment ID"
             />
           </div>
@@ -171,20 +177,35 @@ const EditEquipmentModal = ({ isOpen, onClose, onSubmit, equipment, loading = fa
           {/* Minimum Duration */}
           <div>
             <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
-              Minimum Duration*
+              Minimum Duration (Months)*
             </label>
-            <select
+            <input
+              type="number"
               name="minimumDuration"
-              value={formData.minimumDuration}
-              onChange={handleInputChange}
+              value={formData.minimumDuration.replace(/[^\d]/g, "") || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (
+                  value === "" ||
+                  (parseInt(value) >= 1 && parseInt(value) <= 60)
+                ) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    minimumDuration: value
+                      ? `${value} Month${parseInt(value) !== 1 ? "s" : ""}`
+                      : "",
+                  }));
+                }
+              }}
+              min="1"
+              max="60"
               required
               className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
-            >
-              <option value="1 Month">1 Month</option>
-              <option value="3 Months">3 Months</option>
-              <option value="6 Months">6 Months</option>
-              <option value="12 Months">12 Months</option>
-            </select>
+              placeholder="Enter number of months (1-60)"
+            />
+            <p className="text-[#9CA3AF] text-xs mt-1">
+              Enter a number between 1 and 60 months
+            </p>
           </div>
 
           {/* Availability */}
