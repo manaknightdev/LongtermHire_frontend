@@ -11,6 +11,7 @@ import Profile from "./Profile";
 import Chat from "./components/Chat";
 import PrivateRoute from "./components/PrivateRoute";
 import ClientPrivateRoute from "./components/ClientPrivateRoute";
+import { OnlineStatusProvider } from "./contexts/OnlineStatusContext";
 
 // Client Portal Components
 import ClientLogin from "./client/ClientLogin";
@@ -25,17 +26,19 @@ function DashboardLayout({ children }) {
   const isChatPath = location.pathname.startsWith("/chat");
 
   return (
-    <div className="flex min-h-screen bg-[#292A2B]">
-      <AdminSidebar />
-      <main
-        className={`flex-1 overflow-y-auto  lg:ml-[256px] lg:w-[calc(100vw - 256px)] ${isChatPath && "!mb-0"}`}
-        style={{
-          height: "100vh",
-        }}
-      >
-        {children}
-      </main>
-    </div>
+    <OnlineStatusProvider>
+      <div className="flex min-h-screen bg-[#292A2B]">
+        <AdminSidebar />
+        <main
+          className={`flex-1 overflow-y-auto  lg:ml-[256px] lg:w-[calc(100vw - 256px)] ${isChatPath && "!mb-0"}`}
+          style={{
+            height: "100vh",
+          }}
+        >
+          {children}
+        </main>
+      </div>
+    </OnlineStatusProvider>
   );
 }
 

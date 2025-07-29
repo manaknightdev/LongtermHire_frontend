@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Base API configuration
-const API_BASE_URL = "https://baas.mytechpassport.com"; // Adjust this to your backend URL
+const API_BASE_URL = "http://localhost:5172"; // Adjust this to your backend URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,

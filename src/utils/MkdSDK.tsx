@@ -6,7 +6,7 @@
 //
 class MkdSDK {
   constructor(config: any = {}) {
-    this._baseurl = config.baseurl || "http://localhost:5172";
+    this._baseurl = "http://localhost:5172";
     this._project_id = config.project_id || "longtermhire";
     this._table = config.table || "";
     this._secret = config.secret || "longtermhire_secret"; // Default secret for longtermhire

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authApi } from "./services/authApi";
+import { chatApi } from "./services/chatApi";
 
 function AdminSidebar() {
   const location = useLocation();
@@ -9,6 +10,10 @@ function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
+      // Set offline status before logout
+      await chatApi.setOffline();
+
+      // Then logout
       await authApi.logout();
       navigate("/login");
     } catch (error) {

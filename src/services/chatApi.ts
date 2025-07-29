@@ -75,4 +75,28 @@ export const chatApi = {
     );
     return response.data;
   },
+
+  // Set user online status
+  setOnline: async () => {
+    const response = await api.post("/v1/api/longtermhire/chat/online");
+    return response.data;
+  },
+
+  // Set user offline status
+  setOffline: async () => {
+    const response = await api.post("/v1/api/longtermhire/chat/offline");
+    return response.data;
+  },
+
+  // Send heartbeat to maintain online status
+  sendHeartbeat: async () => {
+    const response = await api.post("/v1/api/longtermhire/chat/heartbeat");
+    return response.data;
+  },
+
+  // Check admin online status
+  getAdminStatus: async () => {
+    const response = await api.get("/v1/api/longtermhire/chat/admin-status");
+    return response.data;
+  },
 };

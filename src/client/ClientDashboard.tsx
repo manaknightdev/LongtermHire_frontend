@@ -31,12 +31,14 @@ function ClientDashboard() {
   const messagesContainerRef = useRef(null);
   const lastMessageCountRef = useRef(0);
 
-  // Use real chat functionality
+  // Use real chat functionality with online status
   const {
     conversations,
     messages,
     loading: chatLoading,
     error: chatError,
+    adminOnline,
+    adminStatus,
     loadConversations,
     sendMessage,
     clearError: clearChatError,
@@ -131,7 +133,7 @@ function ClientDashboard() {
     }
   }, [isChatOpen]);
 
-  // Process equipment data from API and organize by categories
+  // Process equipment data from API and organize by categories with discount support
   const getEquipmentData = () => {
     if (!equipment || equipment.length === 0) {
       return {};
@@ -144,15 +146,47 @@ function ClientDashboard() {
         acc[category] = [];
       }
 
+      // Calculate display price based on discount system
+      const displayPrice = item.discounted_price || item.base_price;
+      const hasDiscount =
+        item.discounted_price && item.discounted_price < item.base_price;
+
+      // Format price for display
+      const priceDisplay = displayPrice
+        ? `$${displayPrice}`
+        : "Contact for pricing";
+
+      // Create discount info object
+      const discountInfo = hasDiscount
+        ? {
+            has_discount: true,
+            discount_type: item.discount_type,
+            discount_value: item.discount_value,
+            original_price: item.base_price,
+            discounted_price: item.discounted_price,
+            pricing_package: item.pricing_package,
+          }
+        : {
+            has_discount: false,
+            discount_type: null,
+            discount_value: null,
+            original_price: item.base_price,
+            discounted_price: null,
+            pricing_package: null,
+          };
+
       acc[category].push({
         id: item.equipment_id || item.id,
         name: item.equipment_name,
         status: item.availability === 1 ? "Available" : "Unavailable",
         description:
           item.content?.description || `${item.equipment_name} equipment`,
-        price: item.base_price ? `$${item.base_price}` : "Contact for pricing",
+        price: priceDisplay,
+        base_price: item.base_price,
+        discounted_price: item.discounted_price,
         image: item.content?.image || "/figma-assets/equipment-placeholder.jpg",
         category: item.category_name,
+        discount: discountInfo,
       });
 
       return acc;
@@ -266,7 +300,18 @@ function ClientDashboard() {
       return 0;
     }
 
-    // Handle both string and number base_price
+    // Check if equipment has backend discount applied
+    if (
+      selectedEquipmentData.discounted_price &&
+      selectedEquipmentData.discounted_price < selectedEquipmentData.base_price
+    ) {
+      return (
+        selectedEquipmentData.base_price -
+        selectedEquipmentData.discounted_price
+      );
+    }
+
+    // Fallback to duration-based discount calculation
     let basePrice = 0;
     if (typeof selectedEquipmentData.base_price === "string") {
       basePrice =
@@ -284,6 +329,27 @@ function ClientDashboard() {
 
     const discountPercentage = getDiscountPercentage();
     return Math.round(basePrice * (discountPercentage / 100));
+  };
+
+  // Get final price for selected equipment (with backend discount applied)
+  const getFinalPrice = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+    if (!selectedEquipmentData) {
+      return 0;
+    }
+
+    // Use backend discounted price if available
+    if (
+      selectedEquipmentData.discounted_price &&
+      selectedEquipmentData.discounted_price < selectedEquipmentData.base_price
+    ) {
+      return selectedEquipmentData.discounted_price;
+    }
+
+    // Fallback to base price
+    return selectedEquipmentData.base_price || 0;
   };
 
   const handleSendMessage = async () => {
@@ -676,9 +742,21 @@ function ClientDashboard() {
             {isChatVisible && (
               <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden">
                 <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4 flex items-center justify-between">
-                  <h3 className="text-[#FFFFFF] text-base font-semibold">
-                    Message Rental Company
-                  </h3>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-[#FFFFFF] text-base font-semibold">
+                      Message Rental Company
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
+                      ></div>
+                      <span
+                        className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
+                      >
+                        {adminOnline ? "Admin Online" : "Admin Offline"}
+                      </span>
+                    </div>
+                  </div>
                   <button
                     onClick={() => setIsChatVisible(false)}
                     className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors p-1"
@@ -834,9 +912,21 @@ function ClientDashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden">
           <div className="fixed bottom-0 left-0 right-0 bg-[#1F1F20] border-t border-[#333333] rounded-t-lg max-h-[80vh] flex flex-col">
             <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4 flex items-center justify-between">
-              <h3 className="text-[#FFFFFF] text-base font-semibold">
-                Message Rental Company
-              </h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-[#FFFFFF] text-base font-semibold">
+                  Message Rental Company
+                </h3>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
+                  ></div>
+                  <span
+                    className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
+                  >
+                    {adminOnline ? "Admin Online" : "Admin Offline"}
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => setIsChatOpen(false)}
                 className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors"

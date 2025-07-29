@@ -3,6 +3,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { clientPasswordApi } from "../services/clientPasswordApi";
+import { useEffect, useRef, useState } from "react";
 
 function VerifyOTP() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);

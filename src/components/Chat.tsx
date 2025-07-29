@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "../hooks/useChat";
+import { useOnlineStatus } from "../contexts/OnlineStatusContext";
 import { chatApi } from "../services/chatApi";
 import { ClipLoader } from "react-spinners";
 
@@ -34,6 +35,9 @@ const Chat = () => {
     stopPolling,
     clearMessages,
   } = useChat();
+
+  // Use global online status
+  const { adminOnline, adminStatus } = useOnlineStatus();
 
   // Filter conversations based on search query
   const filteredConversations = conversations.filter((conversation) =>
@@ -366,7 +370,18 @@ const Chat = () => {
                   <h2 className="text-[#E5E5E5] font-semibold text-lg">
                     {selectedConversation.other_user_name || "Unknown User"}
                   </h2>
-                  {/* <p className="text-[#9CA3AF] text-sm">Online</p> */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <div
+                      className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
+                    ></div>
+                    <span
+                      className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
+                    >
+                      {adminOnline
+                        ? `Admin Online (${adminStatus.online_admin_count}/${adminStatus.total_admin_count})`
+                        : "Admin Offline"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
