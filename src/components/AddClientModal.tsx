@@ -515,7 +515,6 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                           </div>
                           <div className="text-[#9CA3AF] text-sm">
                             {equipment.category_name} - ${equipment.base_price}
-                            /day
                           </div>
                         </div>
                       </div>

@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import AdminSidebar from "./AdminSidebar";
 import DashboardMain from "./DashboardMain";
 import Login from "./Login";
@@ -143,6 +145,20 @@ function App() {
         <Route path="/client/verify-otp" element={<VerifyOTP />} />
         <Route path="/client/reset-password" element={<ResetPassword />} />
       </Routes>
+
+      {/* Global Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </BrowserRouter>
   );
 }

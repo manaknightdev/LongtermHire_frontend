@@ -61,39 +61,64 @@ api.interceptors.response.use(
       // Only redirect to login if it's not a login attempt
       const isLoginRequest = error.config?.url?.includes("/login");
       if (!isLoginRequest) {
-        // Show session expired toast
-        toast.error("Session expired. Please login again.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-
-        // Determine if this is a client or admin request and redirect accordingly
-        const isClientRequest = error.config?.url?.includes("/client/");
+        // Determine if this is a client or admin request
+        const isClientRequest =
+          error.config?.url?.includes("/client/") ||
+          error.config?.url?.includes("/longtermhire/client/");
 
         if (isClientRequest) {
+          // Client session expired
+          toast.error("Your client session has expired. Please login again.", {
+            position: "top-right",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+
           // Clear client tokens and redirect to client login
           localStorage.removeItem("clientAuthToken");
           localStorage.removeItem("clientRole");
           localStorage.removeItem("clientUserId");
           localStorage.removeItem("clientEmail");
           localStorage.removeItem("clientProfile");
+
           setTimeout(() => {
             window.location.href = "/client/login";
-          }, 1000); // Small delay to show toast
+          }, 1500); // Delay to show toast
         } else {
+          // Admin session expired
+          toast.error("Your admin session has expired. Please login again.", {
+            position: "top-right",
+            autoClose: 4000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+
           // Clear admin tokens and redirect to admin login
           localStorage.removeItem("authToken");
           localStorage.removeItem("userRole");
           localStorage.removeItem("userId");
+          localStorage.removeItem("user");
+
           setTimeout(() => {
             window.location.href = "/login";
-          }, 1000); // Small delay to show toast
+          }, 1500); // Delay to show toast
         }
       }
+    } else if (error.response?.status === 403) {
+      // Handle forbidden access
+      toast.error("You don't have permission to access this resource.", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
     return Promise.reject(error);
   }

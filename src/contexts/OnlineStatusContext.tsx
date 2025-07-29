@@ -71,7 +71,7 @@ export const OnlineStatusProvider: React.FC<OnlineStatusProviderProps> = ({
       const xhr = new XMLHttpRequest();
       xhr.open(
         "POST",
-        "http://localhost:5172/v1/api/longtermhire/chat/offline",
+        "https://baas.mytechpassport.com/v1/api/longtermhire/chat/offline",
         false
       ); // synchronous
       xhr.setRequestHeader("Content-Type", "application/json");

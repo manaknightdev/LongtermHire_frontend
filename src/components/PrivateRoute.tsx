@@ -1,6 +1,7 @@
 // @ts-nocheck
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 /**
  * PrivateRoute component for protecting routes that require authentication
@@ -13,6 +14,29 @@ function PrivateRoute({ children, allowedRoles = [] }) {
   // Check if user is authenticated
   const token = localStorage.getItem("authToken");
   const userRole = localStorage.getItem("userRole");
+
+  useEffect(() => {
+    // Show message when redirecting due to missing authentication
+    if (!token) {
+      toast.error("Please login to access the admin portal.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } else if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+      toast.error("You don't have permission to access this area.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  }, [token, userRole, allowedRoles]);
 
   // If no token, redirect to login
   if (!token) {
