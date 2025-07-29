@@ -7,7 +7,7 @@ import MkdSDK from "./MkdSDK";
 
 // Create a singleton SDK instance
 const sdk = new MkdSDK({
-  baseurl: "http://localhost:5172",
+  baseurl: "https://baas.mytechpassport.com",
   project_id: "longtermhire",
   secret: "key_1752663783199_yb4x4bg7j", // Using the globalKey from config
 });

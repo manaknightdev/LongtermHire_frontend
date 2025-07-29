@@ -9,6 +9,7 @@ import ClientDetailsModal from "./components/ClientDetailsModal";
 import EquipmentPopover from "./components/EquipmentPopover";
 import PricingPopover from "./components/PricingPopover";
 import CustomPackageModal from "./components/CustomPackageModal";
+
 import { clientApi } from "./services/clientApi";
 import { equipmentApi } from "./services/equipmentApi";
 import { pricingApi } from "./services/pricingApi";
@@ -91,8 +92,8 @@ const ClientManagement = () => {
         setCurrentPage(clientsRes.pagination.page);
       }
 
-      // Load assignments for each client
-      await loadClientAssignments(clientsData);
+      // Load assignments for each client (pass equipmentData to ensure it's available)
+      await loadClientAssignments(clientsData, equipmentData);
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Error loading data. Please try again.");
@@ -106,7 +107,10 @@ const ClientManagement = () => {
   console.log("Pricing Packages:", pricingPackages);
 
   // Load equipment and pricing assignments for all clients
-  const loadClientAssignments = async (clientsData) => {
+  const loadClientAssignments = async (
+    clientsData,
+    equipmentData = equipment
+  ) => {
     try {
       const equipmentAssignments = {};
       const pricingAssignments = {};
@@ -119,47 +123,30 @@ const ClientManagement = () => {
           );
           console.log(equipmentRes);
           if (equipmentRes.data && equipmentRes.data.length > 0) {
-            // Map equipment IDs to full equipment objects
+            // Use the equipment data directly from API response (it already has names)
             const clientEquipmentDetails = equipmentRes.data.map(
-              (assignment) => {
-                const fullEquipment = equipment.find(
-                  (eq) => eq.equipment_id == assignment.equipment_id
-                );
-                return (
-                  fullEquipment || {
-                    equipment_id: assignment.equipment_id,
-                    equipment_name: "Unknown Equipment",
-                    category_name: "N/A",
-                  }
-                );
-              }
+              (assignment) => ({
+                id: assignment.equipment_id,
+                equipment_id: assignment.equipment_id,
+                equipment_name: assignment.equipment_name,
+                category_name: assignment.category_name,
+                availability: assignment.availability,
+              })
             );
             equipmentAssignments[client.user_id] = clientEquipmentDetails;
           }
 
-          // Load pricing assignments (if client has pricing data)
-          if (client.pricing_package_name || client.custom_discount_value) {
-            let pricingInfo;
-
-            if (client.pricing_package_name) {
-              // Find the full pricing package object
-              const fullPackage = pricingPackages.find(
-                (pkg) => pkg.name === client.pricing_package_name
-              );
-              pricingInfo = fullPackage || {
-                name: client.pricing_package_name,
-                description: `Package: ${client.pricing_package_name}`,
-                package_id: "Unknown",
-              };
-            } else if (client.custom_discount_value) {
-              // Custom discount
-              pricingInfo = {
-                name: "Custom Discount",
-                description: `Custom ${client.custom_discount_value}${client.custom_discount_type === "percentage" ? "%" : "$"} off`,
-                custom_discount_value: client.custom_discount_value,
-                custom_discount_type: client.custom_discount_type,
-              };
-            }
+          // Load pricing assignments (only for pricing packages, not custom discounts)
+          if (client.pricing_package_name) {
+            // Find the full pricing package object
+            const fullPackage = pricingPackages.find(
+              (pkg) => pkg.name === client.pricing_package_name
+            );
+            const pricingInfo = fullPackage || {
+              name: client.pricing_package_name,
+              description: `Package: ${client.pricing_package_name}`,
+              package_id: "Unknown",
+            };
 
             pricingAssignments[client.user_id] = [pricingInfo];
           }
@@ -227,20 +214,13 @@ const ClientManagement = () => {
     }
   };
 
-  const handleAssignPricing = async (
-    clientUserId,
-    pricingPackageId,
-    customDiscount = null
-  ) => {
+  const handleAssignPricing = async (clientUserId, pricingPackageId) => {
     try {
       setAssignmentLoading(true);
-      await clientApi.assignPricing(
-        clientUserId,
-        pricingPackageId,
-        customDiscount
-      );
+      await clientApi.assignPricing(clientUserId, pricingPackageId);
       toast.success("Pricing package assigned successfully!");
-      // Don't reload entire page, just update silently
+      // Reload data to reflect changes
+      loadInitialData(currentPage, searchData);
     } catch (error) {
       console.error("Error assigning pricing:", error);
       toast.error(
@@ -349,11 +329,30 @@ const ClientManagement = () => {
           equipmentPopover.clientId,
           selectedEquipmentIds
         );
+
+        // Convert equipment IDs to full equipment objects for UI
+        const selectedEquipmentObjects = selectedEquipmentIds.map(
+          (equipmentId) => {
+            const fullEquipment = equipment.find((eq) => eq.id === equipmentId);
+            return (
+              fullEquipment || {
+                id: equipmentId,
+                equipment_id: equipmentId,
+                equipment_name: `Equipment ${equipmentId}`,
+                category_name: "N/A",
+              }
+            );
+          }
+        );
+
         // Update local state for UI
         setClientEquipment((prev) => ({
           ...prev,
-          [equipmentPopover.clientId]: selectedEquipmentIds,
+          [equipmentPopover.clientId]: selectedEquipmentObjects,
         }));
+
+        // Reload equipment assignments to ensure data consistency
+        await loadClientAssignments(clients);
       } catch (error) {
         console.error("Error applying equipment assignment:", error);
       }
@@ -382,16 +381,36 @@ const ClientManagement = () => {
   const handleCustomPackageSave = async (customPackage) => {
     if (customPackageModal.clientId) {
       try {
-        await handleAssignPricing(
-          customPackageModal.clientId,
-          `custom_${Date.now()}`,
-          customPackage
+        // Get the assigned equipment for this client
+        const clientEquipmentData =
+          clientEquipment[customPackageModal.clientId] || [];
+
+        if (clientEquipmentData.length === 0) {
+          toast.error(
+            "Please assign equipment to this client first before applying custom discounts."
+          );
+          return;
+        }
+
+        // Apply custom discount to selected equipment only
+        const discountPromises = customPackage.selectedEquipment.map(
+          (equipmentId) =>
+            clientApi.assignEquipmentDiscount(
+              customPackageModal.clientId,
+              equipmentId,
+              customPackage
+            )
         );
-        toast.success("Custom discount assigned successfully!");
+
+        await Promise.all(discountPromises);
+        toast.success(
+          "Custom discount applied to all assigned equipment successfully!"
+        );
+
         // Reload data to reflect changes
         loadInitialData(currentPage, searchData);
       } catch (error) {
-        console.error("Error applying custom pricing:", error);
+        console.error("Error applying custom discount:", error);
         toast.error("Error applying custom discount. Please try again.");
       }
     }
@@ -399,19 +418,10 @@ const ClientManagement = () => {
     setCustomPackageModal({ isOpen: false, clientId: null });
   };
 
-  const handlePricingSelect = async (
-    selectedPackageId,
-    customDiscount = null
-  ) => {
+  const handlePricingSelect = async (selectedPackageId) => {
     if (pricingPopover.clientId) {
       try {
-        await handleAssignPricing(
-          pricingPopover.clientId,
-          selectedPackageId,
-          customDiscount
-        );
-        // Reload data to reflect changes
-        loadInitialData(currentPage, searchData);
+        await handleAssignPricing(pricingPopover.clientId, selectedPackageId);
       } catch (error) {
         console.error("Error applying pricing assignment:", error);
       }
@@ -632,21 +642,12 @@ const ClientManagement = () => {
                         <button
                           onClick={(e) => handlePricingClick(client.user_id, e)}
                           className={`border rounded-md font-[Inter] font-normal line-clamp-2 text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
-                            client.pricing_package_name ||
-                            client.custom_discount_value
+                            client.pricing_package_name
                               ? "bg-[#FDCE06] border-[#FDCE06] text-[#1F1F20]"
                               : "bg-[#292A2B] border-[#333333] text-[#E5E5E5] hover:border-[#FDCE06]"
                           }`}
                         >
-                          {client.pricing_package_name
-                            ? client.pricing_package_name
-                            : client.custom_discount_value
-                              ? `Custom ${client.custom_discount_value}${
-                                  client.custom_discount_type === "percentage"
-                                    ? "%"
-                                    : "$"
-                                } off`
-                              : "Set Pricing"}
+                          {client.pricing_package_name || "Set Pricing"}
                           <svg
                             width="12"
                             height="12"
@@ -793,7 +794,9 @@ const ClientManagement = () => {
         referenceElement={equipmentPopover.anchorEl}
         selectedEquipment={
           equipmentPopover.clientId
-            ? clientEquipment[equipmentPopover.clientId] || []
+            ? (clientEquipment[equipmentPopover.clientId] || []).map(
+                (eq) => eq.equipment_id || eq.id
+              )
             : []
         }
         equipmentOptions={getAllEquipmentOptions()}
@@ -819,6 +822,13 @@ const ClientManagement = () => {
         isOpen={customPackageModal.isOpen}
         onClose={() => setCustomPackageModal({ isOpen: false, clientId: null })}
         onSave={handleCustomPackageSave}
+        clientId={customPackageModal.clientId}
+        clientEquipment={
+          customPackageModal.clientId &&
+          clientEquipment[customPackageModal.clientId]
+            ? clientEquipment[customPackageModal.clientId]
+            : []
+        }
       />
 
       {/* Toast Container */}

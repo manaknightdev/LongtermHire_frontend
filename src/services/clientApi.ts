@@ -100,26 +100,63 @@ export const clientApi = {
     }
   },
 
-  // Assign pricing to client
-  assignPricing: async (
-    clientUserId,
-    pricingPackageId,
-    customDiscount = null
-  ) => {
+  // Assign pricing to client (only for pricing packages, not custom discounts)
+  assignPricing: async (clientUserId, pricingPackageId) => {
     try {
-      const requestData = {
-        client_user_id: clientUserId,
-        pricing_package_id: pricingPackageId,
-      };
-
-      // Add custom discount data if provided
-      if (customDiscount) {
-        requestData.custom_discount = customDiscount;
-      }
-
       const response = await api.post(
         "/v1/api/longtermhire/super_admin/assign-pricing",
-        requestData
+        {
+          client_user_id: clientUserId,
+          pricing_package_id: pricingPackageId,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Assign custom discount to specific equipment for a client
+  assignEquipmentDiscount: async (clientUserId, equipmentId, discountData) => {
+    try {
+      const response = await api.post(
+        "/v1/api/longtermhire/super_admin/assign-equipment-discount",
+        {
+          client_user_id: clientUserId,
+          equipment_id: equipmentId,
+          discount_type: discountData.discountType,
+          discount_value: discountData.discountValue,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Remove custom discount from specific equipment for a client
+  removeEquipmentDiscount: async (clientUserId, equipmentId) => {
+    try {
+      const response = await api.delete(
+        "/v1/api/longtermhire/super_admin/remove-equipment-discount",
+        {
+          data: {
+            client_user_id: clientUserId,
+            equipment_id: equipmentId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get all equipment-specific custom discounts for a client
+  getClientEquipmentDiscounts: async (clientUserId) => {
+    try {
+      const response = await api.get(
+        `/v1/api/longtermhire/super_admin/client-equipment-discounts/${clientUserId}`
       );
       return response.data;
     } catch (error) {

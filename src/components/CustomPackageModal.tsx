@@ -2,12 +2,23 @@
 import { useState } from "react";
 import Modal from "./Modal";
 
-const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
+const CustomPackageModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  clientId,
+  clientEquipment = [],
+}) => {
+  // Debug: Log the equipment data
+  console.log("CustomPackageModal - clientEquipment:", clientEquipment);
   const [formData, setFormData] = useState({
     discountType: "percentage", // "percentage" or "fixed"
     discountValue: "",
   });
+
+  console.log(clientEquipment);
   const [errors, setErrors] = useState({});
+  const [selectedEquipment, setSelectedEquipment] = useState([]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -25,6 +36,10 @@ const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
 
   const validateForm = () => {
     const newErrors = {};
+
+    if (selectedEquipment.length === 0) {
+      newErrors.equipment = "Please select at least one equipment";
+    }
 
     if (!formData.discountValue || formData.discountValue === "") {
       newErrors.discountValue = "Discount value is required";
@@ -53,6 +68,7 @@ const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
     onSave({
       discountType: formData.discountType,
       discountValue: discountValue,
+      selectedEquipment: selectedEquipment,
       displayName:
         formData.discountType === "percentage"
           ? `Custom - ${discountValue}% off`
@@ -73,6 +89,7 @@ const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
       discountValue: "",
     });
     setErrors({});
+    setSelectedEquipment([]);
     onClose();
   };
 
@@ -80,15 +97,69 @@ const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
     <Modal
       isOpen={isOpen}
       onClose={handleCancel}
-      title="Create Custom Discount"
+      title="Create Equipment-Specific Custom Discount"
       width="600px"
     >
       <div className="space-y-6">
         {/* Description */}
         <p className="text-[#9CA3AF] font-[Inter] text-[16px] leading-[24px] -mt-2">
-          Create a custom discount package for this client with personalized
-          pricing.
+          Create a custom discount that will be applied to all equipment
+          assigned to this client.
         </p>
+
+        {/* Equipment Selection */}
+        <div>
+          <label className="block text-[#9CA3AF] font-[Inter] font-medium text-[14px] leading-[20px] mb-2">
+            Select equipment to apply custom discount:
+          </label>
+          <div className="bg-[#292A2B] border border-[#333333] rounded-[6px] p-3 max-h-32 overflow-y-auto">
+            {clientEquipment.length > 0 ? (
+              clientEquipment.map((equipment, index) => {
+                const equipmentId = equipment.equipment_id || equipment.id;
+                const isSelected = selectedEquipment.includes(equipmentId);
+
+                return (
+                  <div
+                    key={equipmentId || index}
+                    className="flex items-center gap-3 py-2 cursor-pointer hover:bg-[#333333] rounded px-2 transition-colors"
+                    onClick={() => {
+                      setSelectedEquipment((prev) =>
+                        isSelected
+                          ? prev.filter((id) => id !== equipmentId)
+                          : [...prev, equipmentId]
+                      );
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {}} // Handled by onClick
+                      className="w-4 h-4 text-[#FDCE06] bg-[#292A2B] border-[#333333] rounded focus:ring-[#FDCE06] focus:ring-2"
+                    />
+                    <span className="text-[#E5E5E5] font-[Inter] text-[14px]">
+                      {equipment.equipment_name ||
+                        equipment.name ||
+                        `Equipment ${equipmentId || index}`}
+                      {equipment.category_name &&
+                        equipment.category_name !== "N/A" &&
+                        ` (${equipment.category_name})`}
+                    </span>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-[#9CA3AF] font-[Inter] text-[14px] py-1">
+                No equipment assigned to this client. Please assign equipment
+                first.
+              </div>
+            )}
+          </div>
+          {errors.equipment && (
+            <p className="text-red-500 text-sm mt-1 font-[Inter]">
+              {errors.equipment}
+            </p>
+          )}
+        </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -175,7 +246,7 @@ const CustomPackageModal = ({ isOpen, onClose, onSave }) => {
               type="submit"
               className="px-6 py-2 bg-[#FDCE06] hover:bg-[#E5B800] border-none rounded-[6px] text-[#1F1F20] font-[Inter] font-bold text-[16px] cursor-pointer transition-colors"
             >
-              Create Discount
+              Apply to Equipment
             </button>
           </div>
         </form>

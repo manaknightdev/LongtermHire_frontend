@@ -20,14 +20,20 @@ const EquipmentPopover = ({
 }) => {
   const [localSelected, setLocalSelected] = useState(selectedEquipment);
 
+  // Update localSelected when selectedEquipment changes (when popover opens)
+  React.useEffect(() => {
+    setLocalSelected(selectedEquipment);
+  }, [selectedEquipment]);
+
   const { refs, floatingStyles } = useFloating({
     elements: {
       reference: referenceElement,
     },
     open: isOpen,
     onOpenChange: onClose,
+    placement: "bottom-start",
     middleware: [
-      offset(8),
+      offset({ mainAxis: 8, crossAxis: 0 }),
       flip({
         fallbackAxisSideDirection: "start",
         padding: 16,
@@ -198,6 +204,17 @@ const EquipmentPopover = ({
                   >
                     {equipment.name}
                     {!equipment.available && " (Unavailable)"}
+                    {localSelected.includes(equipment.id) && (
+                      <span
+                        style={{
+                          color: "#FDCE06",
+                          marginLeft: "8px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        (Assigned)
+                      </span>
+                    )}
                   </span>
                 </label>
               ))}
