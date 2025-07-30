@@ -18,6 +18,7 @@ const Chat = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   // Refs for scroll management
   const messagesEndRef = useRef(null);
@@ -39,12 +40,35 @@ const Chat = () => {
   // Use global online status
   const { adminOnline, adminStatus } = useOnlineStatus();
 
+  // Get current admin user ID
+  const currentUserId = parseInt(localStorage.getItem("userId"));
+
   // Filter conversations based on search query
   const filteredConversations = conversations.filter((conversation) =>
     conversation.other_user_name
       ?.toLowerCase()
       .includes(searchQuery.toLowerCase())
   );
+
+  // Filter messages to only show messages for the selected conversation
+  const filteredMessages = messages.filter((message) => {
+    if (!selectedConversation) return false;
+
+    // Check if message belongs to this conversation
+    // Convert IDs to numbers for comparison to handle string/number mismatches
+    const conversationUserIds = [
+      parseInt(selectedConversation.user1_id),
+      parseInt(selectedConversation.user2_id),
+    ];
+
+    const messageFromUserId = parseInt(message.from_user_id);
+    const messageToUserId = parseInt(message.to_user_id);
+
+    return (
+      conversationUserIds.includes(messageFromUserId) &&
+      conversationUserIds.includes(messageToUserId)
+    );
+  });
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (force = false) => {
@@ -66,11 +90,11 @@ const Chat = () => {
 
   // Auto-scroll when messages change
   useEffect(() => {
-    if (messages.length > lastMessageCountRef.current) {
+    if (filteredMessages.length > lastMessageCountRef.current) {
       scrollToBottom(true); // Force scroll for new messages
-      lastMessageCountRef.current = messages.length;
+      lastMessageCountRef.current = filteredMessages.length;
     }
-  }, [messages]);
+  }, [filteredMessages]);
 
   // Auto-scroll when conversation changes
   useEffect(() => {
@@ -81,7 +105,7 @@ const Chat = () => {
 
   // Effect to handle auto-scroll when messages change
   useEffect(() => {
-    const currentMessageCount = messages.length;
+    const currentMessageCount = filteredMessages.length;
     const previousMessageCount = lastMessageCountRef.current;
 
     if (currentMessageCount > previousMessageCount) {
@@ -90,7 +114,7 @@ const Chat = () => {
     }
 
     lastMessageCountRef.current = currentMessageCount;
-  }, [messages]);
+  }, [filteredMessages]);
 
   // Effect to scroll to bottom when conversation changes
   useEffect(() => {
@@ -129,17 +153,29 @@ const Chat = () => {
 
   // Handle sending messages
   const handleSendMessage = async () => {
-    if (!messageInput.trim() || !selectedConversation) return;
+    if (!messageInput.trim() || !selectedConversation || sendingMessage) return;
 
-    const messageData = {
-      to_user_id: selectedConversation.other_user_id,
-      message: messageInput.trim(),
-      message_type: "text",
-    };
+    try {
+      setSendingMessage(true);
 
-    const result = await sendMessage(messageData);
-    if (!result.error) {
-      setMessageInput("");
+      const messageData = {
+        to_user_id: selectedConversation.other_user_id,
+        message: messageInput.trim(),
+        message_type: "text",
+        from_user_id: currentUserId,
+      };
+
+      const result = await sendMessage(messageData);
+      if (!result.error) {
+        setMessageInput("");
+        // Don't reload conversations here - let the polling handle updates
+      } else {
+        console.error("Failed to send message:", result.message);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -392,24 +428,22 @@ const Chat = () => {
               className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-[#292A2B]"
               style={{ scrollBehavior: "smooth" }}
             >
-              {loading ? (
+              {loading && filteredMessages.length === 0 ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="text-[#9CA3AF]">Loading messages...</div>
                 </div>
-              ) : messages.length === 0 ? (
+              ) : filteredMessages.length === 0 ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="text-[#9CA3AF]">
                     No messages yet. Start the conversation!
                   </div>
                 </div>
               ) : (
-                messages.map((message) => {
+                filteredMessages.map((message) => {
                   // Check if message is from current user (admin)
-                  const currentUserId = parseInt(
-                    localStorage.getItem("userId")
-                  );
+                  // Convert both to numbers for comparison to handle string/number mismatches
                   const isFromCurrentUser =
-                    message.from_user_id === currentUserId;
+                    parseInt(message.from_user_id) === currentUserId;
                   const isEquipmentRequest =
                     message.message_type === "equipment_request";
 
@@ -482,24 +516,29 @@ const Chat = () => {
                       maxHeight: "120px",
                       resize: "none",
                     }}
+                    disabled={sendingMessage}
                   />
                 </div>
                 <button
                   onClick={handleSendMessage}
-                  disabled={!messageInput.trim() || loading}
+                  disabled={!messageInput.trim() || loading || sendingMessage}
                   className="bg-[#FDCE06] text-[#1F1F20] p-3 rounded-lg hover:bg-[#E5B800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22,2 15,22 11,13 2,9 22,2" />
-                  </svg>
+                  {sendingMessage ? (
+                    <ClipLoader size={16} color="#1F1F20" />
+                  ) : (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22,2 15,22 11,13 2,9 22,2" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>

@@ -73,7 +73,7 @@ export const useChat = () => {
           // Add message to local state immediately for better UX
           const newMessage = {
             id: response.data.id,
-            from_user_id: messageData.from_user_id || "current_user",
+            from_user_id: messageData.from_user_id, // Use the actual user ID
             to_user_id: messageData.to_user_id,
             message: messageData.message,
             message_type: messageData.message_type || "text",
@@ -81,10 +81,19 @@ export const useChat = () => {
             from_user_name: "You",
           };
 
-          setMessages((prev) => [...prev, newMessage]);
+          setMessages((prev) => {
+            // Check if message already exists to prevent duplicates
+            const messageExists = prev.some(
+              (msg) => msg.id === response.data.id
+            );
+            if (messageExists) {
+              return prev;
+            }
+            return [...prev, newMessage];
+          });
 
-          // Refresh conversations to update last message
-          loadConversations();
+          // Don't reload conversations here - let the polling handle updates
+          // This prevents the "Loading conversations..." message from appearing
 
           return response;
         } else {
@@ -97,7 +106,7 @@ export const useChat = () => {
         return { error: true, message: "Failed to send message" };
       }
     },
-    [loadConversations]
+    [] // Remove loadConversations dependency to prevent unnecessary re-renders
   );
 
   // Send equipment request
@@ -109,7 +118,7 @@ export const useChat = () => {
           // Add equipment request message to local state
           const requestMessage = {
             id: response.data.message_id,
-            from_user_id: "current_user",
+            from_user_id: requestData.from_user_id, // Use the actual user ID
             to_user_id: requestData.to_user_id,
             message: requestData.message,
             message_type: "equipment_request",
@@ -119,10 +128,19 @@ export const useChat = () => {
             from_user_name: "You",
           };
 
-          setMessages((prev) => [...prev, requestMessage]);
+          setMessages((prev) => {
+            // Check if message already exists to prevent duplicates
+            const messageExists = prev.some(
+              (msg) => msg.id === response.data.message_id
+            );
+            if (messageExists) {
+              return prev;
+            }
+            return [...prev, requestMessage];
+          });
 
-          // Refresh conversations
-          loadConversations();
+          // Don't reload conversations here - let the polling handle updates
+          // This prevents the "Loading conversations..." message from appearing
 
           return response;
         } else {
@@ -135,7 +153,7 @@ export const useChat = () => {
         return { error: true, message: "Failed to send equipment request" };
       }
     },
-    [loadConversations]
+    [] // Remove loadConversations dependency to prevent unnecessary re-renders
   );
 
   // Poll for new messages (simulating real-time)
@@ -156,9 +174,25 @@ export const useChat = () => {
             );
 
             if (newMessages.length > 0) {
-              setMessages((prev) => [...prev, ...newMessages.reverse()]);
+              setMessages((prev) => {
+                // Create a Set of existing message IDs to check for duplicates
+                const existingMessageIds = new Set(prev.map((msg) => msg.id));
+
+                // Filter out messages that already exist
+                const uniqueNewMessages = newMessages.filter(
+                  (msg) => !existingMessageIds.has(msg.id)
+                );
+
+                if (uniqueNewMessages.length > 0) {
+                  return [...prev, ...uniqueNewMessages.reverse()];
+                }
+                return prev;
+              });
+
+              // Update timestamp only if we actually added new messages
+              const latestMessage = newMessages[newMessages.length - 1];
               lastMessageTimestamp.current = new Date(
-                newMessages[newMessages.length - 1].created_at
+                latestMessage.created_at
               ).getTime();
 
               // Refresh conversations to update unread counts
@@ -172,7 +206,7 @@ export const useChat = () => {
 
       setIsConnected(true);
     },
-    [loadConversations]
+    [] // Remove loadConversations dependency to prevent unnecessary re-renders
   );
 
   // Stop polling

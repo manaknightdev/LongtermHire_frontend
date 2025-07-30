@@ -56,14 +56,14 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                     </div>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
                       Category
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
                       {content.category_name || "N/A"}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
@@ -130,19 +130,19 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                       Image
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md p-3">
-                      {content.image ? (
+                      {content.image_url ? (
                         <div className="space-y-3">
                           <img
-                            src={content.image}
+                            src={content.image_url}
                             alt={content.equipment_name}
                             className="w-full h-48 object-cover rounded-md"
                             onError={(e) => {
                               e.target.src = "/placeholder-equipment.jpg";
                             }}
                           />
-                          <div className="text-[#9CA3AF] text-sm break-all">
-                            {content.image}
-                          </div>
+                          {/* <div className="text-[#9CA3AF] text-sm break-all">
+                            {content.image_url}
+                          </div> */}
                         </div>
                       ) : (
                         <div className="flex items-center justify-center h-48 bg-[#1A1A1A] rounded-md">

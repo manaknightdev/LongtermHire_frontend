@@ -41,6 +41,9 @@ function ClientDashboard() {
     adminStatus,
     loadConversations,
     sendMessage,
+    startPolling,
+    stopPolling,
+    clearMessages,
     clearError: clearChatError,
   } = useClientChat();
 
@@ -101,10 +104,20 @@ function ClientDashboard() {
     loadClientData();
   }, [navigate]);
 
-  // Load chat conversations
+  // Load chat conversations and start polling
   useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+    const initializeChat = async () => {
+      await loadConversations();
+
+      // Start polling if there are conversations
+      if (conversations.length > 0) {
+        const firstConversation = conversations[0];
+        startPolling(firstConversation.id);
+      }
+    };
+
+    initializeChat();
+  }, [loadConversations, conversations.length, startPolling]);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (force = false) => {
@@ -123,6 +136,13 @@ function ClientDashboard() {
       }
     }
   };
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, [stopPolling]);
 
   // Effect to handle auto-scroll when messages change
   useEffect(() => {

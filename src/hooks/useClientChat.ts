@@ -16,6 +16,8 @@ export const useClientChat = () => {
   // Intervals for online status management
   const heartbeatInterval = useRef(null);
   const adminStatusInterval = useRef(null);
+  const pollingInterval = useRef(null);
+  const lastMessageTimestamp = useRef(0);
 
   // Set user online status
   const setOnline = useCallback(async () => {
@@ -89,7 +91,16 @@ export const useClientChat = () => {
       const response = await chatApi.getMessages(conversationId);
 
       if (!response.error) {
-        setMessages(response.data || []);
+        const messagesData = response.data || [];
+        setMessages(messagesData);
+
+        // Update last message timestamp for real-time polling
+        if (messagesData.length > 0) {
+          const latestMessage = messagesData[messagesData.length - 1];
+          lastMessageTimestamp.current = new Date(
+            latestMessage.created_at
+          ).getTime();
+        }
       } else {
         setError(response.message || "Failed to load messages");
       }
@@ -112,10 +123,28 @@ export const useClientChat = () => {
         });
 
         if (!response.error) {
-          // Reload messages to show the new message
-          if (conversations.length > 0) {
-            await loadMessages(conversations[0].id);
-          }
+          // Add message to local state immediately for better UX
+          const newMessage = {
+            id: response.data.id,
+            from_user_id: response.data.from_user_id,
+            to_user_id: toUserId,
+            message: message,
+            message_type: "text",
+            created_at: new Date().toISOString(),
+            from_user_name: "You",
+          };
+
+          setMessages((prev) => {
+            // Check if message already exists to prevent duplicates
+            const messageExists = prev.some(
+              (msg) => msg.id === response.data.id
+            );
+            if (messageExists) {
+              return prev;
+            }
+            return [...prev, newMessage];
+          });
+
           return true;
         } else {
           setError(response.message || "Failed to send message");
@@ -173,6 +202,64 @@ export const useClientChat = () => {
     setError("");
   }, []);
 
+  // Start polling for new messages
+  const startPolling = useCallback((conversationId) => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current);
+    }
+
+    pollingInterval.current = setInterval(async () => {
+      try {
+        const response = await chatApi.getMessages(conversationId, 1, 10);
+        if (!response.error && response.data.length > 0) {
+          const newMessages = response.data.filter(
+            (msg) =>
+              new Date(msg.created_at).getTime() > lastMessageTimestamp.current
+          );
+
+          if (newMessages.length > 0) {
+            setMessages((prev) => {
+              // Create a Set of existing message IDs to check for duplicates
+              const existingMessageIds = new Set(prev.map((msg) => msg.id));
+
+              // Filter out messages that already exist
+              const uniqueNewMessages = newMessages.filter(
+                (msg) => !existingMessageIds.has(msg.id)
+              );
+
+              if (uniqueNewMessages.length > 0) {
+                return [...prev, ...uniqueNewMessages.reverse()];
+              }
+              return prev;
+            });
+
+            // Update timestamp
+            const latestMessage = newMessages[newMessages.length - 1];
+            lastMessageTimestamp.current = new Date(
+              latestMessage.created_at
+            ).getTime();
+          }
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 3000); // Poll every 3 seconds
+  }, []);
+
+  // Stop polling
+  const stopPolling = useCallback(() => {
+    if (pollingInterval.current) {
+      clearInterval(pollingInterval.current);
+      pollingInterval.current = null;
+    }
+  }, []);
+
+  // Clear messages
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    lastMessageTimestamp.current = 0;
+  }, []);
+
   // Initialize online status and intervals on mount
   useEffect(() => {
     // Set online status on mount
@@ -199,6 +286,7 @@ export const useClientChat = () => {
       setOffline();
       stopHeartbeat();
       stopAdminStatusCheck();
+      stopPolling();
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [
@@ -221,6 +309,9 @@ export const useClientChat = () => {
     loadConversations,
     loadMessages,
     sendMessage,
+    startPolling,
+    stopPolling,
+    clearMessages,
     clearError,
     setOnline,
     setOffline,

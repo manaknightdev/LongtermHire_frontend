@@ -388,11 +388,12 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
           </div>
 
           {/* Password Field */}
-          <div
+          {/* <div
             style={{
               width: "606px",
               height: "74px",
             }}
+            className="hidden"
           >
             <div
               style={{
@@ -400,6 +401,7 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                 height: "20px",
                 marginBottom: "8px",
               }}
+              className=""
             >
               <label
                 className="text-[#9CA3AF]"
@@ -429,7 +431,7 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                 lineHeight: "19px",
               }}
             />
-          </div>
+          </div> */}
 
           {/* Equipment Field */}
           <div
