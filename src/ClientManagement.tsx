@@ -136,8 +136,11 @@ const ClientManagement = () => {
             equipmentAssignments[client.user_id] = clientEquipmentDetails;
           }
 
-          // Load pricing assignments (only for pricing packages, not custom discounts)
-          if (client.pricing_package_name) {
+          // Load pricing assignments based on pricing type
+          if (
+            client.pricing_type === "package" &&
+            client.pricing_package_name
+          ) {
             // Find the full pricing package object
             const fullPackage = pricingPackages.find(
               (pkg) => pkg.name === client.pricing_package_name
@@ -145,11 +148,22 @@ const ClientManagement = () => {
             const pricingInfo = fullPackage || {
               name: client.pricing_package_name,
               description: `Package: ${client.pricing_package_name}`,
-              package_id: "Unknown",
+              package_id: client.pricing_package_id || "Unknown",
             };
 
             pricingAssignments[client.user_id] = [pricingInfo];
+          } else if (client.pricing_type === "custom") {
+            // Custom pricing - show as custom pricing
+            pricingAssignments[client.user_id] = [
+              {
+                name: "Custom Pricing",
+                description: "Equipment-specific custom discounts applied",
+                package_id: "custom",
+                type: "custom",
+              },
+            ];
           }
+          // For "none" type, no pricing assignment is shown
         } catch (error) {
           console.error(
             `Error loading assignments for client ${client.user_id}:`,
@@ -642,12 +656,26 @@ const ClientManagement = () => {
                         <button
                           onClick={(e) => handlePricingClick(client.user_id, e)}
                           className={`border rounded-md font-[Inter] font-normal line-clamp-2 text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
-                            client.pricing_package_name
+                            client.pricing_type &&
+                            client.pricing_type !== "none"
                               ? "bg-[#FDCE06] border-[#FDCE06] text-[#1F1F20]"
                               : "bg-[#292A2B] border-[#333333] text-[#E5E5E5] hover:border-[#FDCE06]"
                           }`}
                         >
-                          {client.pricing_package_name || "Set Pricing"}
+                          {(() => {
+                            switch (client.pricing_type) {
+                              case "package":
+                                return (
+                                  client.pricing_package_name ||
+                                  "Package Pricing"
+                                );
+                              case "custom":
+                                return "Custom Pricing";
+                              case "none":
+                              default:
+                                return "Set Pricing";
+                            }
+                          })()}
                           <svg
                             width="12"
                             height="12"

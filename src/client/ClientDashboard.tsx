@@ -157,32 +157,20 @@ function ClientDashboard() {
         acc[category] = [];
       }
 
-      // Calculate display price based on equipment discount
-      const hasDiscount = item.discount_type && item.discount_value;
-      let displayPrice = item.base_price;
-
-      if (hasDiscount) {
-        if (item.discount_type === "percentage") {
-          displayPrice =
-            item.base_price - (item.base_price * item.discount_value) / 100;
-        } else if (item.discount_type === "fixed") {
-          displayPrice = item.base_price - item.discount_value;
-        }
-      }
-
-      // Format price for display
-      const priceDisplay = displayPrice
-        ? `$${displayPrice.toFixed(2)}`
+      // Equipment cards show base price only
+      const priceDisplay = item.base_price
+        ? `$${item.base_price.toFixed(2)}`
         : "Contact for pricing";
 
       // Create discount info object
+      const hasDiscount = item.discount_type && item.discount_value;
       const discountInfo = hasDiscount
         ? {
             has_discount: true,
             discount_type: item.discount_type,
             discount_value: item.discount_value,
             original_price: item.base_price,
-            discounted_price: displayPrice,
+            discounted_price: null, // Will be calculated dynamically
             pricing_package: item.pricing_package,
           }
         : {
@@ -317,7 +305,30 @@ function ClientDashboard() {
     }
   };
 
-  // Calculate equipment-specific discount amount
+  // Get selected duration in months
+  const getSelectedDurationMonths = () => {
+    const match = selectedDuration.match(/(\d+)/);
+    return match ? parseInt(match[1]) : 1;
+  };
+
+  // Calculate duration-adjusted base price
+  const getDurationAdjustedBasePrice = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+
+    if (!selectedEquipmentData?.base_price) return 0;
+
+    const basePrice = selectedEquipmentData.base_price;
+    const minDuration = getMinimumDuration();
+    const selectedDurationMonths = getSelectedDurationMonths();
+
+    // Base price is for minimum duration, scale proportionally
+    const multiplier = selectedDurationMonths / minDuration;
+    return basePrice * multiplier;
+  };
+
+  // Calculate equipment-specific discount amount (scales with duration)
   const getEquipmentDiscount = () => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
@@ -330,30 +341,25 @@ function ClientDashboard() {
     if (!discount_type || !discount_value || !base_price) return 0;
 
     let discountAmount = 0;
+    const durationAdjustedBasePrice = getDurationAdjustedBasePrice();
 
     if (discount_type === "percentage") {
-      // Percentage discount
-      discountAmount = (base_price * discount_value) / 100;
+      // Percentage discount on duration-adjusted base price
+      discountAmount = (durationAdjustedBasePrice * discount_value) / 100;
     } else if (discount_type === "fixed") {
-      // Fixed amount discount
+      // Fixed amount discount (stays constant)
       discountAmount = discount_value;
     }
 
     return parseFloat(discountAmount.toFixed(2));
   };
 
-  // Calculate final price with equipment discount
+  // Calculate final price: (Duration-adjusted base price) - (Fixed discount)
   const getFinalPrice = () => {
-    const selectedEquipmentData = equipment.find(
-      (item) => item.equipment_name === selectedEquipment
-    );
-
-    if (!selectedEquipmentData?.base_price) return 0;
-
-    const basePrice = selectedEquipmentData.base_price;
+    const durationAdjustedPrice = getDurationAdjustedBasePrice();
     const discountAmount = getEquipmentDiscount();
 
-    return parseFloat((basePrice - discountAmount).toFixed(2));
+    return parseFloat((durationAdjustedPrice - discountAmount).toFixed(2));
   };
 
   // Get discount percentage for display
@@ -689,7 +695,7 @@ function ClientDashboard() {
                           -${getEquipmentDiscount().toFixed(2)}
                         </span>
                         <div className="text-[#9CA3AF] text-xs">
-                          Equipment discount
+                          Discount applied
                         </div>
                       </>
                     )}
