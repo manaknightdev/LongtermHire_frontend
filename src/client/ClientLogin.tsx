@@ -91,10 +91,10 @@ function ClientLogin() {
         >
           {/* Login Form Container - Exact Figma dimensions */}
           <div
-            className="bg-[#1F1F20] border border-[#333333] flex flex-col"
+            className="bg-[#1F1F20] min-h-[415px] border border-[#333333] flex flex-col"
             style={{
               width: "448px",
-              height: "371px",
+
               borderRadius: "8px",
             }}
           >
@@ -123,10 +123,10 @@ function ClientLogin() {
             {/* Form Section */}
             <form
               onSubmit={handleSubmit}
-              className="flex flex-col"
+              className="flex flex-col min-h-[263px]"
               style={{
                 width: "398px",
-                height: "253px",
+
                 marginLeft: "25px",
                 marginTop: "32px",
               }}

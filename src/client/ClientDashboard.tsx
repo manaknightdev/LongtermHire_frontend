@@ -71,7 +71,18 @@ function ClientDashboard() {
           setEquipment(equipmentResponse.equipment);
 
           if (equipmentResponse.equipment.length > 0) {
-            setSelectedEquipment(equipmentResponse.equipment[0].equipment_name);
+            const firstEquipment = equipmentResponse.equipment[0];
+            setSelectedEquipment(firstEquipment.equipment_name);
+
+            // Set initial duration to minimum duration of first equipment
+            const minDuration = firstEquipment.minimum_duration;
+            if (minDuration) {
+              const match = minDuration.match(/(\d+)/);
+              const minMonths = match ? parseInt(match[1]) : 1;
+              setSelectedDuration(
+                `${minMonths} month${minMonths > 1 ? "s" : ""}`
+              );
+            }
           }
         } else {
           console.log("No equipment assigned to this client");
@@ -146,14 +157,22 @@ function ClientDashboard() {
         acc[category] = [];
       }
 
-      // Calculate display price based on discount system
-      const displayPrice = item.discounted_price || item.base_price;
-      const hasDiscount =
-        item.discounted_price && item.discounted_price < item.base_price;
+      // Calculate display price based on equipment discount
+      const hasDiscount = item.discount_type && item.discount_value;
+      let displayPrice = item.base_price;
+
+      if (hasDiscount) {
+        if (item.discount_type === "percentage") {
+          displayPrice =
+            item.base_price - (item.base_price * item.discount_value) / 100;
+        } else if (item.discount_type === "fixed") {
+          displayPrice = item.base_price - item.discount_value;
+        }
+      }
 
       // Format price for display
       const priceDisplay = displayPrice
-        ? `$${displayPrice}`
+        ? `$${displayPrice.toFixed(2)}`
         : "Contact for pricing";
 
       // Create discount info object
@@ -163,7 +182,7 @@ function ClientDashboard() {
             discount_type: item.discount_type,
             discount_value: item.discount_value,
             original_price: item.base_price,
-            discounted_price: item.discounted_price,
+            discounted_price: displayPrice,
             pricing_package: item.pricing_package,
           }
         : {
@@ -242,20 +261,44 @@ function ClientDashboard() {
     }
   };
 
+  // Get minimum duration for selected equipment
+  const getMinimumDuration = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+    if (!selectedEquipmentData?.minimum_duration) {
+      return 1; // Default to 1 month
+    }
+
+    // Extract number from "4 Months" format
+    const match = selectedEquipmentData.minimum_duration.match(/(\d+)/);
+    return match ? parseInt(match[1]) : 1;
+  };
+
+  // Get available durations from minimum to 12 months
+  const getAvailableDurations = () => {
+    const minDuration = getMinimumDuration();
+    const durations = [];
+
+    for (let i = minDuration; i <= 12; i++) {
+      durations.push(`${i} month${i > 1 ? "s" : ""}`);
+    }
+
+    return durations;
+  };
+
   // Calculate slider position based on selected duration
   const getSliderPosition = () => {
-    switch (selectedDuration) {
-      case "1 month":
-        return { barWidth: "0%", circleLeft: "0%" }; // Start position
-      case "3 months":
-        return { barWidth: "33.33%", circleLeft: "33.33%" }; // First third
-      case "6 months":
-        return { barWidth: "66.66%", circleLeft: "66.66%" }; // Second third
-      case "12 months":
-        return { barWidth: "100%", circleLeft: "100%" }; // End position
-      default:
-        return { barWidth: "33.33%", circleLeft: "33.33%" }; // Default to 3 months
+    const durations = getAvailableDurations();
+    const currentIndex = durations.indexOf(selectedDuration);
+    const totalSteps = durations.length - 1;
+
+    if (currentIndex === -1 || totalSteps === 0) {
+      return { barWidth: "0%", circleLeft: "0%" };
     }
+
+    const percentage = (currentIndex / totalSteps) * 100;
+    return { barWidth: `${percentage}%`, circleLeft: `${percentage}%` };
   };
 
   // Handle slider drag functionality
@@ -264,92 +307,80 @@ function ClientDashboard() {
     const clickX = e.clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
 
-    if (percentage <= 16.66) {
-      setSelectedDuration("1 month");
-    } else if (percentage <= 50) {
-      setSelectedDuration("3 months");
-    } else if (percentage <= 83.33) {
-      setSelectedDuration("6 months");
-    } else {
-      setSelectedDuration("12 months");
+    const durations = getAvailableDurations();
+    const totalSteps = durations.length - 1;
+    const stepSize = 100 / totalSteps;
+    const selectedIndex = Math.round(percentage / stepSize);
+
+    if (selectedIndex >= 0 && selectedIndex < durations.length) {
+      setSelectedDuration(durations[selectedIndex]);
     }
   };
 
-  // Calculate discount percentage based on selected duration
-  const getDiscountPercentage = () => {
-    switch (selectedDuration) {
-      case "1 month":
-        return 0; // No discount for 1 month
-      case "3 months":
-        return 5; // 5% discount for 3 months
-      case "6 months":
-        return 10; // 10% discount for 6 months
-      case "12 months":
-        return 20; // 20% discount for 12 months
-      default:
-        return 5; // Default to 3 months discount
-    }
-  };
-
-  // Calculate actual discount amount for selected equipment
-  const getDiscountAmount = () => {
+  // Calculate equipment-specific discount amount
+  const getEquipmentDiscount = () => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
     );
-    if (!selectedEquipmentData || !selectedEquipmentData.base_price) {
-      return 0;
+
+    if (!selectedEquipmentData) return 0;
+
+    const { discount_type, discount_value, base_price } = selectedEquipmentData;
+
+    if (!discount_type || !discount_value || !base_price) return 0;
+
+    let discountAmount = 0;
+
+    if (discount_type === "percentage") {
+      // Percentage discount
+      discountAmount = (base_price * discount_value) / 100;
+    } else if (discount_type === "fixed") {
+      // Fixed amount discount
+      discountAmount = discount_value;
     }
 
-    // Check if equipment has backend discount applied
-    if (
-      selectedEquipmentData.discounted_price &&
-      selectedEquipmentData.discounted_price < selectedEquipmentData.base_price
-    ) {
-      return (
-        selectedEquipmentData.base_price -
-        selectedEquipmentData.discounted_price
-      );
-    }
-
-    // Fallback to duration-based discount calculation
-    let basePrice = 0;
-    if (typeof selectedEquipmentData.base_price === "string") {
-      basePrice =
-        parseFloat(selectedEquipmentData.base_price.replace(/[^\d.]/g, "")) ||
-        0;
-    } else if (typeof selectedEquipmentData.base_price === "number") {
-      basePrice = selectedEquipmentData.base_price;
-    } else {
-      // Try to convert to number as fallback
-      basePrice =
-        parseFloat(
-          String(selectedEquipmentData.base_price).replace(/[^\d.]/g, "")
-        ) || 0;
-    }
-
-    const discountPercentage = getDiscountPercentage();
-    return Math.round(basePrice * (discountPercentage / 100));
+    return parseFloat(discountAmount.toFixed(2));
   };
 
-  // Get final price for selected equipment (with backend discount applied)
+  // Calculate final price with equipment discount
   const getFinalPrice = () => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
     );
-    if (!selectedEquipmentData) {
+
+    if (!selectedEquipmentData?.base_price) return 0;
+
+    const basePrice = selectedEquipmentData.base_price;
+    const discountAmount = getEquipmentDiscount();
+
+    return parseFloat((basePrice - discountAmount).toFixed(2));
+  };
+
+  // Get discount percentage for display
+  const getDiscountPercentage = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+
+    if (
+      !selectedEquipmentData?.discount_type ||
+      !selectedEquipmentData?.discount_value
+    ) {
       return 0;
     }
 
-    // Use backend discounted price if available
-    if (
-      selectedEquipmentData.discounted_price &&
-      selectedEquipmentData.discounted_price < selectedEquipmentData.base_price
-    ) {
-      return selectedEquipmentData.discounted_price;
+    if (selectedEquipmentData.discount_type === "percentage") {
+      return selectedEquipmentData.discount_value;
+    } else if (selectedEquipmentData.discount_type === "fixed") {
+      const basePrice = selectedEquipmentData.base_price;
+      if (basePrice > 0) {
+        return parseFloat(
+          ((selectedEquipmentData.discount_value / basePrice) * 100).toFixed(2)
+        );
+      }
     }
 
-    // Fallback to base price
-    return selectedEquipmentData.base_price || 0;
+    return 0;
   };
 
   const handleSendMessage = async () => {
@@ -584,7 +615,23 @@ function ClientDashboard() {
                 <div className="relative">
                   <select
                     value={selectedEquipment}
-                    onChange={(e) => setSelectedEquipment(e.target.value)}
+                    onChange={(e) => {
+                      const newEquipment = e.target.value;
+                      setSelectedEquipment(newEquipment);
+
+                      // Update duration to minimum duration of selected equipment
+                      const selectedEquipmentData = equipment.find(
+                        (item) => item.equipment_name === newEquipment
+                      );
+                      if (selectedEquipmentData?.minimum_duration) {
+                        const match =
+                          selectedEquipmentData.minimum_duration.match(/(\d+)/);
+                        const minMonths = match ? parseInt(match[1]) : 1;
+                        setSelectedDuration(
+                          `${minMonths} month${minMonths > 1 ? "s" : ""}`
+                        );
+                      }
+                    }}
                     className="w-full bg-[#2A2A2B] border border-[#444444] rounded-md px-3 py-3 text-[#FFFFFF] text-sm sm:text-base appearance-none cursor-pointer"
                   >
                     {equipment.length === 0 ? (
@@ -614,36 +661,55 @@ function ClientDashboard() {
                 </div>
               </div>
 
+              {/* Minimum Hire Duration */}
+              <div className="mb-4">
+                <div className="text-[#9CA3AF] text-xs text-center">
+                  {(() => {
+                    const selectedEquipmentData = equipment.find(
+                      (item) => item.equipment_name === selectedEquipment
+                    );
+                    const minDuration = selectedEquipmentData?.minimum_duration;
+                    return minDuration
+                      ? `Minimum hire duration: ${minDuration}`
+                      : "";
+                  })()}
+                </div>
+              </div>
+
               {/* Hire Duration */}
               <div>
-                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <span className="text-[#FFFFFF] text-base sm:text-lg font-semibold">
                     Hire For
                   </span>
                   <div className="text-right">
-                    {getDiscountPercentage() > 0 && (
+                    {getEquipmentDiscount() > 0 && (
                       <>
                         <span className="text-[#22C55E] text-base sm:text-lg font-bold">
-                          -{getDiscountPercentage()}% (${getDiscountAmount()})
+                          -${getEquipmentDiscount().toFixed(2)}
                         </span>
                         <div className="text-[#9CA3AF] text-xs">
-                          Discount applied
+                          Equipment discount
                         </div>
                       </>
                     )}
-                    {getDiscountPercentage() === 0 && (
+                    {getEquipmentDiscount() === 0 && (
                       <span className="text-[#9CA3AF] text-sm">
                         No discount
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="relative mb-4 sm:mb-6">
+
+                {/* Slider */}
+                <div className="relative mb-6">
                   <div
-                    className="bg-[#E5E5E5] border border-[#B7B5B5] rounded-full h-2 relative cursor-pointer select-none"
+                    className="bg-[#E5E5E5] border border-[#B7B5B5] rounded-full h-3 relative cursor-pointer select-none"
                     onClick={handleSliderInteraction}
                     onMouseDown={(e) => {
+                      e.preventDefault();
                       const handleMouseMove = (moveEvent) => {
+                        moveEvent.preventDefault();
                         handleSliderInteraction(moveEvent);
                       };
 
@@ -659,81 +725,58 @@ function ClientDashboard() {
                       document.addEventListener("mouseup", handleMouseUp);
                       handleSliderInteraction(e);
                     }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      const touch = e.touches[0];
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickX = touch.clientX - rect.left;
+                      const percentage = Math.max(
+                        0,
+                        Math.min(100, (clickX / rect.width) * 100)
+                      );
+
+                      const durations = getAvailableDurations();
+                      const totalSteps = durations.length - 1;
+                      const stepSize = 100 / totalSteps;
+                      const selectedIndex = Math.round(percentage / stepSize);
+
+                      if (
+                        selectedIndex >= 0 &&
+                        selectedIndex < durations.length
+                      ) {
+                        setSelectedDuration(durations[selectedIndex]);
+                      }
+                    }}
                   >
                     <div
-                      className="absolute left-0 top-0 bg-[#0075FF] rounded-full h-2 transition-all duration-200 ease-in-out"
+                      className="absolute left-0 top-0 bg-[#0075FF] rounded-full h-3 transition-all duration-200 ease-in-out"
                       style={{ width: getSliderPosition().barWidth }}
                     ></div>
                     <div
-                      className="absolute top-[-9px] bg-[#0075FF] rounded-full w-5 h-5 flex items-center justify-center transition-all duration-200 ease-in-out cursor-grab active:cursor-grabbing"
+                      className="absolute top-[-10px] bg-[#0075FF] rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 ease-in-out cursor-grab active:cursor-grabbing shadow-lg"
                       style={{
                         left: getSliderPosition().circleLeft,
                         transform: "translateX(-50%)",
                       }}
                     >
                       <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
                         fill="none"
                       >
-                        <circle cx="9" cy="9" r="7.5" fill="white" />
-                        <circle cx="9" cy="9" r="3" fill="#0075FF" />
+                        <circle cx="10" cy="10" r="8" fill="white" />
+                        <circle cx="10" cy="10" r="4" fill="#0075FF" />
                       </svg>
                     </div>
                   </div>
-                  <div className="text-[#9CA3AF] text-xs text-center mt-2">
-                    {(() => {
-                      const selectedEquipmentData = equipment.find(
-                        (item) => item.equipment_name === selectedEquipment
-                      );
-                      const minDuration =
-                        selectedEquipmentData?.minimum_duration;
-                      return minDuration ? ` • Min: ${minDuration}` : "";
-                    })()}
-                  </div>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <button
-                    onClick={() => setSelectedDuration("1 month")}
-                    className={`${
-                      selectedDuration === "1 month"
-                        ? "text-[#FDCE06] font-bold"
-                        : "text-[#9CA3AF]"
-                    } transition-colors`}
-                  >
-                    1 month
-                  </button>
-                  <button
-                    onClick={() => setSelectedDuration("3 months")}
-                    className={`${
-                      selectedDuration === "3 months"
-                        ? "text-[#FDCE06] font-bold"
-                        : "text-[#9CA3AF]"
-                    } transition-colors`}
-                  >
-                    3 months
-                  </button>
-                  <button
-                    onClick={() => setSelectedDuration("6 months")}
-                    className={`${
-                      selectedDuration === "6 months"
-                        ? "text-[#FDCE06] font-bold"
-                        : "text-[#9CA3AF]"
-                    } transition-colors`}
-                  >
-                    6 months
-                  </button>
-                  <button
-                    onClick={() => setSelectedDuration("12 months")}
-                    className={`${
-                      selectedDuration === "12 months"
-                        ? "text-[#FDCE06] font-bold"
-                        : "text-[#9CA3AF]"
-                    } transition-colors`}
-                  >
-                    12 months
-                  </button>
+
+                {/* Duration Display */}
+                <div className="text-center">
+                  <span className="text-[#FDCE06] text-lg font-bold">
+                    {selectedDuration}
+                  </span>
                 </div>
               </div>
             </div>
