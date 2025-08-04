@@ -2,14 +2,8 @@ import React, { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import Modal from "./Modal";
 import { equipmentApi } from "../services/equipmentApi";
-import {
-  uploadImage,
-  validateImageFile,
-  getImagePreview,
-  cleanupImagePreview,
-  formatFileSize,
-  isImageUrl,
-} from "../utils/uploadUtils";
+import { contentApi } from "../services/contentApi";
+import ImageManager from "./ImageManager";
 
 const EditContentModal = ({
   isOpen,
@@ -22,13 +16,9 @@ const EditContentModal = ({
     equipment_id: "",
     description: "",
     bannerDescription: "",
-    imageUrl: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
+  const [images, setImages] = useState([]);
   const [equipmentList, setEquipmentList] = useState([]);
   const [equipmentLoading, setEquipmentLoading] = useState(false);
 
@@ -46,25 +36,31 @@ const EditContentModal = ({
         equipment_id: content.equipment_id || "",
         description: content.description || "",
         bannerDescription: content.banner_description || "",
-        imageUrl: content.image_url || "",
       });
 
-      // Set existing image as preview if available
-      if (content.image_url && isImageUrl(content.image_url)) {
-        setImagePreview(content.image_url);
+      // Set existing images
+      if (content.images && Array.isArray(content.images)) {
+        setImages(content.images);
+      } else if (content.image_url) {
+        // Backward compatibility - convert single image to array format
+        setImages([
+          {
+            id: null,
+            image_url: content.image_url,
+            is_main: 1,
+            caption: "Main image",
+          },
+        ]);
+      } else {
+        setImages([]);
       }
     }
   }, [content]);
 
-  // Clean up image preview when modal closes
+  // Clean up when modal closes
   useEffect(() => {
     if (!isOpen) {
-      if (imagePreview && imagePreview.startsWith("blob:")) {
-        cleanupImagePreview(imagePreview);
-      }
-      setImagePreview(null);
-      setImageFile(null);
-      setUploadError("");
+      setImages([]);
     }
   }, [isOpen]);
 
@@ -91,63 +87,43 @@ const EditContentModal = ({
     }));
   };
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    setUploadError("");
+  const handleImagesChange = (newImages) => {
+    setImages(newImages);
+  };
 
-    if (!file) {
-      setImageFile(null);
-      if (imagePreview && imagePreview.startsWith("blob:")) {
-        cleanupImagePreview(imagePreview);
-      }
-      // Reset to original image or empty
-      const originalImageUrl = content?.image_url || "";
-      setImagePreview(
-        originalImageUrl && isImageUrl(originalImageUrl)
-          ? originalImageUrl
-          : null
-      );
-      setFormData((prev) => ({ ...prev, imageUrl: originalImageUrl }));
-      return;
-    }
-
+  const handleAddImage = async (contentId, imageData) => {
     try {
-      validateImageFile(file);
-      setImageFile(file);
-
-      // Create preview
-      const preview = getImagePreview(file);
-      if (imagePreview && imagePreview.startsWith("blob:")) {
-        cleanupImagePreview(imagePreview);
-      }
-      setImagePreview(preview);
-
-      // Upload image immediately
-      setUploadLoading(true);
-      const uploadResult = await uploadImage(file);
-
-      // Update form data with uploaded image URL
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl: uploadResult.url,
-      }));
+      const response = await contentApi.addImage(contentId, imageData);
+      return response;
     } catch (error) {
-      console.error("Image upload error:", error);
-      setUploadError(error.message);
-      setImageFile(null);
-      if (imagePreview && imagePreview.startsWith("blob:")) {
-        cleanupImagePreview(imagePreview);
-      }
-      // Reset to original image
-      const originalImageUrl = content?.image_url || "";
-      setImagePreview(
-        originalImageUrl && isImageUrl(originalImageUrl)
-          ? originalImageUrl
-          : null
-      );
-      setFormData((prev) => ({ ...prev, imageUrl: originalImageUrl }));
-    } finally {
-      setUploadLoading(false);
+      throw error;
+    }
+  };
+
+  const handleRemoveImage = async (contentId, imageId) => {
+    try {
+      const response = await contentApi.removeImage(contentId, imageId);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleSetMainImage = async (contentId, imageId) => {
+    try {
+      const response = await contentApi.setMainImage(contentId, imageId);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleReorderImages = async (contentId, imageOrder) => {
+    try {
+      const response = await contentApi.reorderImages(contentId, imageOrder);
+      return response;
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -159,13 +135,22 @@ const EditContentModal = ({
       (eq) => eq.id.toString() === formData.equipment_id
     );
 
+    // Get main image URL (for backward compatibility)
+    const mainImage = images.find((img) => img.is_main);
+    const imageUrl = mainImage ? mainImage.url : "";
+
     // Prepare data for API
     const contentData = {
       equipment_id: formData.equipment_id,
       equipment_name: selectedEquipment?.equipment_name || "",
       description: formData.description,
       banner_description: formData.bannerDescription,
-      image_url: formData.imageUrl,
+      image_url: imageUrl, // Keep for backward compatibility
+      images: images.map((img, index) => ({
+        url: img.url,
+        is_main: img.is_main,
+        caption: img.caption || `Image ${index + 1}`,
+      })),
     };
 
     try {
@@ -184,32 +169,24 @@ const EditContentModal = ({
         equipment_id: content.equipment_id || "",
         description: content.description || "",
         bannerDescription: content.banner_description || "",
-        imageUrl: content.image_url || "",
       });
 
-      // Reset image preview
-      if (imagePreview && imagePreview.startsWith("blob:")) {
-        cleanupImagePreview(imagePreview);
+      // Reset images
+      if (content.images && Array.isArray(content.images)) {
+        setImages(content.images);
+      } else if (content.image_url) {
+        setImages([
+          {
+            id: null,
+            image_url: content.image_url,
+            is_main: 1,
+            caption: "Main image",
+          },
+        ]);
+      } else {
+        setImages([]);
       }
-      const originalImageUrl = content.image_url || "";
-      setImagePreview(
-        originalImageUrl && isImageUrl(originalImageUrl)
-          ? originalImageUrl
-          : null
-      );
-      setImageFile(null);
-      setUploadError("");
     }
-  };
-
-  const removeImage = () => {
-    setImageFile(null);
-    if (imagePreview && imagePreview.startsWith("blob:")) {
-      cleanupImagePreview(imagePreview);
-    }
-    setImagePreview(null);
-    setFormData((prev) => ({ ...prev, imageUrl: "" }));
-    setUploadError("");
   };
 
   return (
@@ -217,11 +194,11 @@ const EditContentModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Edit Content"
-      width="672px"
-      height="700px"
+      width="800px"
+      height="800px"
     >
       <form onSubmit={handleSubmit}>
-        <div className="space-y-6" style={{ width: "606px" }}>
+        <div className="space-y-6" style={{ width: "734px" }}>
           {/* Equipment Selection */}
           <div>
             <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
@@ -240,7 +217,8 @@ const EditContentModal = ({
                 value={formData.equipment_id}
                 onChange={handleInputChange}
                 required
-                className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+                disabled
+                className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#9CA3AF] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none transition-colors cursor-not-allowed opacity-60"
               >
                 <option value="">Select an equipment...</option>
                 {equipmentList.map((equipment) => (
@@ -253,110 +231,17 @@ const EditContentModal = ({
             )}
           </div>
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
-              Equipment Image
-            </label>
-
-            {!imagePreview ? (
-              <div className="border-2 border-dashed border-[#333333] rounded-[8px] p-6 text-center hover:border-[#FDCE06] transition-colors">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="image-upload-edit"
-                  disabled={uploadLoading}
-                />
-                <label
-                  htmlFor="image-upload-edit"
-                  className="cursor-pointer flex flex-col items-center"
-                >
-                  <div className="w-12 h-12 bg-[#333333] rounded-full flex items-center justify-center mb-3">
-                    <svg
-                      className="w-6 h-6 text-[#9CA3AF]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                  </div>
-                  <span className="text-[#E5E5E5] font-[Inter] font-medium text-[14px]">
-                    {uploadLoading ? "Uploading..." : "Click to upload image"}
-                  </span>
-                  <span className="text-[#9CA3AF] font-[Inter] font-normal text-[12px] mt-1">
-                    PNG, JPG, GIF up to 10MB
-                  </span>
-                </label>
-                {uploadLoading && (
-                  <div className="mt-3">
-                    <ClipLoader color="#FDCE06" size={20} />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="relative">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-[8px] border border-[#333333]"
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-                {imageFile && (
-                  <div className="mt-2 text-[#9CA3AF] font-[Inter] font-normal text-[12px]">
-                    {imageFile.name} ({formatFileSize(imageFile.size)})
-                  </div>
-                )}
-                <div className="mt-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="image-replace-edit"
-                    disabled={uploadLoading}
-                  />
-                  <label
-                    htmlFor="image-replace-edit"
-                    className="inline-block px-3 py-1 bg-[#333333] text-[#E5E5E5] rounded text-sm cursor-pointer hover:bg-[#444444] transition-colors"
-                  >
-                    {uploadLoading ? "Uploading..." : "Replace Image"}
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {uploadError && (
-              <div className="mt-2 text-red-400 font-[Inter] font-normal text-[12px]">
-                {uploadError}
-              </div>
-            )}
-          </div>
+          {/* Multiple Images Upload */}
+          <ImageManager
+            images={images}
+            onImagesChange={handleImagesChange}
+            contentId={content?.id}
+            onAddImage={handleAddImage}
+            onRemoveImage={handleRemoveImage}
+            onSetMainImage={handleSetMainImage}
+            onReorderImages={handleReorderImages}
+            disabled={loading}
+          />
 
           {/* Description */}
           <div>
@@ -399,7 +284,7 @@ const EditContentModal = ({
             </button>
             <button
               type="submit"
-              disabled={loading || uploadLoading}
+              disabled={loading}
               className="flex-1 h-[48px] bg-[#FDCE06] rounded-[8px] text-[#1A1A1A] font-[Inter] font-medium text-[14px] leading-[1.21em] hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading ? (

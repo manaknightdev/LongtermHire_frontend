@@ -24,6 +24,9 @@ function ClientDashboard() {
   const [error, setError] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
+  // const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  // const [loadingMore, setLoadingMore] = useState(false);
+  // const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   // Refs for scroll management
@@ -39,13 +42,41 @@ function ClientDashboard() {
     error: chatError,
     adminOnline,
     adminStatus,
+    hasMoreMessages,
+    loadingMore,
+    currentPage,
     loadConversations,
+    loadMessages,
+    loadMoreMessages,
     sendMessage,
     startPolling,
     stopPolling,
     clearMessages,
     clearError: clearChatError,
   } = useClientChat();
+
+  // Get current user ID - simple approach
+  const getCurrentUserId = () => {
+    const clientUserId = localStorage.getItem("clientUserId");
+    const userId = localStorage.getItem("user_id");
+    console.log("Getting user ID:", { clientUserId, userId });
+    return parseInt(clientUserId || userId || "0");
+  };
+
+  // Group messages by date for date headers
+  const groupMessagesByDate = (messages) => {
+    const groups = {};
+    messages.forEach((message) => {
+      const date = new Date(message.created_at).toDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(message);
+    });
+    return groups;
+  };
+
+  const messageGroups = groupMessagesByDate(messages);
 
   // Load client data and equipment on component mount
   useEffect(() => {
@@ -70,7 +101,29 @@ function ClientDashboard() {
         const equipmentResponse = await clientEquipmentApi.getEquipment();
         console.log("Equipment API response:", equipmentResponse);
 
-        if (equipmentResponse && equipmentResponse.equipment) {
+        if (
+          equipmentResponse &&
+          equipmentResponse.data &&
+          equipmentResponse.data.equipment
+        ) {
+          setEquipment(equipmentResponse.data.equipment);
+
+          if (equipmentResponse.data.equipment.length > 0) {
+            const firstEquipment = equipmentResponse.data.equipment[0];
+            setSelectedEquipment(firstEquipment.equipment_name);
+
+            // Set initial duration to minimum duration of first equipment
+            const minDuration = firstEquipment.minimum_duration;
+            if (minDuration) {
+              const match = minDuration.match(/(\d+)/);
+              const minMonths = match ? parseInt(match[1]) : 1;
+              setSelectedDuration(
+                `${minMonths} month${minMonths > 1 ? "s" : ""}`
+              );
+            }
+          }
+        } else if (equipmentResponse && equipmentResponse.equipment) {
+          // Fallback for old API structure
           setEquipment(equipmentResponse.equipment);
 
           if (equipmentResponse.equipment.length > 0) {
@@ -202,6 +255,30 @@ function ClientDashboard() {
             pricing_package: null,
           };
 
+      // Handle multiple images - get main image and additional images
+      let mainImage = "/figma-assets/equipment-placeholder.jpg";
+      let additionalImages = [];
+
+      if (
+        item.content?.images &&
+        Array.isArray(item.content.images) &&
+        item.content.images.length > 0
+      ) {
+        // Use new multiple images structure
+        const mainImageObj =
+          item.content.images.find(
+            (img) => img.is_main === 1 || img.is_main === true
+          ) || item.content.images[0];
+        mainImage =
+          mainImageObj.image_url || "/figma-assets/equipment-placeholder.jpg";
+        additionalImages = item.content.images
+          .filter((img) => !(img.is_main === 1 || img.is_main === true))
+          .slice(0, 3); // Show up to 3 additional images
+      } else if (item.content?.image) {
+        // Fallback to single image
+        mainImage = item.content.image;
+      }
+
       acc[category].push({
         id: item.equipment_id || item.id,
         name: item.equipment_name,
@@ -211,7 +288,9 @@ function ClientDashboard() {
         price: priceDisplay,
         base_price: item.base_price,
         discounted_price: item.discounted_price,
-        image: item.content?.image || "/figma-assets/equipment-placeholder.jpg",
+        image: mainImage,
+        additionalImages: additionalImages,
+        allImages: item.content?.images || [],
         category: item.category_name,
         discount: discountInfo,
       });
@@ -348,7 +427,7 @@ function ClientDashboard() {
     return basePrice * multiplier;
   };
 
-  // Calculate equipment-specific discount amount (scales with duration)
+  // Calculate equipment-specific discount amount (compounding discount)
   const getEquipmentDiscount = () => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
@@ -360,26 +439,64 @@ function ClientDashboard() {
 
     if (!discount_type || !discount_value || !base_price) return 0;
 
-    let discountAmount = 0;
-    const durationAdjustedBasePrice = getDurationAdjustedBasePrice();
+    const selectedDurationMonths = getSelectedDurationMonths();
 
     if (discount_type === "percentage") {
-      // Percentage discount on duration-adjusted base price
-      discountAmount = (durationAdjustedBasePrice * discount_value) / 100;
+      // Compounding discount calculation
+      // Each month gets a discount on the previous month's price
+      let totalCost = 0;
+      let currentMonthPrice = base_price;
+
+      for (let month = 1; month <= selectedDurationMonths; month++) {
+        totalCost += currentMonthPrice;
+        // Next month's price is discounted from current month's price
+        currentMonthPrice = currentMonthPrice * (1 - discount_value / 100);
+      }
+
+      // Calculate total discount (difference between simple multiplication and compounding)
+      const simpleTotalCost = base_price * selectedDurationMonths;
+      const discountAmount = simpleTotalCost - totalCost;
+
+      return parseFloat(discountAmount.toFixed(2));
     } else if (discount_type === "fixed") {
       // Fixed amount discount (stays constant)
-      discountAmount = discount_value;
+      return discount_value;
     }
 
-    return parseFloat(discountAmount.toFixed(2));
+    return 0;
   };
 
-  // Calculate final price: (Duration-adjusted base price) - (Fixed discount)
+  // Calculate final price with compounding discount
   const getFinalPrice = () => {
-    const durationAdjustedPrice = getDurationAdjustedBasePrice();
-    const discountAmount = getEquipmentDiscount();
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
 
-    return parseFloat((durationAdjustedPrice - discountAmount).toFixed(2));
+    if (!selectedEquipmentData?.base_price) return 0;
+
+    const { discount_type, discount_value, base_price } = selectedEquipmentData;
+    const selectedDurationMonths = getSelectedDurationMonths();
+
+    if (discount_type === "percentage" && discount_value) {
+      // Calculate total cost with compounding discount
+      let totalCost = 0;
+      let currentMonthPrice = base_price;
+
+      for (let month = 1; month <= selectedDurationMonths; month++) {
+        totalCost += currentMonthPrice;
+        // Next month's price is discounted from current month's price
+        currentMonthPrice = currentMonthPrice * (1 - discount_value / 100);
+      }
+
+      return parseFloat(totalCost.toFixed(2));
+    } else if (discount_type === "fixed" && discount_value) {
+      // Fixed discount: simple multiplication minus fixed amount
+      const simpleTotalCost = base_price * selectedDurationMonths;
+      return parseFloat((simpleTotalCost - discount_value).toFixed(2));
+    } else {
+      // No discount: simple multiplication
+      return parseFloat((base_price * selectedDurationMonths).toFixed(2));
+    }
   };
 
   // Get discount percentage for display
@@ -409,6 +526,40 @@ function ClientDashboard() {
     return 0;
   };
 
+  // Get monthly breakdown for compounding discount
+  const getMonthlyBreakdown = () => {
+    const selectedEquipmentData = equipment.find(
+      (item) => item.equipment_name === selectedEquipment
+    );
+
+    if (!selectedEquipmentData?.base_price) return [];
+
+    const { discount_type, discount_value, base_price } = selectedEquipmentData;
+    const selectedDurationMonths = getSelectedDurationMonths();
+
+    if (discount_type === "percentage" && discount_value) {
+      const breakdown = [];
+      let currentMonthPrice = base_price;
+
+      for (let month = 1; month <= selectedDurationMonths; month++) {
+        breakdown.push({
+          month,
+          price: parseFloat(currentMonthPrice.toFixed(2)),
+          discount:
+            month === 1
+              ? 0
+              : parseFloat((base_price - currentMonthPrice).toFixed(2)),
+        });
+        // Next month's price is discounted from current month's price
+        currentMonthPrice = currentMonthPrice * (1 - discount_value / 100);
+      }
+
+      return breakdown;
+    }
+
+    return [];
+  };
+
   const handleSendMessage = async () => {
     if (!messageText.trim() || conversations.length === 0 || sendingMessage) {
       return; // Prevent sending if already sending or no message/conversation
@@ -419,15 +570,19 @@ function ClientDashboard() {
 
       // Get the admin user ID from the conversation
       const conversation = conversations[0];
-      const currentUserId = localStorage.getItem("user_id");
+      const currentUserId = getCurrentUserId();
       const adminUserId =
-        conversation.user1_id == currentUserId
+        parseInt(conversation.user1_id) === currentUserId
           ? conversation.user2_id
           : conversation.user1_id;
 
       const success = await sendMessage(adminUserId, messageText);
       if (success) {
         setMessageText("");
+        // Force a small delay to ensure the message is properly added before re-render
+        setTimeout(() => {
+          // This will trigger a re-render with the new message
+        }, 100);
       } else {
         toast.error("Failed to send message. Please try again.");
       }
@@ -561,7 +716,8 @@ function ClientDashboard() {
                         className="bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors"
                       >
                         <div className="p-3 sm:p-4">
-                          <div className="bg-[#292A2B] rounded-md p-0 mb-3 sm:mb-4">
+                          <div className="bg-[#292A2B] rounded-md p-0 mb-3 sm:mb-4 relative">
+                            {/* Main Image */}
                             <img
                               src={
                                 equipment?.image
@@ -570,10 +726,65 @@ function ClientDashboard() {
                               }
                               alt={equipment.name}
                               className="w-full h-28 sm:h-32 object-cover rounded-md"
-                              // onError={(e) => {
-                              //   e.target.src = "/placeholder-equipment.jpg";
-                              // }}
+                              onError={(e) => {
+                                e.target.src = "/placeholder-equipment.jpg";
+                              }}
                             />
+
+                            {/* Additional Images Thumbnails */}
+                            {equipment?.additionalImages &&
+                              equipment.additionalImages.length > 0 && (
+                                <div className="absolute bottom-2 right-2 flex gap-1">
+                                  {equipment.additionalImages.map(
+                                    (img, index) => (
+                                      <div
+                                        key={index}
+                                        className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-[#333333] flex items-center justify-center"
+                                        title={
+                                          img.caption || `Image ${index + 1}`
+                                        }
+                                      >
+                                        <img
+                                          src={img.image_url}
+                                          alt={
+                                            img.caption ||
+                                            `Additional view ${index + 1}`
+                                          }
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            e.target.style.display = "none";
+                                            e.target.nextSibling.style.display =
+                                              "flex";
+                                          }}
+                                        />
+                                        <div className="hidden w-full h-full items-center justify-center">
+                                          <svg
+                                            className="w-4 h-4 text-[#9CA3AF]"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                            />
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    )
+                                  )}
+                                  {equipment.allImages &&
+                                    equipment.allImages.length > 4 && (
+                                      <div className="w-8 h-8 rounded-full border-2 border-white bg-[#FDCE06] flex items-center justify-center">
+                                        <span className="text-[#1A1A1A] text-xs font-bold">
+                                          +{equipment.allImages.length - 4}
+                                        </span>
+                                      </div>
+                                    )}
+                                </div>
+                              )}
                           </div>
                           <div className="space-y-2 sm:space-y-3">
                             <div className="flex items-start justify-between gap-2">
@@ -709,20 +920,16 @@ function ClientDashboard() {
                     Hire For
                   </span>
                   <div className="text-right">
+                    <span className="text-[#FDCE06] text-base sm:text-lg font-bold">
+                      ${getFinalPrice().toFixed(2)}
+                    </span>
+                    <div className="text-[#9CA3AF] text-xs">
+                      Total for {selectedDuration}
+                    </div>
                     {getEquipmentDiscount() > 0 && (
-                      <>
-                        <span className="text-[#22C55E] text-base sm:text-lg font-bold">
-                          -${getEquipmentDiscount().toFixed(2)}
-                        </span>
-                        <div className="text-[#9CA3AF] text-xs">
-                          Discount applied
-                        </div>
-                      </>
-                    )}
-                    {getEquipmentDiscount() === 0 && (
-                      <span className="text-[#9CA3AF] text-sm">
-                        No discount
-                      </span>
+                      <div className="text-[#22C55E] text-xs">
+                        -${getEquipmentDiscount().toFixed(2)} discount
+                      </div>
                     )}
                   </div>
                 </div>
@@ -736,7 +943,24 @@ function ClientDashboard() {
                       e.preventDefault();
                       const handleMouseMove = (moveEvent) => {
                         moveEvent.preventDefault();
-                        handleSliderInteraction(moveEvent);
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const clickX = moveEvent.clientX - rect.left;
+                        const percentage = Math.max(
+                          0,
+                          Math.min(100, (clickX / rect.width) * 100)
+                        );
+
+                        const durations = getAvailableDurations();
+                        const totalSteps = durations.length - 1;
+                        const stepSize = 100 / totalSteps;
+                        const selectedIndex = Math.round(percentage / stepSize);
+
+                        if (
+                          selectedIndex >= 0 &&
+                          selectedIndex < durations.length
+                        ) {
+                          setSelectedDuration(durations[selectedIndex]);
+                        }
                       };
 
                       const handleMouseUp = () => {
@@ -753,6 +977,43 @@ function ClientDashboard() {
                     }}
                     onTouchStart={(e) => {
                       e.preventDefault();
+                      const handleTouchMove = (touchEvent) => {
+                        touchEvent.preventDefault();
+                        const touch = touchEvent.touches[0];
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const clickX = touch.clientX - rect.left;
+                        const percentage = Math.max(
+                          0,
+                          Math.min(100, (clickX / rect.width) * 100)
+                        );
+
+                        const durations = getAvailableDurations();
+                        const totalSteps = durations.length - 1;
+                        const stepSize = 100 / totalSteps;
+                        const selectedIndex = Math.round(percentage / stepSize);
+
+                        if (
+                          selectedIndex >= 0 &&
+                          selectedIndex < durations.length
+                        ) {
+                          setSelectedDuration(durations[selectedIndex]);
+                        }
+                      };
+
+                      const handleTouchEnd = () => {
+                        document.removeEventListener(
+                          "touchmove",
+                          handleTouchMove
+                        );
+                        document.removeEventListener(
+                          "touchend",
+                          handleTouchEnd
+                        );
+                      };
+
+                      document.addEventListener("touchmove", handleTouchMove);
+                      document.addEventListener("touchend", handleTouchEnd);
+
                       const touch = e.touches[0];
                       const rect = e.currentTarget.getBoundingClientRect();
                       const clickX = touch.clientX - rect.left;
@@ -803,6 +1064,12 @@ function ClientDashboard() {
                   <span className="text-[#FDCE06] text-lg font-bold">
                     {selectedDuration}
                   </span>
+                  {getEquipmentDiscount() > 0 &&
+                    getDiscountPercentage() > 0 && (
+                      <div className="text-[#9CA3AF] text-xs mt-1">
+                        {getDiscountPercentage()}% compounding discount
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
@@ -843,6 +1110,30 @@ function ClientDashboard() {
                   </button>
                 </div>
                 <div className="p-4 space-y-4 h-[400px] overflow-y-auto">
+                  {/* Load More Button */}
+                  {hasMoreMessages && (
+                    <div className="flex justify-center mb-4">
+                      <button
+                        onClick={() => {
+                          if (conversations.length > 0) {
+                            loadMoreMessages(conversations[0].id);
+                          }
+                        }}
+                        disabled={loadingMore}
+                        className="bg-[#333333] text-[#E5E5E5] px-4 py-2 rounded-lg hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                      >
+                        {loadingMore ? (
+                          <div className="flex items-center gap-2">
+                            <ClipLoader size={12} color="#E5E5E5" />
+                            Loading...
+                          </div>
+                        ) : (
+                          "Load More Messages"
+                        )}
+                      </button>
+                    </div>
+                  )}
+
                   {messages.length === 0 ? (
                     <div className="text-center py-8">
                       <p className="text-[#9CA3AF]">
@@ -850,38 +1141,136 @@ function ClientDashboard() {
                       </p>
                     </div>
                   ) : (
-                    messages.map((message) => {
-                      // Get current user ID from localStorage (client side)
-                      const currentUserId = parseInt(
-                        localStorage.getItem("clientUserId")
-                      );
-                      const isCurrentUser =
-                        message.from_user_id === currentUserId;
-
-                      return (
-                        <div
-                          key={message.id}
-                          className={`flex ${
-                            isCurrentUser ? "justify-end" : "justify-start"
-                          }`}
-                        >
-                          <div
-                            className={`max-w-[280px] rounded-lg p-3 ${
-                              isCurrentUser
-                                ? "bg-[#FDCE06] text-[#000000]"
-                                : "bg-[#292A2B] text-[#E5E5E5]"
-                            }`}
-                          >
-                            <p className="text-sm">{message.message}</p>
-                            <p className="text-xs mt-1 opacity-70">
-                              {new Date(
-                                message.created_at
-                              ).toLocaleTimeString()}
-                            </p>
+                    Object.entries(messageGroups).map(
+                      ([date, dateMessages]) => (
+                        <div key={date}>
+                          {/* Date Header */}
+                          <div className="flex justify-center my-4">
+                            <div className="bg-[#333333] text-[#9CA3AF] text-xs px-3 py-1 rounded-full">
+                              {new Date(date).toLocaleDateString([], {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                            </div>
                           </div>
+
+                          {/* Messages for this date */}
+                          {dateMessages.map((message) => {
+                            const messageUserId = parseInt(
+                              message.from_user_id || "0"
+                            );
+                            const currentUserId = getCurrentUserId();
+                            const isCurrentUser =
+                              messageUserId === currentUserId &&
+                              messageUserId > 0;
+                            const isEquipmentRequest =
+                              message.message_type === "equipment_request";
+
+                            // Debug logging
+                            console.log("Message alignment:", {
+                              messageId: message.id,
+                              messageUserId,
+                              currentUserId,
+                              isCurrentUser,
+                              message: message.message.substring(0, 10),
+                              rawFromUserId: message.from_user_id,
+                            });
+
+                            return (
+                              <div
+                                key={message.id}
+                                className={`flex ${
+                                  isCurrentUser
+                                    ? "justify-end"
+                                    : "justify-start"
+                                }`}
+                              >
+                                <div
+                                  className={`max-w-[280px] mb-5 rounded-lg p-3 ${
+                                    isEquipmentRequest
+                                      ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                                      : isCurrentUser
+                                        ? "bg-[#FDCE06] text-[#000000]"
+                                        : "bg-[#292A2B] text-[#E5E5E5]"
+                                  }`}
+                                >
+                                  {isEquipmentRequest && (
+                                    <div className="mb-2">
+                                      <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
+                                        Equipment Request
+                                      </span>
+                                    </div>
+                                  )}
+                                  <p className="text-sm">{message.message}</p>
+                                  {message.equipment_name && (
+                                    <div className="mt-2 text-xs opacity-80">
+                                      Equipment: {message.equipment_name}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between mt-2">
+                                    <p className="text-xs opacity-70">
+                                      {new Date(
+                                        message.created_at
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </p>
+                                    {/* Read Receipt */}
+                                    {isCurrentUser && (
+                                      <div className="flex items-center gap-1">
+                                        {message.read_at ? (
+                                          <div className="flex items-center gap-1">
+                                            <svg
+                                              width="12"
+                                              height="12"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2"
+                                              className="text-blue-500"
+                                            >
+                                              <polyline points="20,6 9,17 4,12" />
+                                            </svg>
+                                            <svg
+                                              width="12"
+                                              height="12"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2"
+                                              className="text-blue-500"
+                                            >
+                                              <polyline points="20,6 9,17 4,12" />
+                                            </svg>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center gap-1">
+                                            <svg
+                                              width="12"
+                                              height="12"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2"
+                                              className="text-gray-400"
+                                            >
+                                              <polyline points="20,6 9,17 4,12" />
+                                            </svg>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })
+                      )
+                    )
                   )}
                 </div>
                 <div className="border-t border-[#333333] p-4">
@@ -1023,9 +1412,12 @@ function ClientDashboard() {
                 </div>
               ) : (
                 messages.map((message) => {
-                  // Get current user ID from localStorage
-                  const currentUserId = localStorage.getItem("user_id");
-                  const isCurrentUser = message.from_user_id == currentUserId;
+                  const messageUserId = parseInt(message.from_user_id || "0");
+                  const currentUserId = getCurrentUserId();
+                  const isCurrentUser =
+                    messageUserId === currentUserId && messageUserId > 0;
+                  const isEquipmentRequest =
+                    message.message_type === "equipment_request";
 
                   return (
                     <div
@@ -1036,15 +1428,39 @@ function ClientDashboard() {
                     >
                       <div
                         className={`max-w-[80%] rounded-lg p-3 ${
-                          isCurrentUser
-                            ? "bg-[#FDCE06] text-[#000000]"
-                            : "bg-[#292A2B] text-[#E5E5E5]"
+                          isEquipmentRequest
+                            ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                            : isCurrentUser
+                              ? "bg-[#FDCE06] text-[#000000]"
+                              : "bg-[#292A2B] text-[#E5E5E5]"
                         }`}
                       >
+                        {isEquipmentRequest && (
+                          <div className="mb-2">
+                            <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
+                              Equipment Request
+                            </span>
+                          </div>
+                        )}
                         <p className="text-sm">{message.message}</p>
-                        <p className="text-xs mt-1 opacity-70">
-                          {new Date(message.created_at).toLocaleTimeString()}
-                        </p>
+                        {message.equipment_name && (
+                          <div className="mt-2 text-xs opacity-80">
+                            Equipment: {message.equipment_name}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="text-xs opacity-70">
+                            {new Date(message.created_at).toLocaleString([], {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                          {message.read_at && (
+                            <p className="text-xs opacity-50">✓ Read</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

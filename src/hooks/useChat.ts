@@ -7,6 +7,9 @@ export const useChat = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Polling interval for real-time updates
   const pollingInterval = useRef(null);
@@ -33,18 +36,30 @@ export const useChat = () => {
   // Load messages for a conversation
   const loadMessages = useCallback(async (conversationId, page = 1) => {
     try {
-      setLoading(true);
+      if (page === 1) {
+        setLoading(true);
+        setCurrentPage(1);
+      } else {
+        setLoadingMore(true);
+      }
+
       const response = await chatApi.getMessages(conversationId, page);
       if (!response.error) {
         const messagesData = response.data || [];
+        const pagination = response.pagination || {};
 
         if (page === 1) {
-          // First page - replace all messages (already in correct order from backend)
+          // First page - replace all messages
           setMessages(messagesData);
+          setCurrentPage(1);
         } else {
           // Additional pages - prepend older messages
           setMessages((prev) => [...messagesData, ...prev]);
+          setCurrentPage(page);
         }
+
+        // Update pagination state
+        setHasMoreMessages(pagination.hasMore || false);
 
         // Update last message timestamp for real-time polling
         if (messagesData.length > 0) {
@@ -61,8 +76,20 @@ export const useChat = () => {
       console.error("Load messages error:", err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, []);
+
+  // Load more messages (for pagination)
+  const loadMoreMessages = useCallback(
+    async (conversationId) => {
+      if (!hasMoreMessages || loadingMore) return;
+
+      const nextPage = currentPage + 1;
+      await loadMessages(conversationId, nextPage);
+    },
+    [hasMoreMessages, loadingMore, currentPage, loadMessages]
+  );
 
   // Send a message
   const sendMessage = useCallback(
@@ -243,10 +270,14 @@ export const useChat = () => {
     loading,
     error,
     isConnected,
+    hasMoreMessages,
+    loadingMore,
+    currentPage,
 
     // Actions
     loadConversations,
     loadMessages,
+    loadMoreMessages,
     sendMessage,
     sendEquipmentRequest,
     startPolling,

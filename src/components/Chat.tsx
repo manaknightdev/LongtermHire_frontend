@@ -14,8 +14,8 @@ const Chat = () => {
   const [showNewConversationModal, setShowNewConversationModal] =
     useState(false);
   const [page, setPage] = useState(1);
-  const [hasMoreMessages, setHasMoreMessages] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  // const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  // const [loadingMore, setLoadingMore] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -29,8 +29,12 @@ const Chat = () => {
     conversations,
     messages,
     loading,
+    hasMoreMessages,
+    loadingMore,
+    currentPage,
     loadConversations,
     loadMessages,
+    loadMoreMessages,
     sendMessage,
     startPolling,
     stopPolling,
@@ -69,6 +73,21 @@ const Chat = () => {
       conversationUserIds.includes(messageToUserId)
     );
   });
+
+  // Group messages by date for date headers
+  const groupMessagesByDate = (messages) => {
+    const groups = {};
+    messages.forEach((message) => {
+      const date = new Date(message.created_at).toDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(message);
+    });
+    return groups;
+  };
+
+  const messageGroups = groupMessagesByDate(filteredMessages);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (force = false) => {
@@ -193,33 +212,70 @@ const Chat = () => {
 
       // If no client passed, use selectedClientId and find the client
       if (!client && selectedClientId) {
+        console.log("Selected client ID from dropdown:", selectedClientId);
+        console.log("Available clients:", clients);
         clientToUse = clients.find(
           (c) => c.user_id === parseInt(selectedClientId)
         );
+        console.log("Found client:", clientToUse);
       }
 
       if (!clientToUse) {
         console.error("No client selected");
+        console.log("Available clients:", clients);
+        console.log("Selected client ID:", selectedClientId);
         return;
       }
 
-      // Check if conversation already exists
+      console.log("Selected client:", clientToUse);
+
+      // Double-check that this client doesn't already have a conversation
       if (clientToUse.has_conversation === 1) {
-        console.error("Conversation already exists with this client");
+        console.error("Client already has a conversation:", clientToUse);
+        // Instead of returning, we should find the existing conversation and select it
+        const existingConversation = conversations.find(
+          (conv) =>
+            parseInt(conv.user1_id) === clientToUse.user_id ||
+            parseInt(conv.user2_id) === clientToUse.user_id
+        );
+
+        if (existingConversation) {
+          console.log("Found existing conversation:", existingConversation);
+          handleSelectConversation(existingConversation);
+          setShowNewConversationModal(false);
+          setSelectedClientId("");
+          return;
+        } else {
+          console.error(
+            "Client has has_conversation=1 but no conversation found in list"
+          );
+          return;
+        }
+      }
+
+      console.log("Starting conversation with client:", clientToUse);
+      console.log("Client ID being sent:", clientToUse.user_id);
+      console.log("Client ID type:", typeof clientToUse.user_id);
+
+      // Ensure client_id is a valid number
+      if (!clientToUse.user_id || isNaN(clientToUse.user_id)) {
+        console.error("Invalid client ID:", clientToUse.user_id);
         return;
       }
-      console.log(clientToUse, clients);
 
       const response = await chatApi.startConversation(
         clientToUse.user_id,
-        `Hello ${clientToUse.name}, how can I help you today?`
+        `Hello ${clientToUse.name || clientToUse.email || "there"}, how can I help you today?`
       );
 
       if (!response.error) {
+        console.log("Conversation started successfully:", response);
         // Reload conversations to show the new one
         loadConversations();
         setShowNewConversationModal(false);
         setSelectedClientId("");
+      } else {
+        console.error("Failed to start conversation:", response);
       }
     } catch (error) {
       console.error("Failed to start conversation:", error);
@@ -428,6 +484,25 @@ const Chat = () => {
               className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-[#292A2B]"
               style={{ scrollBehavior: "smooth" }}
             >
+              {/* Load More Button */}
+              {hasMoreMessages && (
+                <div className="flex justify-center mb-4">
+                  <button
+                    onClick={() => loadMoreMessages(selectedConversation.id)}
+                    disabled={loadingMore}
+                    className="bg-[#333333] text-[#E5E5E5] px-4 py-2 rounded-lg hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                  >
+                    {loadingMore ? (
+                      <div className="flex items-center gap-2">
+                        <ClipLoader size={12} color="#E5E5E5" />
+                        Loading...
+                      </div>
+                    ) : (
+                      "Load More Messages"
+                    )}
+                  </button>
+                </div>
+              )}
               {loading && filteredMessages.length === 0 ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="text-[#9CA3AF]">Loading messages...</div>
@@ -439,59 +514,125 @@ const Chat = () => {
                   </div>
                 </div>
               ) : (
-                filteredMessages.map((message) => {
-                  // Check if message is from current user (admin)
-                  // Convert both to numbers for comparison to handle string/number mismatches
-                  const isFromCurrentUser =
-                    parseInt(message.from_user_id) === currentUserId;
-                  const isEquipmentRequest =
-                    message.message_type === "equipment_request";
-
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${
-                        isFromCurrentUser ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          isEquipmentRequest
-                            ? "bg-[#FDCE06] text-[#1F1F20] border-2 border-[#E5B800]"
-                            : isFromCurrentUser
-                              ? "bg-[#FDCE06] text-[#1F1F20]"
-                              : "bg-[#1F1F20] text-[#E5E5E5] border border-[#333333]"
-                        }`}
-                      >
-                        {isEquipmentRequest && (
-                          <div className="mb-2">
-                            <span className="text-xs font-bold bg-[#1F1F20] text-[#FDCE06] px-2 py-1 rounded">
-                              Bulldozer Required
-                            </span>
-                          </div>
-                        )}
-                        <p className="text-sm">{message.message}</p>
-                        {message.equipment_name && (
-                          <div className="mt-2 text-xs opacity-80">
-                            Equipment: {message.equipment_name}
-                          </div>
-                        )}
-                        <p
-                          className={`text-xs mt-1 ${
-                            isFromCurrentUser
-                              ? "text-[#1F1F20] opacity-70"
-                              : "text-[#9CA3AF]"
-                          }`}
-                        >
-                          {new Date(message.created_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                Object.entries(messageGroups).map(([date, dateMessages]) => (
+                  <div key={date}>
+                    {/* Date Header */}
+                    <div className="flex justify-center my-4">
+                      <div className="bg-[#333333] text-[#9CA3AF] text-xs px-3 py-1 rounded-full">
+                        {new Date(date).toLocaleDateString([], {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
                       </div>
                     </div>
-                  );
-                })
+
+                    {/* Messages for this date */}
+                    {dateMessages.map((message) => {
+                      // Check if message is from current user (admin)
+                      // Convert both to numbers for comparison to handle string/number mismatches
+                      const isFromCurrentUser =
+                        parseInt(message.from_user_id) === currentUserId;
+                      const isEquipmentRequest =
+                        message.message_type === "equipment_request";
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${
+                            isFromCurrentUser ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-[85%] mb-5 sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                              isEquipmentRequest
+                                ? "bg-[#FDCE06] text-[#1F1F20] border-2 border-[#E5B800]"
+                                : isFromCurrentUser
+                                  ? "bg-[#FDCE06] text-[#1F1F20]"
+                                  : "bg-[#1F1F20] text-[#E5E5E5] border border-[#333333]"
+                            }`}
+                          >
+                            {isEquipmentRequest && (
+                              <div className="mb-2">
+                                <span className="text-xs font-bold bg-[#1F1F20] text-[#FDCE06] px-2 py-1 rounded">
+                                  Equipment Request
+                                </span>
+                              </div>
+                            )}
+                            <p className="text-sm">{message.message}</p>
+                            {message.equipment_name && (
+                              <div className="mt-2 text-xs opacity-80">
+                                Equipment: {message.equipment_name}
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mt-1">
+                              <p
+                                className={`text-xs ${
+                                  isFromCurrentUser
+                                    ? "text-[#1F1F20] opacity-70"
+                                    : "text-[#9CA3AF]"
+                                }`}
+                              >
+                                {new Date(
+                                  message.created_at
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                              {/* Read Receipt */}
+                              {isFromCurrentUser && (
+                                <div className="flex items-center gap-1">
+                                  {message.read_at ? (
+                                    <div className="flex items-center gap-1">
+                                      <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        className="text-blue-500"
+                                      >
+                                        <polyline points="20,6 9,17 4,12" />
+                                      </svg>
+                                      <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        className="text-blue-500"
+                                      >
+                                        <polyline points="20,6 9,17 4,12" />
+                                      </svg>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1">
+                                      <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        className="text-gray-400"
+                                      >
+                                        <polyline points="20,6 9,17 4,12" />
+                                      </svg>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
               )}
             </div>
 
@@ -592,7 +733,7 @@ const Chat = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleStartConversation}
+                  onClick={() => handleStartConversation()}
                   disabled={!selectedClientId}
                   className="flex-1 bg-[#FDCE06] text-[#1F1F20] py-2 px-4 rounded-lg hover:bg-[#E5B800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >

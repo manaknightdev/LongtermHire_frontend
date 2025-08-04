@@ -85,4 +85,54 @@ export const contentApi = {
       throw error.response?.data || error.message;
     }
   },
+
+  // Add single image to content
+  addImage: async (contentId, imageData) => {
+    try {
+      const response = await api.post(
+        `/v1/api/longtermhire/super_admin/content/${contentId}/images`,
+        imageData
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Remove image from content
+  removeImage: async (contentId, imageId) => {
+    try {
+      const response = await api.delete(
+        `/v1/api/longtermhire/super_admin/content/${contentId}/images/${imageId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Set main image for content
+  setMainImage: async (contentId, imageId) => {
+    try {
+      const response = await api.put(
+        `/v1/api/longtermhire/super_admin/content/${contentId}/images/${imageId}/main`
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Reorder images for content
+  reorderImages: async (contentId, imageOrder) => {
+    try {
+      const response = await api.put(
+        `/v1/api/longtermhire/super_admin/content/${contentId}/images/reorder`,
+        { imageOrder }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };

@@ -127,10 +127,104 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
 
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
-                      Image
+                      Images (
+                      {content.images && Array.isArray(content.images)
+                        ? content.images.length
+                        : content.image_url
+                          ? 1
+                          : 0}
+                      )
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md p-3">
-                      {content.image_url ? (
+                      {content.images &&
+                      Array.isArray(content.images) &&
+                      content.images.length > 0 ? (
+                        <div className="space-y-4">
+                          {/* Main Image Display */}
+                          {(() => {
+                            const mainImage = content.images.find(
+                              (img) => img.is_main === 1 || img.is_main === true
+                            );
+                            const displayImage = mainImage || content.images[0];
+                            return (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[#E5E5E5] font-medium text-sm">
+                                    Main Image:
+                                  </span>
+                                  {mainImage && (
+                                    <span className="bg-[#FDCE06] text-[#1A1A1A] px-2 py-1 rounded text-xs font-medium">
+                                      Main
+                                    </span>
+                                  )}
+                                </div>
+                                <img
+                                  src={displayImage.image_url}
+                                  alt={
+                                    displayImage.caption ||
+                                    content.equipment_name
+                                  }
+                                  className="w-full h-48 object-cover rounded-md"
+                                  onError={(e) => {
+                                    e.target.src = "/placeholder-equipment.jpg";
+                                  }}
+                                />
+                                {displayImage.caption && (
+                                  <div className="text-[#9CA3AF] text-sm">
+                                    Caption: {displayImage.caption}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {/* All Images Grid */}
+                          {content.images.length > 1 && (
+                            <div className="space-y-2">
+                              <span className="text-[#E5E5E5] font-medium text-sm">
+                                All Images:
+                              </span>
+                              <div className="grid grid-cols-3 gap-2">
+                                {content.images.map((image, index) => (
+                                  <div key={index} className="relative">
+                                    <img
+                                      src={image.image_url}
+                                      alt={
+                                        image.caption || `Image ${index + 1}`
+                                      }
+                                      className="w-full h-20 object-cover rounded-md border border-[#333333]"
+                                      onError={(e) => {
+                                        e.target.src =
+                                          "/placeholder-equipment.jpg";
+                                      }}
+                                    />
+                                    {(image.is_main === 1 ||
+                                      image.is_main === true) && (
+                                      <div className="absolute top-1 left-1 w-5 h-5 bg-[#FDCE06] rounded-full flex items-center justify-center">
+                                        <svg
+                                          className="w-3 h-3 text-[#1A1A1A]"
+                                          fill="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                    {image.caption && (
+                                      <div
+                                        className="text-[#9CA3AF] text-xs mt-1 truncate"
+                                        title={image.caption}
+                                      >
+                                        {image.caption}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : content.image_url ? (
                         <div className="space-y-3">
                           <img
                             src={content.image_url}
@@ -140,9 +234,6 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                               e.target.src = "/placeholder-equipment.jpg";
                             }}
                           />
-                          {/* <div className="text-[#9CA3AF] text-sm break-all">
-                            {content.image_url}
-                          </div> */}
                         </div>
                       ) : (
                         <div className="flex items-center justify-center h-48 bg-[#1A1A1A] rounded-md">

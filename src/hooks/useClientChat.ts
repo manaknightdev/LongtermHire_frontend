@@ -12,6 +12,9 @@ export const useClientChat = () => {
     online_admin_count: 0,
     total_admin_count: 0,
   });
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Intervals for online status management
   const heartbeatInterval = useRef(null);
@@ -85,14 +88,32 @@ export const useClientChat = () => {
   }, []);
 
   // Load messages for a specific conversation
-  const loadMessages = useCallback(async (conversationId) => {
+  const loadMessages = useCallback(async (conversationId, page = 1) => {
     try {
-      setLoading(true);
-      const response = await chatApi.getMessages(conversationId);
+      if (page === 1) {
+        setLoading(true);
+        setCurrentPage(1);
+      } else {
+        setLoadingMore(true);
+      }
 
+      const response = await chatApi.getMessages(conversationId, page);
       if (!response.error) {
         const messagesData = response.data || [];
-        setMessages(messagesData);
+        const pagination = response.pagination || {};
+
+        if (page === 1) {
+          // First page - replace all messages
+          setMessages(messagesData);
+          setCurrentPage(1);
+        } else {
+          // Additional pages - prepend older messages
+          setMessages((prev) => [...messagesData, ...prev]);
+          setCurrentPage(page);
+        }
+
+        // Update pagination state
+        setHasMoreMessages(pagination.hasMore || false);
 
         // Update last message timestamp for real-time polling
         if (messagesData.length > 0) {
@@ -109,8 +130,20 @@ export const useClientChat = () => {
       setError("Failed to load messages");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, []);
+
+  // Load more messages (for pagination)
+  const loadMoreMessages = useCallback(
+    async (conversationId) => {
+      if (!hasMoreMessages || loadingMore) return;
+
+      const nextPage = currentPage + 1;
+      await loadMessages(conversationId, nextPage);
+    },
+    [hasMoreMessages, loadingMore, currentPage, loadMessages]
+  );
 
   // Send a message
   const sendMessage = useCallback(
@@ -124,9 +157,14 @@ export const useClientChat = () => {
 
         if (!response.error) {
           // Add message to local state immediately for better UX
+          const currentUserId = parseInt(
+            localStorage.getItem("clientUserId") ||
+              localStorage.getItem("user_id") ||
+              "0"
+          );
           const newMessage = {
             id: response.data.id,
-            from_user_id: response.data.from_user_id,
+            from_user_id: currentUserId, // Use current user ID instead of response data
             to_user_id: toUserId,
             message: message,
             message_type: "text",
@@ -306,8 +344,12 @@ export const useClientChat = () => {
     error,
     adminOnline,
     adminStatus,
+    hasMoreMessages,
+    loadingMore,
+    currentPage,
     loadConversations,
     loadMessages,
+    loadMoreMessages,
     sendMessage,
     startPolling,
     stopPolling,

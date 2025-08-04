@@ -66,12 +66,19 @@ export const chatApi = {
 
   // Start a new conversation (admin with client)
   startConversation: async (clientId, initialMessage = null) => {
+    console.log("API call - clientId:", clientId, "type:", typeof clientId);
+    console.log("API call - initialMessage:", initialMessage);
+
+    const requestBody = {
+      client_id: clientId,
+      initial_message: initialMessage,
+    };
+
+    console.log("API request body:", requestBody);
+
     const response = await api.post(
       "/v1/api/longtermhire/chat/start-conversation",
-      {
-        client_id: clientId,
-        initial_message: initialMessage,
-      }
+      requestBody
     );
     return response.data;
   },

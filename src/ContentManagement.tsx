@@ -90,7 +90,9 @@ const ContentManagement = () => {
 
   const handleSubmitContent = async (contentData) => {
     try {
-      await contentApi.addContent(contentData);
+      // Send the complete contentData including images array to backend
+      const response = await contentApi.addContent(contentData);
+
       toast.success("Content created successfully!");
       setIsAddModalOpen(false);
       // Refresh the content list
@@ -114,7 +116,9 @@ const ContentManagement = () => {
 
   const handleUpdateContent = async (contentData) => {
     try {
+      // Send the complete contentData including images array to backend
       await contentApi.updateContent(selectedContent.id, contentData);
+
       toast.success("Content updated successfully!");
       setIsEditModalOpen(false);
       setSelectedContent(null);
@@ -518,7 +522,40 @@ const ContentManagement = () => {
                             index === 0 || index === 4 ? "9.9px" : "10.4px",
                         }}
                       >
-                        {item.image_url && isImageUrl(item.image_url) ? (
+                        {item.images &&
+                        Array.isArray(item.images) &&
+                        item.images.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {/* Show only main image in table */}
+                            {(() => {
+                              const mainImage = item.images.find(
+                                (img) =>
+                                  img.is_main === 1 || img.is_main === true
+                              );
+                              if (mainImage) {
+                                return (
+                                  <div className="relative">
+                                    <img
+                                      src={mainImage.image_url}
+                                      alt={mainImage.caption || "Equipment"}
+                                      className="w-16 h-12 object-cover rounded border border-[#333333]"
+                                    />
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#FDCE06] rounded-full flex items-center justify-center">
+                                      <svg
+                                        className="w-2 h-2 text-[#1A1A1A]"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path d="M5 13l4 4L19 7" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
+                        ) : item.image_url && isImageUrl(item.image_url) ? (
                           <img
                             src={item.image_url}
                             alt="Equipment"
