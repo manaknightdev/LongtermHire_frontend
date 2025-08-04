@@ -114,10 +114,19 @@ const ContentManagement = () => {
     setIsDetailsModalOpen(true);
   };
 
-  const handleUpdateContent = async (contentData) => {
+  const handleUpdateContent = async (contentData, contentId = null) => {
     try {
+      // Use provided contentId or fall back to selectedContent
+      const idToUpdate = contentId || (selectedContent && selectedContent.id);
+
+      if (!idToUpdate) {
+        console.error("No content ID provided for update");
+        toast.error("No content ID provided for update");
+        return;
+      }
+
       // Send the complete contentData including images array to backend
-      await contentApi.updateContent(selectedContent.id, contentData);
+      await contentApi.updateContent(idToUpdate, contentData);
 
       toast.success("Content updated successfully!");
       setIsEditModalOpen(false);

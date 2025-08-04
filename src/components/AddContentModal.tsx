@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import { equipmentApi } from "../services/equipmentApi";
 import { contentApi } from "../services/contentApi";
 import ImageManager from "./ImageManager";
+import { toast } from "react-toastify";
 
 const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
   const [formData, setFormData] = useState({
@@ -44,6 +45,7 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
       const response = await equipmentApi.getEquipment(1, 100); // Get first 100 equipment
       if (!response.error) {
         setEquipmentList(response.data || []);
+        console.log("Loaded equipment list:", response.data);
       }
     } catch (error) {
       console.error("Failed to load equipment list:", error);
@@ -58,6 +60,7 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
       const response = await contentApi.getContent(1, 1000); // Get all content
       if (!response.error) {
         setExistingContent(response.data || []);
+        console.log("Loaded existing content:", response.data);
       }
     } catch (error) {
       console.error("Failed to load existing content:", error);
@@ -115,14 +118,22 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if we have at least one image
+    if (images.length === 0) {
+      toast.error("Please upload at least one image for the content");
+      return;
+    }
+
     // Find selected equipment details
     const selectedEquipment = equipmentList.find(
       (eq) => eq.id.toString() === formData.equipment_id
     );
 
     // Get main image URL (for backward compatibility)
-    const mainImage = images.find((img) => img.is_main);
-    const imageUrl = mainImage ? mainImage.url : "";
+    const mainImage = images.find(
+      (img) => img.is_main === 1 || img.is_main === true
+    );
+    const imageUrl = mainImage ? mainImage.image_url || mainImage.url : "";
 
     // Prepare data for API
     const contentData = {
@@ -132,11 +143,13 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
       banner_description: formData.bannerDescription,
       image_url: imageUrl, // Keep for backward compatibility
       images: images.map((img, index) => ({
-        url: img.url,
-        is_main: img.is_main,
+        url: img.image_url || img.url,
+        is_main: img.is_main === 1 || img.is_main === true ? 1 : 0,
         caption: img.caption || `Image ${index + 1}`,
       })),
     };
+
+    console.log("Submitting content data:", contentData);
 
     try {
       await onSubmit(contentData);
@@ -173,11 +186,16 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                 </span>
               </div>
             ) : equipmentList.filter((equipment) => {
-                const hasContent = existingContent.some(
-                  (content) =>
-                    content.equipment_id === equipment.equipment_id ||
-                    content.equipment_id === equipment.id
-                );
+                const hasContent = existingContent.some((content) => {
+                  const contentEquipmentId = content.equipment_id?.toString();
+                  const equipmentId = equipment.equipment_id?.toString();
+                  const equipmentDbId = equipment.id?.toString();
+
+                  return (
+                    contentEquipmentId === equipmentId ||
+                    contentEquipmentId === equipmentDbId
+                  );
+                });
                 return !hasContent;
               }).length === 0 ? (
               <div className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 flex items-center">
@@ -198,10 +216,22 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                 {equipmentList
                   .filter((equipment) => {
                     // Filter out equipment that already has content
-                    const hasContent = existingContent.some(
-                      (content) =>
-                        content.equipment_id === equipment.equipment_id ||
-                        content.equipment_id === equipment.id
+                    const hasContent = existingContent.some((content) => {
+                      // Check multiple possible ID matches
+                      const contentEquipmentId =
+                        content.equipment_id?.toString();
+                      const equipmentId = equipment.equipment_id?.toString();
+                      const equipmentDbId = equipment.id?.toString();
+
+                      return (
+                        contentEquipmentId === equipmentId ||
+                        contentEquipmentId === equipmentDbId
+                      );
+                    });
+
+                    console.log(
+                      `Equipment ${equipment.equipment_name} (${equipment.equipment_id || equipment.id}) has content:`,
+                      hasContent
                     );
                     return !hasContent;
                   })
@@ -271,11 +301,16 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
               disabled={
                 loading ||
                 equipmentList.filter((equipment) => {
-                  const hasContent = existingContent.some(
-                    (content) =>
-                      content.equipment_id === equipment.equipment_id ||
-                      content.equipment_id === equipment.id
-                  );
+                  const hasContent = existingContent.some((content) => {
+                    const contentEquipmentId = content.equipment_id?.toString();
+                    const equipmentId = equipment.equipment_id?.toString();
+                    const equipmentDbId = equipment.id?.toString();
+
+                    return (
+                      contentEquipmentId === equipmentId ||
+                      contentEquipmentId === equipmentDbId
+                    );
+                  });
                   return !hasContent;
                 }).length === 0
               }

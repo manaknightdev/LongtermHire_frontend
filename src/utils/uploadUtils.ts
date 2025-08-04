@@ -23,7 +23,9 @@ export const uploadImage = async (file) => {
     formData.append("file", file);
 
     // Upload using MkdSDK
+    console.log("Starting upload for file:", file.name, file.size, file.type);
     const response = await sdk.upload(file);
+    console.log("Upload response:", response);
 
     // Return the response data which should contain {id, url}
     return response;

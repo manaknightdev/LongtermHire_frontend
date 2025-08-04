@@ -40,13 +40,23 @@ const ImageManager = ({
 
         // Upload image
         const uploadResult = await uploadImage(file);
+        console.log("Upload result:", uploadResult);
 
         // Create image object
         const imageObj = {
-          image_url: uploadResult.url,
+          image_url: uploadResult.url || uploadResult.image_url,
           is_main: images.length === 0 ? 1 : 0, // First image becomes main if no images exist
           caption: file.name.replace(/\.[^/.]+$/, ""), // Remove extension for caption
         };
+
+        console.log("Created image object:", imageObj);
+
+        // Validate that we have a valid image_url
+        if (!imageObj.image_url) {
+          throw new Error(
+            `Upload failed for ${file.name}: No image URL received`
+          );
+        }
 
         newImages.push(imageObj);
       }

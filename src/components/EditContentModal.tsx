@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import { equipmentApi } from "../services/equipmentApi";
 import { contentApi } from "../services/contentApi";
 import ImageManager from "./ImageManager";
+import { toast } from "react-toastify";
 
 const EditContentModal = ({
   isOpen,
@@ -130,14 +131,22 @@ const EditContentModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if we have at least one image
+    if (images.length === 0) {
+      toast.error("Please upload at least one image for the content");
+      return;
+    }
+
     // Find selected equipment details
     const selectedEquipment = equipmentList.find(
       (eq) => eq.id.toString() === formData.equipment_id
     );
 
     // Get main image URL (for backward compatibility)
-    const mainImage = images.find((img) => img.is_main);
-    const imageUrl = mainImage ? mainImage.url : "";
+    const mainImage = images.find(
+      (img) => img.is_main === 1 || img.is_main === true
+    );
+    const imageUrl = mainImage ? mainImage.image_url || mainImage.url : "";
 
     // Prepare data for API
     const contentData = {
@@ -147,14 +156,16 @@ const EditContentModal = ({
       banner_description: formData.bannerDescription,
       image_url: imageUrl, // Keep for backward compatibility
       images: images.map((img, index) => ({
-        url: img.url,
-        is_main: img.is_main,
+        url: img.image_url || img.url,
+        is_main: img.is_main === 1 || img.is_main === true ? 1 : 0,
         caption: img.caption || `Image ${index + 1}`,
       })),
     };
 
+    console.log("Submitting content data:", contentData);
+
     try {
-      await onSubmit(contentData);
+      await onSubmit(contentData, content?.id);
     } catch (error) {
       // Error handling is done in parent component
       console.error("Form submission error:", error);

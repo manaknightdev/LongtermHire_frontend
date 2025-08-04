@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { clientAuthApi } from "../services/clientAuthApi";
 import { clientEquipmentApi } from "../services/clientEquipmentApi";
@@ -9,6 +9,44 @@ import EquipmentDetailsModal from "../components/EquipmentDetailsModal";
 import { ClipLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Add custom CSS for scrollbar hiding and range input styling
+const scrollbarHideStyles = `
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0075FF;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0075FF;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+`;
+
+// Inject the styles
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = scrollbarHideStyles;
+document.head.appendChild(styleSheet);
 
 function ClientDashboard() {
   const [user, setUser] = useState(null);
@@ -24,6 +62,7 @@ function ClientDashboard() {
   const [error, setError] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
+  const [selectedImages, setSelectedImages] = useState({}); // Track selected image for each equipment
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -255,9 +294,9 @@ function ClientDashboard() {
             pricing_package: null,
           };
 
-      // Handle multiple images - get main image and additional images
+      // Handle multiple images - get all images and determine main display image
+      let allImages = [];
       let mainImage = "/figma-assets/equipment-placeholder.jpg";
-      let additionalImages = [];
 
       if (
         item.content?.images &&
@@ -265,18 +304,20 @@ function ClientDashboard() {
         item.content.images.length > 0
       ) {
         // Use new multiple images structure
-        const mainImageObj =
-          item.content.images.find(
-            (img) => img.is_main === 1 || img.is_main === true
-          ) || item.content.images[0];
+        allImages = item.content.images;
+        // Get the currently selected image or default to main image
+        const selectedImageIndex =
+          selectedImages[item.equipment_id || item.id] || 0;
         mainImage =
-          mainImageObj.image_url || "/figma-assets/equipment-placeholder.jpg";
-        additionalImages = item.content.images
-          .filter((img) => !(img.is_main === 1 || img.is_main === true))
-          .slice(0, 3); // Show up to 3 additional images
+          allImages[selectedImageIndex]?.image_url ||
+          allImages[0]?.image_url ||
+          "/figma-assets/equipment-placeholder.jpg";
       } else if (item.content?.image) {
         // Fallback to single image
         mainImage = item.content.image;
+        allImages = [
+          { image_url: item.content.image, caption: item.equipment_name },
+        ];
       }
 
       acc[category].push({
@@ -289,8 +330,7 @@ function ClientDashboard() {
         base_price: item.base_price,
         discounted_price: item.discounted_price,
         image: mainImage,
-        additionalImages: additionalImages,
-        allImages: item.content?.images || [],
+        allImages: allImages,
         category: item.category_name,
         discount: discountInfo,
       });
@@ -374,35 +414,7 @@ function ClientDashboard() {
     return durations;
   };
 
-  // Calculate slider position based on selected duration
-  const getSliderPosition = () => {
-    const durations = getAvailableDurations();
-    const currentIndex = durations.indexOf(selectedDuration);
-    const totalSteps = durations.length - 1;
-
-    if (currentIndex === -1 || totalSteps === 0) {
-      return { barWidth: "0%", circleLeft: "0%" };
-    }
-
-    const percentage = (currentIndex / totalSteps) * 100;
-    return { barWidth: `${percentage}%`, circleLeft: `${percentage}%` };
-  };
-
-  // Handle slider drag functionality
-  const handleSliderInteraction = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
-
-    const durations = getAvailableDurations();
-    const totalSteps = durations.length - 1;
-    const stepSize = 100 / totalSteps;
-    const selectedIndex = Math.round(percentage / stepSize);
-
-    if (selectedIndex >= 0 && selectedIndex < durations.length) {
-      setSelectedDuration(durations[selectedIndex]);
-    }
-  };
+  // Removed custom slider functions - now using native range input
 
   // Get selected duration in months
   const getSelectedDurationMonths = () => {
@@ -427,8 +439,8 @@ function ClientDashboard() {
     return basePrice * multiplier;
   };
 
-  // Calculate equipment-specific discount amount (compounding discount)
-  const getEquipmentDiscount = () => {
+  // Memoized equipment discount calculation
+  const equipmentDiscount = useMemo(() => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
     );
@@ -464,10 +476,10 @@ function ClientDashboard() {
     }
 
     return 0;
-  };
+  }, [equipment, selectedEquipment, selectedDuration]);
 
-  // Calculate final price with compounding discount
-  const getFinalPrice = () => {
+  // Memoized final price calculation
+  const finalPrice = useMemo(() => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
     );
@@ -497,10 +509,10 @@ function ClientDashboard() {
       // No discount: simple multiplication
       return parseFloat((base_price * selectedDurationMonths).toFixed(2));
     }
-  };
+  }, [equipment, selectedEquipment, selectedDuration]);
 
-  // Get discount percentage for display
-  const getDiscountPercentage = () => {
+  // Memoized discount percentage calculation
+  const discountPercentage = useMemo(() => {
     const selectedEquipmentData = equipment.find(
       (item) => item.equipment_name === selectedEquipment
     );
@@ -524,6 +536,14 @@ function ClientDashboard() {
     }
 
     return 0;
+  }, [equipment, selectedEquipment]);
+
+  // Handle image selection for equipment
+  const handleImageSelect = (equipmentId, imageIndex) => {
+    setSelectedImages((prev) => ({
+      ...prev,
+      [equipmentId]: imageIndex,
+    }));
   };
 
   // Get monthly breakdown for compounding discount
@@ -725,68 +745,85 @@ function ClientDashboard() {
                                   : "/placeholder-equipment.jpg"
                               }
                               alt={equipment.name}
-                              className="w-full h-28 sm:h-32 object-cover rounded-md"
+                              className="w-full h-28 sm:h-32 object-cover rounded-md transition-all duration-300 ease-in-out"
                               onError={(e) => {
                                 e.target.src = "/placeholder-equipment.jpg";
                               }}
                             />
 
-                            {/* Additional Images Thumbnails */}
-                            {equipment?.additionalImages &&
-                              equipment.additionalImages.length > 0 && (
-                                <div className="absolute bottom-2 right-2 flex gap-1">
-                                  {equipment.additionalImages.map(
-                                    (img, index) => (
-                                      <div
-                                        key={index}
-                                        className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-[#333333] flex items-center justify-center"
-                                        title={
-                                          img.caption || `Image ${index + 1}`
-                                        }
-                                      >
-                                        <img
-                                          src={img.image_url}
-                                          alt={
-                                            img.caption ||
-                                            `Additional view ${index + 1}`
-                                          }
-                                          className="w-full h-full object-cover"
-                                          onError={(e) => {
-                                            e.target.style.display = "none";
-                                            e.target.nextSibling.style.display =
-                                              "flex";
-                                          }}
-                                        />
-                                        <div className="hidden w-full h-full items-center justify-center">
-                                          <svg
-                                            className="w-4 h-4 text-[#9CA3AF]"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth={2}
-                                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                          </svg>
-                                        </div>
-                                      </div>
-                                    )
-                                  )}
-                                  {equipment.allImages &&
-                                    equipment.allImages.length > 4 && (
-                                      <div className="w-8 h-8 rounded-full border-2 border-white bg-[#FDCE06] flex items-center justify-center">
-                                        <span className="text-[#1A1A1A] text-xs font-bold">
-                                          +{equipment.allImages.length - 4}
-                                        </span>
-                                      </div>
-                                    )}
+                            {/* Image Counter Badge */}
+                            {equipment?.allImages &&
+                              equipment.allImages.length > 1 && (
+                                <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full">
+                                  {(selectedImages[equipment.id] || 0) + 1} /{" "}
+                                  {equipment.allImages.length}
                                 </div>
                               )}
                           </div>
-                          <div className="space-y-2 sm:space-y-3">
+
+                          {/* Horizontal Thumbnail Strip */}
+                          {equipment?.allImages &&
+                            equipment.allImages.length > 1 && (
+                              <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
+                                {equipment.allImages.map((img, index) => {
+                                  const isSelected =
+                                    selectedImages[equipment.id] === index;
+                                  return (
+                                    <div
+                                      key={index}
+                                      className={`flex-shrink-0 w-16 h-12 rounded-md overflow-hidden border-2 cursor-pointer transition-all duration-200 hover:scale-105 ${
+                                        isSelected
+                                          ? "border-[#FDCE06] ring-2 ring-[#FDCE06] ring-opacity-50 shadow-lg"
+                                          : "border-[#333333] hover:border-[#555555] hover:shadow-md"
+                                      }`}
+                                      onClick={() =>
+                                        handleImageSelect(equipment.id, index)
+                                      }
+                                      title={
+                                        img.caption || `Image ${index + 1}`
+                                      }
+                                    >
+                                      <img
+                                        src={img.image_url}
+                                        alt={
+                                          img.caption ||
+                                          `Equipment view ${index + 1}`
+                                        }
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          e.target.style.display = "none";
+                                          e.target.nextSibling.style.display =
+                                            "flex";
+                                        }}
+                                      />
+                                      <div className="hidden w-full h-full items-center justify-center bg-[#333333]">
+                                        <svg
+                                          className="w-4 h-4 text-[#9CA3AF]"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                          />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                          <div
+                            className={`space-y-2 sm:space-y-3 ${
+                              equipment?.allImages.length == 1
+                                ? "mt-[76px]"
+                                : ""
+                            }`}
+                          >
                             <div className="flex items-start justify-between gap-2">
                               <h3 className="text-[#FFFFFF] text-sm font-bold flex-1">
                                 {equipment.name}
@@ -921,14 +958,14 @@ function ClientDashboard() {
                   </span>
                   <div className="text-right">
                     <span className="text-[#FDCE06] text-base sm:text-lg font-bold">
-                      ${getFinalPrice().toFixed(2)}
+                      ${finalPrice.toFixed(2)}
                     </span>
                     <div className="text-[#9CA3AF] text-xs">
                       Total for {selectedDuration}
                     </div>
-                    {getEquipmentDiscount() > 0 && (
+                    {equipmentDiscount > 0 && (
                       <div className="text-[#22C55E] text-xs">
-                        -${getEquipmentDiscount().toFixed(2)} discount
+                        -${equipmentDiscount.toFixed(2)} discount
                       </div>
                     )}
                   </div>
@@ -936,127 +973,58 @@ function ClientDashboard() {
 
                 {/* Slider */}
                 <div className="relative mb-6">
-                  <div
-                    className="bg-[#E5E5E5] border border-[#B7B5B5] rounded-full h-3 relative cursor-pointer select-none"
-                    onClick={handleSliderInteraction}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      const handleMouseMove = (moveEvent) => {
-                        moveEvent.preventDefault();
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const clickX = moveEvent.clientX - rect.left;
-                        const percentage = Math.max(
-                          0,
-                          Math.min(100, (clickX / rect.width) * 100)
-                        );
-
-                        const durations = getAvailableDurations();
-                        const totalSteps = durations.length - 1;
-                        const stepSize = 100 / totalSteps;
-                        const selectedIndex = Math.round(percentage / stepSize);
-
-                        if (
-                          selectedIndex >= 0 &&
-                          selectedIndex < durations.length
-                        ) {
-                          setSelectedDuration(durations[selectedIndex]);
-                        }
-                      };
-
-                      const handleMouseUp = () => {
-                        document.removeEventListener(
-                          "mousemove",
-                          handleMouseMove
-                        );
-                        document.removeEventListener("mouseup", handleMouseUp);
-                      };
-
-                      document.addEventListener("mousemove", handleMouseMove);
-                      document.addEventListener("mouseup", handleMouseUp);
-                      handleSliderInteraction(e);
-                    }}
-                    onTouchStart={(e) => {
-                      e.preventDefault();
-                      const handleTouchMove = (touchEvent) => {
-                        touchEvent.preventDefault();
-                        const touch = touchEvent.touches[0];
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const clickX = touch.clientX - rect.left;
-                        const percentage = Math.max(
-                          0,
-                          Math.min(100, (clickX / rect.width) * 100)
-                        );
-
-                        const durations = getAvailableDurations();
-                        const totalSteps = durations.length - 1;
-                        const stepSize = 100 / totalSteps;
-                        const selectedIndex = Math.round(percentage / stepSize);
-
-                        if (
-                          selectedIndex >= 0 &&
-                          selectedIndex < durations.length
-                        ) {
-                          setSelectedDuration(durations[selectedIndex]);
-                        }
-                      };
-
-                      const handleTouchEnd = () => {
-                        document.removeEventListener(
-                          "touchmove",
-                          handleTouchMove
-                        );
-                        document.removeEventListener(
-                          "touchend",
-                          handleTouchEnd
-                        );
-                      };
-
-                      document.addEventListener("touchmove", handleTouchMove);
-                      document.addEventListener("touchend", handleTouchEnd);
-
-                      const touch = e.touches[0];
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const clickX = touch.clientX - rect.left;
-                      const percentage = Math.max(
-                        0,
-                        Math.min(100, (clickX / rect.width) * 100)
+                  <input
+                    type="range"
+                    min={getMinimumDuration()}
+                    max="12"
+                    value={getSelectedDurationMonths()}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      setSelectedDuration(
+                        `${value} month${value > 1 ? "s" : ""}`
                       );
-
-                      const durations = getAvailableDurations();
-                      const totalSteps = durations.length - 1;
-                      const stepSize = 100 / totalSteps;
-                      const selectedIndex = Math.round(percentage / stepSize);
-
-                      if (
-                        selectedIndex >= 0 &&
-                        selectedIndex < durations.length
-                      ) {
-                        setSelectedDuration(durations[selectedIndex]);
-                      }
                     }}
-                  >
-                    <div
-                      className="absolute left-0 top-0 bg-[#0075FF] rounded-full h-3 transition-all duration-200 ease-in-out"
-                      style={{ width: getSliderPosition().barWidth }}
-                    ></div>
-                    <div
-                      className="absolute top-[-10px] bg-[#0075FF] rounded-full w-6 h-6 flex items-center justify-center transition-all duration-200 ease-in-out cursor-grab active:cursor-grabbing shadow-lg"
-                      style={{
-                        left: getSliderPosition().circleLeft,
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
+                    className="w-full h-3 bg-[#E5E5E5] rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #0075FF 0%, #0075FF ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 100%)`,
+                    }}
+                  />
+                </div>
+
+                {/* Month Indicators */}
+                <div className="flex justify-between items-center mb-4 px-1">
+                  {[1, 3, 6, 9, 12].map((month) => {
+                    const isAvailable = month >= getMinimumDuration();
+                    const isSelected = getSelectedDurationMonths() === month;
+                    return (
+                      <div
+                        key={month}
+                        className={`text-xs font-medium transition-all duration-300 ${
+                          isAvailable
+                            ? isSelected
+                              ? "text-[#FDCE06] scale-110 font-bold"
+                              : "text-[#9CA3AF] hover:text-[#E5E5E5] cursor-pointer hover:scale-105"
+                            : "text-[#666666] cursor-not-allowed opacity-50"
+                        }`}
+                        onClick={() => {
+                          if (isAvailable) {
+                            requestAnimationFrame(() => {
+                              setSelectedDuration(
+                                `${month} month${month > 1 ? "s" : ""}`
+                              );
+                            });
+                          }
+                        }}
+                        title={
+                          isAvailable
+                            ? `${month} month${month > 1 ? "s" : ""}`
+                            : "Not available"
+                        }
                       >
-                        <circle cx="10" cy="10" r="8" fill="white" />
-                        <circle cx="10" cy="10" r="4" fill="#0075FF" />
-                      </svg>
-                    </div>
-                  </div>
+                        {month}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Duration Display */}
@@ -1064,12 +1032,11 @@ function ClientDashboard() {
                   <span className="text-[#FDCE06] text-lg font-bold">
                     {selectedDuration}
                   </span>
-                  {getEquipmentDiscount() > 0 &&
-                    getDiscountPercentage() > 0 && (
-                      <div className="text-[#9CA3AF] text-xs mt-1">
-                        {getDiscountPercentage()}% compounding discount
-                      </div>
-                    )}
+                  {equipmentDiscount > 0 && discountPercentage > 0 && (
+                    <div className="text-[#9CA3AF] text-xs mt-1">
+                      {discountPercentage}% discount
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
