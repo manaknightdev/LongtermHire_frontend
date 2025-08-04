@@ -233,7 +233,7 @@ function ClientLogin() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="bg-white border-black border-opacity-50 rounded-sm focus:ring-0"
+                    className="bg-white accent-yellow-500 border-black border-opacity-50 rounded-sm focus:ring-0"
                     style={{
                       width: "16px",
                       height: "16px",

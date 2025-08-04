@@ -86,6 +86,17 @@ const EquipmentPopover = ({
     onClose();
   };
 
+  const handleSelectAll = () => {
+    const allAvailableEquipment = equipmentOptions
+      .filter((equipment) => equipment.available)
+      .map((equipment) => equipment.id);
+    setLocalSelected(allAvailableEquipment);
+  };
+
+  const handleDeselectAll = () => {
+    setLocalSelected([]);
+  };
+
   // Close popover when clicking outside
   React.useEffect(() => {
     if (!isOpen) return;
@@ -136,17 +147,89 @@ const EquipmentPopover = ({
     >
       {/* Header */}
       <div style={{ marginBottom: "20px" }}>
-        <h3
+        <div
           style={{
-            margin: 0,
-            color: "#E5E5E5",
-            fontSize: "18px",
-            fontWeight: 600,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "12px",
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              color: "#E5E5E5",
+              fontSize: "18px",
+              fontWeight: 600,
+              fontFamily: "Inter, sans-serif",
+            }}
+          >
+            Select Equipment
+          </h3>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button
+              onClick={handleSelectAll}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "transparent",
+                border: "1px solid #FDCE06",
+                borderRadius: "4px",
+                color: "#FDCE06",
+                fontSize: "12px",
+                fontWeight: 500,
+                fontFamily: "Inter, sans-serif",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#FDCE06";
+                e.target.style.color = "#1F1F20";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.color = "#FDCE06";
+              }}
+            >
+              Select All
+            </button>
+            <button
+              onClick={handleDeselectAll}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "transparent",
+                border: "1px solid #9CA3AF",
+                borderRadius: "4px",
+                color: "#9CA3AF",
+                fontSize: "12px",
+                fontWeight: 500,
+                fontFamily: "Inter, sans-serif",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#9CA3AF";
+                e.target.style.color = "#1F1F20";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.color = "#9CA3AF";
+              }}
+            >
+              Deselect All
+            </button>
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "#9CA3AF",
             fontFamily: "Inter, sans-serif",
           }}
         >
-          Select Equipment
-        </h3>
+          {localSelected.length} of{" "}
+          {equipmentOptions.filter((e) => e.available).length} equipment
+          selected
+        </div>
       </div>
 
       {/* Equipment Categories */}

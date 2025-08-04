@@ -45,9 +45,9 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#292A2B] p-4">
+    <div className="h-screen flex items-center justify-center bg-[#292A2B] p-4">
       {/* Main Frame - Responsive container */}
-      <div className="w-full  min-h-screen  flex flex-col rounded-lg overflow-hidden">
+      <div className="w-full  h-screen  flex flex-col rounded-lg overflow-hidden">
         {/* Header Section */}
         <header className="relative border-b border-[#333333] flex items-start h-[101px] min-h-[101px] flex-shrink-0">
           {/* Logo positioned at top-left */}
@@ -131,7 +131,7 @@ function Login() {
                   />
                   <label
                     htmlFor="remember"
-                    className="text-[#E5E5E5] font-[Inter] ml-2 text-sm font-normal"
+                    className="text-[#E5E5E5] accent-yellow-500 font-[Inter] ml-2 text-sm font-normal cursor-pointer"
                   >
                     Remember Me
                   </label>

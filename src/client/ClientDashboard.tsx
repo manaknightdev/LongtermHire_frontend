@@ -448,34 +448,34 @@ function ClientDashboard() {
     if (!selectedEquipmentData) return 0;
 
     const { discount_type, discount_value, base_price } = selectedEquipmentData;
-
-    if (!discount_type || !discount_value || !base_price) return 0;
-
     const selectedDurationMonths = getSelectedDurationMonths();
 
-    if (discount_type === "percentage") {
-      // Compounding discount calculation
-      // Each month gets a discount on the previous month's price
-      let totalCost = 0;
-      let currentMonthPrice = base_price;
+    // STANDARD 1% compounding discount for ALL hires (hardcoded)
+    let standardCompoundingCost = 0;
+    let currentMonthPrice = base_price;
 
-      for (let month = 1; month <= selectedDurationMonths; month++) {
-        totalCost += currentMonthPrice;
-        // Next month's price is discounted from current month's price
-        currentMonthPrice = currentMonthPrice * (1 - discount_value / 100);
-      }
-
-      // Calculate total discount (difference between simple multiplication and compounding)
-      const simpleTotalCost = base_price * selectedDurationMonths;
-      const discountAmount = simpleTotalCost - totalCost;
-
-      return parseFloat(discountAmount.toFixed(2));
-    } else if (discount_type === "fixed") {
-      // Fixed amount discount (stays constant)
-      return discount_value;
+    for (let month = 1; month <= selectedDurationMonths; month++) {
+      standardCompoundingCost += currentMonthPrice;
+      // Next month's price is discounted by 1% from current month's price
+      currentMonthPrice = currentMonthPrice * 0.99; // 1% discount = 99% of previous price
     }
 
-    return 0;
+    // Calculate standard discount (difference between simple multiplication and compounding)
+    const simpleTotalCost = base_price * selectedDurationMonths;
+    const standardDiscount = simpleTotalCost - standardCompoundingCost;
+
+    // Add any additional pricing package discount
+    let packageDiscount = 0;
+    if (discount_type && discount_value) {
+      if (discount_type === "fixed") {
+        packageDiscount = discount_value;
+      } else if (discount_type === "percentage") {
+        // Percentage discount applied to the standard compounding cost
+        packageDiscount = standardCompoundingCost * (discount_value / 100);
+      }
+    }
+
+    return parseFloat((standardDiscount + packageDiscount).toFixed(2));
   }, [equipment, selectedEquipment, selectedDuration]);
 
   // Memoized final price calculation
@@ -489,26 +489,28 @@ function ClientDashboard() {
     const { discount_type, discount_value, base_price } = selectedEquipmentData;
     const selectedDurationMonths = getSelectedDurationMonths();
 
-    if (discount_type === "percentage" && discount_value) {
-      // Calculate total cost with compounding discount
-      let totalCost = 0;
-      let currentMonthPrice = base_price;
+    // STANDARD 1% compounding discount for ALL hires (hardcoded)
+    let standardCompoundingCost = 0;
+    let currentMonthPrice = base_price;
 
-      for (let month = 1; month <= selectedDurationMonths; month++) {
-        totalCost += currentMonthPrice;
-        // Next month's price is discounted from current month's price
-        currentMonthPrice = currentMonthPrice * (1 - discount_value / 100);
-      }
-
-      return parseFloat(totalCost.toFixed(2));
-    } else if (discount_type === "fixed" && discount_value) {
-      // Fixed discount: simple multiplication minus fixed amount
-      const simpleTotalCost = base_price * selectedDurationMonths;
-      return parseFloat((simpleTotalCost - discount_value).toFixed(2));
-    } else {
-      // No discount: simple multiplication
-      return parseFloat((base_price * selectedDurationMonths).toFixed(2));
+    for (let month = 1; month <= selectedDurationMonths; month++) {
+      standardCompoundingCost += currentMonthPrice;
+      // Next month's price is discounted by 1% from current month's price
+      currentMonthPrice = currentMonthPrice * 0.99; // 1% discount = 99% of previous price
     }
+
+    // Apply any additional pricing package discount on top of the standard compounding cost
+    let finalCost = standardCompoundingCost;
+    if (discount_type && discount_value) {
+      if (discount_type === "fixed") {
+        finalCost = standardCompoundingCost - discount_value;
+      } else if (discount_type === "percentage") {
+        // Percentage discount applied to the standard compounding cost
+        finalCost = standardCompoundingCost * (1 - discount_value / 100);
+      }
+    }
+
+    return parseFloat(Math.max(0, finalCost).toFixed(2));
   }, [equipment, selectedEquipment, selectedDuration]);
 
   // Memoized discount percentage calculation
@@ -517,26 +519,29 @@ function ClientDashboard() {
       (item) => item.equipment_name === selectedEquipment
     );
 
-    if (
-      !selectedEquipmentData?.discount_type ||
-      !selectedEquipmentData?.discount_value
-    ) {
-      return 0;
+    if (!selectedEquipmentData?.base_price) return 0;
+
+    const selectedDurationMonths = getSelectedDurationMonths();
+    const basePrice = selectedEquipmentData.base_price;
+
+    // Calculate the effective percentage discount from the standard 1% compounding
+    const simpleTotalCost = basePrice * selectedDurationMonths;
+
+    // Calculate standard compounding cost
+    let standardCompoundingCost = 0;
+    let currentMonthPrice = basePrice;
+
+    for (let month = 1; month <= selectedDurationMonths; month++) {
+      standardCompoundingCost += currentMonthPrice;
+      currentMonthPrice = currentMonthPrice * 0.99;
     }
 
-    if (selectedEquipmentData.discount_type === "percentage") {
-      return selectedEquipmentData.discount_value;
-    } else if (selectedEquipmentData.discount_type === "fixed") {
-      const basePrice = selectedEquipmentData.base_price;
-      if (basePrice > 0) {
-        return parseFloat(
-          ((selectedEquipmentData.discount_value / basePrice) * 100).toFixed(2)
-        );
-      }
-    }
+    const standardDiscount = simpleTotalCost - standardCompoundingCost;
+    const standardDiscountPercentage =
+      (standardDiscount / simpleTotalCost) * 100;
 
-    return 0;
-  }, [equipment, selectedEquipment]);
+    return parseFloat(standardDiscountPercentage.toFixed(2));
+  }, [equipment, selectedEquipment, selectedDuration]);
 
   // Handle image selection for equipment
   const handleImageSelect = (equipmentId, imageIndex) => {
@@ -975,7 +980,7 @@ function ClientDashboard() {
                 <div className="relative mb-6">
                   <input
                     type="range"
-                    min={getMinimumDuration()}
+                    min="1"
                     max="12"
                     value={getSelectedDurationMonths()}
                     onChange={(e) => {
@@ -986,7 +991,7 @@ function ClientDashboard() {
                     }}
                     className="w-full h-3 bg-[#E5E5E5] rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, #0075FF 0%, #0075FF ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 100%)`,
+                      background: `linear-gradient(to right, #0075FF 0%, #0075FF ${((getSelectedDurationMonths() - 1) / 11) * 100}%, #E5E5E5 ${((getSelectedDurationMonths() - 1) / 11) * 100}%, #E5E5E5 100%)`,
                     }}
                   />
                 </div>
@@ -994,32 +999,23 @@ function ClientDashboard() {
                 {/* Month Indicators */}
                 <div className="flex justify-between items-center mb-4 px-1">
                   {[1, 3, 6, 9, 12].map((month) => {
-                    const isAvailable = month >= getMinimumDuration();
                     const isSelected = getSelectedDurationMonths() === month;
                     return (
                       <div
                         key={month}
                         className={`text-xs font-medium transition-all duration-300 ${
-                          isAvailable
-                            ? isSelected
-                              ? "text-[#FDCE06] scale-110 font-bold"
-                              : "text-[#9CA3AF] hover:text-[#E5E5E5] cursor-pointer hover:scale-105"
-                            : "text-[#666666] cursor-not-allowed opacity-50"
+                          isSelected
+                            ? "text-[#FDCE06] scale-110 font-bold"
+                            : "text-[#9CA3AF] hover:text-[#E5E5E5] cursor-pointer hover:scale-105"
                         }`}
                         onClick={() => {
-                          if (isAvailable) {
-                            requestAnimationFrame(() => {
-                              setSelectedDuration(
-                                `${month} month${month > 1 ? "s" : ""}`
-                              );
-                            });
-                          }
+                          requestAnimationFrame(() => {
+                            setSelectedDuration(
+                              `${month} month${month > 1 ? "s" : ""}`
+                            );
+                          });
                         }}
-                        title={
-                          isAvailable
-                            ? `${month} month${month > 1 ? "s" : ""}`
-                            : "Not available"
-                        }
+                        title={`${month} month${month > 1 ? "s" : ""}`}
                       >
                         {month}
                       </div>
@@ -1032,9 +1028,29 @@ function ClientDashboard() {
                   <span className="text-[#FDCE06] text-lg font-bold">
                     {selectedDuration}
                   </span>
-                  {equipmentDiscount > 0 && discountPercentage > 0 && (
+                  {equipmentDiscount > 0 && (
                     <div className="text-[#9CA3AF] text-xs mt-1">
-                      {discountPercentage}% discount
+                      {discountPercentage}% standard compounding discount
+                      {(() => {
+                        const selectedEquipmentData = equipment.find(
+                          (item) => item.equipment_name === selectedEquipment
+                        );
+                        if (
+                          selectedEquipmentData?.discount_type &&
+                          selectedEquipmentData?.discount_value
+                        ) {
+                          if (
+                            selectedEquipmentData.discount_type === "percentage"
+                          ) {
+                            return ` + ${selectedEquipmentData.discount_value}% package discount`;
+                          } else if (
+                            selectedEquipmentData.discount_type === "fixed"
+                          ) {
+                            return ` + $${selectedEquipmentData.discount_value} package discount`;
+                          }
+                        }
+                        return "";
+                      })()}
                     </div>
                   )}
                 </div>
