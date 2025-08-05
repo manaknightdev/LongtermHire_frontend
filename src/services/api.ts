@@ -5,6 +5,73 @@ import { toast } from "react-toastify";
 // Base API configuration
 const API_BASE_URL = "https://baas.mytechpassport.com"; // Adjust this to your backend URL
 
+// Global state to track session expiration modal
+let sessionExpiredModalShown = false;
+let sessionExpiredTimeout = null;
+
+// Function to show session expired modal
+const showSessionExpiredModal = (portalType) => {
+  if (sessionExpiredModalShown) return; // Prevent multiple modals
+
+  sessionExpiredModalShown = true;
+
+  // Create modal element
+  const modal = document.createElement("div");
+  modal.className =
+    "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999]";
+  modal.innerHTML = `
+    <div class="bg-[#1F1F20] border border-[#333333] rounded-lg p-6 max-w-md mx-4 text-center">
+      <div class="mb-4">
+        <svg class="w-12 h-12 text-[#FDCE06] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+        <h3 class="text-[#E5E5E5] font-bold text-lg mb-2">Session Expired</h3>
+        <p class="text-[#9CA3AF] text-sm">Your ${portalType} session has expired. You will be redirected to login.</p>
+      </div>
+      <div class="flex justify-center">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-[#FDCE06]"></div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Clear session data
+  if (portalType === "client") {
+    localStorage.removeItem("clientAuthToken");
+    localStorage.removeItem("clientRole");
+    localStorage.removeItem("clientUserId");
+    localStorage.removeItem("clientEmail");
+    localStorage.removeItem("clientProfile");
+  } else {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
+  }
+
+  // Redirect after delay
+  sessionExpiredTimeout = setTimeout(() => {
+    const redirectUrl = portalType === "client" ? "/client/login" : "/login";
+    window.location.href = redirectUrl;
+  }, 2000);
+};
+
+// Function to determine portal type based on current page route
+const determinePortalType = (config) => {
+  // Primary method: check current page route
+  const currentPath = window.location.pathname;
+
+  // Client URLs have /client/ prefix
+  if (currentPath.startsWith("/client/")) {
+    return "client";
+  }
+
+  // Admin URLs are normal routes (no admin prefix)
+  // This includes: /, /login, /dashboard, /equipment, etc.
+  return "admin";
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,37 +79,20 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests with context-aware authentication
+// Add auth token to requests with improved context detection
 api.interceptors.request.use(
   (config) => {
-    // Determine the context based on the URL
-    const isClientRequest =
-      config.url?.includes("/client/") ||
-      config.url?.includes("/longtermhire/client/");
-    const isAdminRequest =
-      config.url?.includes("/admin/") || config.url?.includes("/super_admin/");
+    const portalType = determinePortalType(config);
 
-    if (isClientRequest) {
-      // For client requests, only use client token
+    if (portalType === "client") {
       const clientToken = localStorage.getItem("clientAuthToken");
       if (clientToken) {
         config.headers.Authorization = `Bearer ${clientToken}`;
       }
-    } else if (isAdminRequest) {
-      // For admin requests, only use admin token
-      const adminToken = localStorage.getItem("authToken");
-      if (adminToken) {
-        config.headers.Authorization = `Bearer ${adminToken}`;
-      }
     } else {
-      // For ambiguous requests, prioritize admin token but fallback to client
       const adminToken = localStorage.getItem("authToken");
-      const clientToken = localStorage.getItem("clientAuthToken");
-
       if (adminToken) {
         config.headers.Authorization = `Bearer ${adminToken}`;
-      } else if (clientToken) {
-        config.headers.Authorization = `Bearer ${clientToken}`;
       }
     }
 
@@ -53,72 +103,29 @@ api.interceptors.request.use(
   }
 );
 
-// Handle response errors
+// Handle response errors with modal-based session expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Only redirect to login if it's not a login attempt
+      // Only handle session expiration if it's not a login attempt
       const isLoginRequest = error.config?.url?.includes("/login");
-      if (!isLoginRequest) {
-        // Determine if this is a client or admin request
-        const isClientRequest =
-          error.config?.url?.includes("/client/") ||
-          error.config?.url?.includes("/longtermhire/client/");
-
-        if (isClientRequest) {
-          // Client session expired
-          toast.error("Your client session has expired. Please login again.", {
-            position: "top-right",
-            autoClose: 4000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-
-          // Clear client tokens and redirect to client login
-          localStorage.removeItem("clientAuthToken");
-          localStorage.removeItem("clientRole");
-          localStorage.removeItem("clientUserId");
-          localStorage.removeItem("clientEmail");
-          localStorage.removeItem("clientProfile");
-
-          setTimeout(() => {
-            window.location.href = "/client/login";
-          }, 1500); // Delay to show toast
-        } else {
-          // Admin session expired
-          toast.error("Your admin session has expired. Please login again.", {
-            position: "top-right",
-            autoClose: 4000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-
-          // Clear admin tokens and redirect to admin login
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("userRole");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("user");
-
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 1500); // Delay to show toast
-        }
+      if (!isLoginRequest && !sessionExpiredModalShown) {
+        const portalType = determinePortalType(error.config);
+        showSessionExpiredModal(portalType);
       }
     } else if (error.response?.status === 403) {
-      // Handle forbidden access
-      toast.error("You don't have permission to access this resource.", {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      // Handle forbidden access with toast (less critical)
+      if (!sessionExpiredModalShown) {
+        toast.error("You don't have permission to access this resource.", {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
     }
     return Promise.reject(error);
   }
@@ -161,6 +168,15 @@ export const getAuthContext = () => {
     return "client";
   } else {
     return "none";
+  }
+};
+
+// Utility function to reset session expired state (useful for testing)
+export const resetSessionExpiredState = () => {
+  sessionExpiredModalShown = false;
+  if (sessionExpiredTimeout) {
+    clearTimeout(sessionExpiredTimeout);
+    sessionExpiredTimeout = null;
   }
 };
 

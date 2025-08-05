@@ -310,6 +310,7 @@ function ClientDashboard() {
           selectedImages[item.equipment_id || item.id] || 0;
         mainImage =
           allImages[selectedImageIndex]?.image_url ||
+          allImages.find((img) => img.is_main === 1)?.image_url ||
           allImages[0]?.image_url ||
           "/figma-assets/equipment-placeholder.jpg";
       } else if (item.content?.image) {
@@ -672,7 +673,7 @@ function ClientDashboard() {
   return (
     <div className="min-h-screen bg-[#292A2B] font-[Inter]">
       {/* Header */}
-      <header className="bg-[#1F1F20] border-b border-[#333333] px-4 sm:px-8 lg:px-5 py-5">
+      <header className="bg-[#1F1F20] border-b border-[#333333] px-4 sm:px-8 lg:px-5 py-2">
         <div className="flex items-center justify-between  mx-auto">
           <div className="flex items-center">
             <img
@@ -909,6 +910,9 @@ function ClientDashboard() {
                         setSelectedDuration(
                           `${minMonths} month${minMonths > 1 ? "s" : ""}`
                         );
+                      } else {
+                        // Default to 1 month if no minimum duration specified
+                        setSelectedDuration("1 month");
                       }
                     }}
                     className="w-full bg-[#2A2A2B] border border-[#444444] rounded-md px-3 py-3 text-[#FFFFFF] text-sm sm:text-base appearance-none cursor-pointer"
@@ -942,7 +946,7 @@ function ClientDashboard() {
 
               {/* Minimum Hire Duration */}
               <div className="mb-4">
-                <div className="text-[#9CA3AF] text-xs text-center">
+                <div className="text-[#FDCE06] text-xs text-center font-semibold bg-[#1A1A1A] border border-[#333333] rounded-md py-2 px-3">
                   {(() => {
                     const selectedEquipmentData = equipment.find(
                       (item) => item.equipment_name === selectedEquipment
@@ -950,7 +954,7 @@ function ClientDashboard() {
                     const minDuration = selectedEquipmentData?.minimum_duration;
                     return minDuration
                       ? `Minimum hire duration: ${minDuration}`
-                      : "";
+                      : "Minimum hire duration: 1 Month";
                   })()}
                 </div>
               </div>
@@ -980,7 +984,7 @@ function ClientDashboard() {
                 <div className="relative mb-6">
                   <input
                     type="range"
-                    min="1"
+                    min={getMinimumDuration()}
                     max="12"
                     value={getSelectedDurationMonths()}
                     onChange={(e) => {
@@ -991,36 +995,55 @@ function ClientDashboard() {
                     }}
                     className="w-full h-3 bg-[#E5E5E5] rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, #0075FF 0%, #0075FF ${((getSelectedDurationMonths() - 1) / 11) * 100}%, #E5E5E5 ${((getSelectedDurationMonths() - 1) / 11) * 100}%, #E5E5E5 100%)`,
+                      background: `linear-gradient(to right, #0075FF 0%, #0075FF ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 ${((getSelectedDurationMonths() - getMinimumDuration()) / (12 - getMinimumDuration())) * 100}%, #E5E5E5 100%)`,
                     }}
                   />
                 </div>
 
                 {/* Month Indicators */}
                 <div className="flex justify-between items-center mb-4 px-1">
-                  {[1, 3, 6, 9, 12].map((month) => {
-                    const isSelected = getSelectedDurationMonths() === month;
-                    return (
-                      <div
-                        key={month}
-                        className={`text-xs font-medium transition-all duration-300 ${
-                          isSelected
-                            ? "text-[#FDCE06] scale-110 font-bold"
-                            : "text-[#9CA3AF] hover:text-[#E5E5E5] cursor-pointer hover:scale-105"
-                        }`}
-                        onClick={() => {
-                          requestAnimationFrame(() => {
-                            setSelectedDuration(
-                              `${month} month${month > 1 ? "s" : ""}`
-                            );
-                          });
-                        }}
-                        title={`${month} month${month > 1 ? "s" : ""}`}
-                      >
-                        {month}
-                      </div>
+                  {(() => {
+                    const minDuration = getMinimumDuration();
+                    const validMonths = [1, 3, 6, 9, 12].filter(
+                      (month) => month >= minDuration
                     );
-                  })}
+
+                    return validMonths.map((month) => {
+                      const isSelected = getSelectedDurationMonths() === month;
+                      const isMinimum = month === minDuration;
+                      return (
+                        <div
+                          key={month}
+                          className={`text-xs font-medium transition-all duration-300 ${
+                            isSelected
+                              ? "text-[#FDCE06] scale-110 font-bold"
+                              : isMinimum
+                                ? "text-[#FDCE06] font-semibold"
+                                : "text-[#9CA3AF] hover:text-[#E5E5E5] cursor-pointer hover:scale-105"
+                          }`}
+                          onClick={() => {
+                            requestAnimationFrame(() => {
+                              setSelectedDuration(
+                                `${month} month${month > 1 ? "s" : ""}`
+                              );
+                            });
+                          }}
+                          title={
+                            isMinimum
+                              ? `Minimum hire: ${month} month${month > 1 ? "s" : ""}`
+                              : `${month} month${month > 1 ? "s" : ""}`
+                          }
+                        >
+                          {month}
+                          {isMinimum && (
+                            <span className="block text-[8px] text-[#FDCE06]">
+                              MIN
+                            </span>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
 
                 {/* Duration Display */}
@@ -1057,269 +1080,279 @@ function ClientDashboard() {
             </div>
 
             {/* Chat Section - Hidden on mobile, shown on desktop */}
-            {isChatVisible && (
-              <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden">
-                <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-[#FFFFFF] text-base font-semibold">
-                      Message Rental Company
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
-                      ></div>
-                      <span
-                        className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
-                      >
-                        {adminOnline ? "Admin Online" : "Admin Offline"}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsChatVisible(false)}
-                    className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors p-1"
-                    title="Hide chat"
+            <div className="relative">
+              <div className="absolute bottom-[-100px] right-4 lg:block hidden z-50">
+                <button
+                  onClick={() => setIsChatVisible(!isChatVisible)}
+                  className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+                >
+                  <svg
+                    width="20"
+                    height="19"
+                    viewBox="0 0 20 19"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                      <path
-                        d="M15 5L5 15M5 5L15 15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <div className="p-4 space-y-4 h-[400px] overflow-y-auto">
-                  {/* Load More Button */}
-                  {hasMoreMessages && (
-                    <div className="flex justify-center mb-4">
-                      <button
-                        onClick={() => {
-                          if (conversations.length > 0) {
-                            loadMoreMessages(conversations[0].id);
-                          }
-                        }}
-                        disabled={loadingMore}
-                        className="bg-[#333333] text-[#E5E5E5] px-4 py-2 rounded-lg hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                      >
-                        {loadingMore ? (
-                          <div className="flex items-center gap-2">
-                            <ClipLoader size={12} color="#E5E5E5" />
-                            Loading...
-                          </div>
-                        ) : (
-                          "Load More Messages"
-                        )}
-                      </button>
-                    </div>
-                  )}
-
-                  {messages.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-[#9CA3AF]">
-                        No messages yet. Start the conversation!
-                      </p>
-                    </div>
-                  ) : (
-                    Object.entries(messageGroups).map(
-                      ([date, dateMessages]) => (
-                        <div key={date}>
-                          {/* Date Header */}
-                          <div className="flex justify-center my-4">
-                            <div className="bg-[#333333] text-[#9CA3AF] text-xs px-3 py-1 rounded-full">
-                              {new Date(date).toLocaleDateString([], {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </div>
-                          </div>
-
-                          {/* Messages for this date */}
-                          {dateMessages.map((message) => {
-                            const messageUserId = parseInt(
-                              message.from_user_id || "0"
-                            );
-                            const currentUserId = getCurrentUserId();
-                            const isCurrentUser =
-                              messageUserId === currentUserId &&
-                              messageUserId > 0;
-                            const isEquipmentRequest =
-                              message.message_type === "equipment_request";
-
-                            // Debug logging
-                            console.log("Message alignment:", {
-                              messageId: message.id,
-                              messageUserId,
-                              currentUserId,
-                              isCurrentUser,
-                              message: message.message.substring(0, 10),
-                              rawFromUserId: message.from_user_id,
-                            });
-
-                            return (
-                              <div
-                                key={message.id}
-                                className={`flex ${
-                                  isCurrentUser
-                                    ? "justify-end"
-                                    : "justify-start"
-                                }`}
-                              >
-                                <div
-                                  className={`max-w-[280px] mb-5 rounded-lg p-3 ${
-                                    isEquipmentRequest
-                                      ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
-                                      : isCurrentUser
-                                        ? "bg-[#FDCE06] text-[#000000]"
-                                        : "bg-[#292A2B] text-[#E5E5E5]"
-                                  }`}
-                                >
-                                  {isEquipmentRequest && (
-                                    <div className="mb-2">
-                                      <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
-                                        Equipment Request
-                                      </span>
-                                    </div>
-                                  )}
-                                  <p className="text-sm">{message.message}</p>
-                                  {message.equipment_name && (
-                                    <div className="mt-2 text-xs opacity-80">
-                                      Equipment: {message.equipment_name}
-                                    </div>
-                                  )}
-                                  <div className="flex items-center justify-between mt-2">
-                                    <p className="text-xs opacity-70">
-                                      {new Date(
-                                        message.created_at
-                                      ).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
-                                    </p>
-                                    {/* Read Receipt */}
-                                    {isCurrentUser && (
-                                      <div className="flex items-center gap-1">
-                                        {message.read_at ? (
-                                          <div className="flex items-center gap-1">
-                                            <svg
-                                              width="12"
-                                              height="12"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              strokeWidth="2"
-                                              className="text-blue-500"
-                                            >
-                                              <polyline points="20,6 9,17 4,12" />
-                                            </svg>
-                                            <svg
-                                              width="12"
-                                              height="12"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              strokeWidth="2"
-                                              className="text-blue-500"
-                                            >
-                                              <polyline points="20,6 9,17 4,12" />
-                                            </svg>
-                                          </div>
-                                        ) : (
-                                          <div className="flex items-center gap-1">
-                                            <svg
-                                              width="12"
-                                              height="12"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              strokeWidth="2"
-                                              className="text-gray-400"
-                                            >
-                                              <polyline points="20,6 9,17 4,12" />
-                                            </svg>
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )
-                    )
-                  )}
-                </div>
-                <div className="border-t border-[#333333] p-4">
-                  <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-4 py-2">
-                    <textarea
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Type your message... "
-                      className="flex-1 bg-transparent text-[#ADAEBC] text-sm sm:text-base placeholder-[#ADAEBC] placeholder:text-xs outline-none resize-none min-h-[32px] max-h-[100px] overflow-y-auto"
-                      rows={1}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#444444 transparent",
-                      }}
+                    <path
+                      d="M20.0002 8.875C20.0002 13.3633 15.5236 17 10.0002 17C8.55096 17 7.17596 16.75 5.93377 16.3008C5.46893 16.6406 4.71112 17.1055 3.81268 17.4961C2.87518 17.9023 1.74628 18.25 0.625182 18.25C0.371276 18.25 0.144713 18.0977 0.0470568 17.8633C-0.0505994 17.6289 0.00408808 17.3633 0.179869 17.1836L0.191588 17.1719C0.203307 17.1602 0.218932 17.1445 0.242369 17.1172C0.285338 17.0703 0.351744 16.9961 0.433776 16.8945C0.593932 16.6992 0.808776 16.4102 1.02753 16.0508C1.41815 15.4023 1.78924 14.5508 1.86346 13.5938C0.691588 12.2656 0.00018184 10.6367 0.00018184 8.875C0.00018184 4.38672 4.47674 0.75 10.0002 0.75C15.5236 0.75 20.0002 4.38672 20.0002 8.875Z"
+                      fill="black"
                     />
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={sendingMessage || !messageText.trim()}
-                      className="ml-2 bg-[#FDCE06] rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {sendingMessage ? (
-                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
+                  </svg>
+                </button>
+              </div>
+              {isChatVisible && (
+                <>
+                  <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden relative">
+                    {/* Show Chat Button when chat is hidden */}
+
+                    <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-[#FFFFFF] text-base font-semibold">
+                          Message Rental Company
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
+                          ></div>
+                          <span
+                            className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
+                          >
+                            {adminOnline ? "Admin Online" : "Admin Offline"}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setIsChatVisible(false)}
+                        className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors p-1"
+                        title="Hide chat"
+                      >
                         <svg
                           width="16"
                           height="16"
-                          viewBox="0 0 16 16"
+                          viewBox="0 0 20 20"
                           fill="none"
                         >
                           <path
-                            d="M2 14L14 8L2 2L2 6L10 8L2 10L2 14Z"
-                            fill="#000000"
+                            d="M15 5L5 15M5 5L15 15"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
+                      </button>
+                    </div>
+                    <div className="p-4 space-y-4 h-[400px] overflow-y-auto">
+                      {/* Load More Button */}
+                      {hasMoreMessages && (
+                        <div className="flex justify-center mb-4">
+                          <button
+                            onClick={() => {
+                              if (conversations.length > 0) {
+                                loadMoreMessages(conversations[0].id);
+                              }
+                            }}
+                            disabled={loadingMore}
+                            className="bg-[#333333] text-[#E5E5E5] px-4 py-2 rounded-lg hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                          >
+                            {loadingMore ? (
+                              <div className="flex items-center gap-2">
+                                <ClipLoader size={12} color="#E5E5E5" />
+                                Loading...
+                              </div>
+                            ) : (
+                              "Load More Messages"
+                            )}
+                          </button>
+                        </div>
                       )}
-                    </button>
+
+                      {messages.length === 0 ? (
+                        <div className="text-center py-8">
+                          <p className="text-[#9CA3AF]">
+                            No messages yet. Start the conversation!
+                          </p>
+                        </div>
+                      ) : (
+                        Object.entries(messageGroups).map(
+                          ([date, dateMessages]) => (
+                            <div key={date}>
+                              {/* Date Header */}
+                              <div className="flex justify-center my-4">
+                                <div className="bg-[#333333] text-[#9CA3AF] text-xs px-3 py-1 rounded-full">
+                                  {new Date(date).toLocaleDateString([], {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Messages for this date */}
+                              {dateMessages.map((message) => {
+                                const messageUserId = parseInt(
+                                  message.from_user_id || "0"
+                                );
+                                const currentUserId = getCurrentUserId();
+                                const isCurrentUser =
+                                  messageUserId === currentUserId &&
+                                  messageUserId > 0;
+                                const isEquipmentRequest =
+                                  message.message_type === "equipment_request";
+
+                                // Debug logging
+                                console.log("Message alignment:", {
+                                  messageId: message.id,
+                                  messageUserId,
+                                  currentUserId,
+                                  isCurrentUser,
+                                  message: message.message.substring(0, 10),
+                                  rawFromUserId: message.from_user_id,
+                                });
+
+                                return (
+                                  <div
+                                    key={message.id}
+                                    className={`flex ${
+                                      isCurrentUser
+                                        ? "justify-end"
+                                        : "justify-start"
+                                    }`}
+                                  >
+                                    <div
+                                      className={`max-w-[280px] mb-5 rounded-lg p-3 ${
+                                        isEquipmentRequest
+                                          ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                                          : isCurrentUser
+                                            ? "bg-[#FDCE06] text-[#000000]"
+                                            : "bg-[#292A2B] text-[#E5E5E5]"
+                                      }`}
+                                    >
+                                      {isEquipmentRequest && (
+                                        <div className="mb-2">
+                                          <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
+                                            Equipment Request
+                                          </span>
+                                        </div>
+                                      )}
+                                      <p className="text-sm">
+                                        {message.message}
+                                      </p>
+                                      {message.equipment_name && (
+                                        <div className="mt-2 text-xs opacity-80">
+                                          Equipment: {message.equipment_name}
+                                        </div>
+                                      )}
+                                      <div className="flex items-center justify-between mt-2">
+                                        <p className="text-xs opacity-70">
+                                          {new Date(
+                                            message.created_at
+                                          ).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })}
+                                        </p>
+                                        {/* Read Receipt */}
+                                        {isCurrentUser && (
+                                          <div className="flex items-center gap-1">
+                                            {message.read_at ? (
+                                              <div className="flex items-center gap-1">
+                                                <svg
+                                                  width="12"
+                                                  height="12"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  className="text-blue-500"
+                                                >
+                                                  <polyline points="20,6 9,17 4,12" />
+                                                </svg>
+                                                <svg
+                                                  width="12"
+                                                  height="12"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  className="text-blue-500"
+                                                >
+                                                  <polyline points="20,6 9,17 4,12" />
+                                                </svg>
+                                              </div>
+                                            ) : (
+                                              <div className="flex items-center gap-1">
+                                                <svg
+                                                  width="12"
+                                                  height="12"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  className="text-gray-400"
+                                                >
+                                                  <polyline points="20,6 9,17 4,12" />
+                                                </svg>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )
+                        )
+                      )}
+                    </div>
+                    <div className="border-t border-[#333333] p-4">
+                      <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-4 py-2">
+                        <textarea
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          placeholder="Type your message... "
+                          className="flex-1 bg-transparent text-[#ADAEBC] text-sm sm:text-base placeholder-[#ADAEBC] placeholder:text-xs outline-none resize-none min-h-[32px] max-h-[100px] overflow-y-auto"
+                          rows={1}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              handleSendMessage();
+                            }
+                          }}
+                          style={{
+                            scrollbarWidth: "thin",
+                            scrollbarColor: "#444444 transparent",
+                          }}
+                        />
+                        <button
+                          onClick={handleSendMessage}
+                          disabled={sendingMessage || !messageText.trim()}
+                          className="ml-2 bg-[#FDCE06] rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {sendingMessage ? (
+                            <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                            >
+                              <path
+                                d="M2 14L14 8L2 2L2 6L10 8L2 10L2 14Z"
+                                fill="#000000"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Show Chat Button when chat is hidden */}
-
-            <div className="fixed bottom-4 right-4 lg:block hidden z-50">
-              <button
-                onClick={() => setIsChatVisible(!isChatVisible)}
-                className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className="sm:w-5 sm:h-5"
-                >
-                  <path
-                    d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
-                    fill="#000000"
-                  />
-                </svg>
-              </button>
+                </>
+              )}
             </div>
           </div>
         </aside>

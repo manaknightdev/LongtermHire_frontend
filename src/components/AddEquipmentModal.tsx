@@ -190,7 +190,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                     </option>
                   ))}
                 </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                {/* <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                   <svg
                     width="15"
                     height="9"
@@ -200,7 +200,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                   >
                     <path d="M7.5 0L15 9L0 9L7.5 0Z" fill="#E5E5E5" />
                   </svg>
-                </div>
+                </div> */}
               </div>
               <button
                 type="button"
