@@ -707,7 +707,7 @@ function ClientDashboard() {
 
       <div className="flex flex-col lg:flex-row">
         {/* Main Content */}
-        <main className="flex-1 px-4 sm:px-8 lg:px-20 py-6 lg:py-8 lg:max-w-[866px] xl:max-w-full">
+        <main className="flex-1 px-4 sm:px-8 lg:px-20 pb-[100px] py-6 lg:py-8 lg:max-w-[866px] xl:max-w-full">
           <div className="max-w-full lg:max-w-[810px]">
             {/* Project Name */}
             <div className="mb-12 lg:mb-22">
