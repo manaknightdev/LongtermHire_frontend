@@ -39,10 +39,13 @@ function DashboardMain() {
     total_equipment: 0,
     recent_messages: 0,
     pending_requests: 0,
+    logins_today: 0,
+    logins_this_week: 0,
   });
   const [recentActivity, setRecentActivity] = useState({
     recent_requests: [],
     recent_chat_activity: [],
+    recent_client_logins: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -63,6 +66,7 @@ function DashboardMain() {
         setRecentActivity({
           recent_requests: response.data.recent_requests,
           recent_chat_activity: response.data.recent_chat_activity,
+          recent_client_logins: response.data.recent_client_logins,
         });
       } else {
         setError(response.message || "Failed to load dashboard stats");
@@ -106,7 +110,9 @@ function DashboardMain() {
       {/* Stats Section */}
       <section className="mb-8 sm:mb-10 lg:mb-12">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
             <StatCardSkeleton />
             <StatCardSkeleton />
             <StatCardSkeleton />
@@ -123,7 +129,7 @@ function DashboardMain() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6">
             {/* Total Clients Card */}
             <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 min-h-[100px] sm:min-h-[118px] flex flex-col justify-between">
               <p className="text-[#9CA3AF] font-[Inter] font-normal text-xs sm:text-sm leading-tight mb-2">
@@ -161,6 +167,26 @@ function DashboardMain() {
               </p>
               <p className="text-[#E5E5E5] font-[Inter] font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight">
                 {stats.recent_messages || 0}
+              </p>
+            </div>
+
+            {/* Logins Today Card */}
+            <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 min-h-[100px] sm:min-h-[118px] flex flex-col justify-between">
+              <p className="text-[#9CA3AF] font-[Inter] font-normal text-xs sm:text-sm leading-tight mb-2">
+                Logins Today
+              </p>
+              <p className="text-[#E5E5E5] font-[Inter] font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight">
+                {stats.logins_today || 0}
+              </p>
+            </div>
+
+            {/* Logins This Week Card */}
+            <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 min-h-[100px] sm:min-h-[118px] flex flex-col justify-between">
+              <p className="text-[#9CA3AF] font-[Inter] font-normal text-xs sm:text-sm leading-tight mb-2">
+                Logins This Week
+              </p>
+              <p className="text-[#E5E5E5] font-[Inter] font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight">
+                {stats.logins_this_week || 0}
               </p>
             </div>
           </div>
@@ -258,9 +284,43 @@ function DashboardMain() {
                 </div>
               )}
 
+              {/* Recent Client Logins */}
+              {recentActivity.recent_client_logins.length > 0 && (
+                <div>
+                  <h3 className="text-[#E5E5E5] font-[Inter] font-medium text-sm mb-3">
+                    Recent Client Logins
+                  </h3>
+                  <ul className="space-y-2 sm:space-y-3">
+                    {recentActivity.recent_client_logins
+                      .slice(0, 5)
+                      .map((login, index) => (
+                        <li
+                          key={index}
+                          className="flex items-start sm:items-center gap-3 sm:gap-4"
+                        >
+                          <span className="flex items-center justify-center rounded-md w-6 h-6 sm:w-8 sm:h-8 bg-green-500/20 flex-shrink-0 mt-1 sm:mt-0">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[#E5E5E5] font-[Inter] font-normal text-xs sm:text-sm break-words">
+                              {login.client_name || `Client ${login.client_id}`}{" "}
+                              logged in
+                            </p>
+                            <p className="text-[#9CA3AF] font-[Inter] font-normal text-xs">
+                              {new Date(login.login_time).toLocaleString()} •{" "}
+                              {login.ip_address}
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+
               {/* No Activity Message */}
               {recentActivity.recent_requests.length === 0 &&
-                recentActivity.recent_chat_activity.length === 0 && (
+                recentActivity.recent_chat_activity.length === 0 &&
+                recentActivity.recent_client_logins.length === 0 && (
                   <div className="text-center py-6 sm:py-8">
                     <p className="text-[#9CA3AF] font-[Inter] font-normal text-sm">
                       No recent activity in the last 7 days

@@ -19,6 +19,8 @@ const Chat = () => {
   const [selectedClientId, setSelectedClientId] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [clientStatus, setClientStatus] = useState({});
+  const [clientStatusLoading, setClientStatusLoading] = useState(false);
 
   // Refs for scroll management
   const messagesEndRef = useRef(null);
@@ -89,6 +91,22 @@ const Chat = () => {
 
   const messageGroups = groupMessagesByDate(filteredMessages);
 
+  // Get client ID from conversation
+  const getClientIdFromConversation = (conversation) => {
+    const currentUserId = parseInt(localStorage.getItem("userId"));
+    const user1Id = parseInt(conversation.user1_id);
+    const user2Id = parseInt(conversation.user2_id);
+
+    // Return the ID that's not the current admin user
+    return user1Id === currentUserId ? user2Id : user1Id;
+  };
+
+  // Get client online status
+  const getClientOnlineStatus = (conversation) => {
+    const clientId = getClientIdFromConversation(conversation);
+    return clientStatus[clientId] || { is_online: false, last_seen: null };
+  };
+
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (force = false) => {
     if (messagesEndRef.current) {
@@ -146,6 +164,7 @@ const Chat = () => {
   useEffect(() => {
     loadConversations();
     loadClients();
+    loadClientStatus();
   }, [loadConversations]);
 
   // Load clients for new conversation
@@ -157,6 +176,29 @@ const Chat = () => {
       }
     } catch (error) {
       console.error("Failed to load clients:", error);
+    }
+  };
+
+  // Load client online status
+  const loadClientStatus = async () => {
+    try {
+      setClientStatusLoading(true);
+      const response = await chatApi.getClientStatus();
+      if (!response.error) {
+        // Create a map of client ID to status for easy lookup
+        const statusMap = {};
+        response.data.clients.forEach((client) => {
+          statusMap[client.id] = {
+            is_online: client.is_online,
+            last_seen: client.last_seen,
+          };
+        });
+        setClientStatus(statusMap);
+      }
+    } catch (error) {
+      console.error("Failed to load client status:", error);
+    } finally {
+      setClientStatusLoading(false);
     }
   };
 
@@ -204,6 +246,15 @@ const Chat = () => {
       stopPolling();
     };
   }, [stopPolling]);
+
+  // Refresh client status periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadClientStatus();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Start conversation with selected client
   const handleStartConversation = async (client = null) => {
@@ -310,9 +361,19 @@ const Chat = () => {
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[#333333]">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-[#E5E5E5] font-[Inter] font-bold text-xl sm:text-2xl leading-tight">
-              Chat
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-[#E5E5E5] font-[Inter] font-bold text-xl sm:text-2xl leading-tight">
+                Chat
+              </h1>
+              {clientStatusLoading && (
+                <div className="flex items-center gap-1">
+                  <ClipLoader size={12} color="#FDCE06" />
+                  <span className="text-[#9CA3AF] text-xs">
+                    Updating status...
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowNewConversationModal(true)}
@@ -387,33 +448,64 @@ const Chat = () => {
               <div className="text-[#9CA3AF]">No conversations found</div>
             </div>
           ) : (
-            filteredConversations.map((conversation) => (
-              <div
-                key={conversation.id}
-                onClick={() => handleSelectConversation(conversation)}
-                className={`p-4 border-b border-[#333333] cursor-pointer overflow-hidden hover:bg-[#292A2B] transition-colors ${
-                  selectedConversation?.id === conversation.id
-                    ? "bg-[#292A2B] border-l-4 border-l-[#FDCE06]"
-                    : ""
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 max-w-[90%]">
-                    <h3 className="text-[#E5E5E5] font-medium">
-                      {conversation.other_user_name || "Unknown User"}
-                    </h3>
-                    <p className="text-[#9CA3AF] text-sm truncate mt-1">
-                      {conversation.last_message_text || "No messages yet"}
-                    </p>
-                  </div>
-                  {conversation.unread_count > 0 && (
-                    <div className="bg-[#FDCE06] text-[#1F1F20] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-2">
-                      {conversation.unread_count}
+            filteredConversations.map((conversation) => {
+              const clientStatus = getClientOnlineStatus(conversation);
+              return (
+                <div
+                  key={conversation.id}
+                  onClick={() => handleSelectConversation(conversation)}
+                  className={`p-4 border-b border-[#333333] cursor-pointer overflow-hidden hover:bg-[#292A2B] transition-colors ${
+                    selectedConversation?.id === conversation.id
+                      ? "bg-[#292A2B] border-l-4 border-l-[#FDCE06]"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 max-w-[90%]">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-[#E5E5E5] font-medium">
+                          {conversation.other_user_name || "Unknown User"}
+                        </h3>
+                        {/* Online Status Indicator */}
+                        <div className="flex items-center gap-1">
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              clientStatus.is_online
+                                ? "bg-green-500"
+                                : "bg-gray-500"
+                            }`}
+                          ></div>
+                          <span
+                            className={`text-xs ${
+                              clientStatus.is_online
+                                ? "text-green-400"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {clientStatus.is_online ? "Online" : "Offline"}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-[#9CA3AF] text-sm truncate mt-1">
+                        {conversation.last_message_text || "No messages yet"}
+                      </p>
+                      {/* Last Seen Info */}
+                      {!clientStatus.is_online && clientStatus.last_seen && (
+                        <p className="text-[#9CA3AF] text-xs mt-1">
+                          Last seen:{" "}
+                          {new Date(clientStatus.last_seen).toLocaleString()}
+                        </p>
+                      )}
                     </div>
-                  )}
+                    {conversation.unread_count > 0 && (
+                      <div className="bg-[#FDCE06] text-[#1F1F20] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-2">
+                        {conversation.unread_count}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
@@ -462,18 +554,52 @@ const Chat = () => {
                   <h2 className="text-[#E5E5E5] font-semibold text-lg">
                     {selectedConversation.other_user_name || "Unknown User"}
                   </h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div
-                      className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
-                    ></div>
-                    <span
-                      className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
-                    >
-                      {adminOnline
-                        ? `Admin Online (${adminStatus.online_admin_count}/${adminStatus.total_admin_count})`
-                        : "Admin Offline"}
-                    </span>
+                  <div className="flex items-center gap-4 mt-1">
+                    {/* Client Online Status */}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          getClientOnlineStatus(selectedConversation).is_online
+                            ? "bg-green-500"
+                            : "bg-gray-500"
+                        }`}
+                      ></div>
+                      <span
+                        className={`text-xs ${
+                          getClientOnlineStatus(selectedConversation).is_online
+                            ? "text-green-400"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {getClientOnlineStatus(selectedConversation).is_online
+                          ? "Client Online"
+                          : "Client Offline"}
+                      </span>
+                    </div>
+                    {/* Admin Online Status */}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
+                      ></div>
+                      <span
+                        className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
+                      >
+                        {adminOnline
+                          ? `Admin Online (${adminStatus.online_admin_count}/${adminStatus.total_admin_count})`
+                          : "Admin Offline"}
+                      </span>
+                    </div>
                   </div>
+                  {/* Client Last Seen */}
+                  {!getClientOnlineStatus(selectedConversation).is_online &&
+                    getClientOnlineStatus(selectedConversation).last_seen && (
+                      <p className="text-[#9CA3AF] text-xs mt-1">
+                        Client last seen:{" "}
+                        {new Date(
+                          getClientOnlineStatus(selectedConversation).last_seen
+                        ).toLocaleString()}
+                      </p>
+                    )}
                 </div>
               </div>
             </div>

@@ -106,4 +106,18 @@ export const chatApi = {
     const response = await api.get("/v1/api/longtermhire/chat/admin-status");
     return response.data;
   },
+
+  // Get all clients status (online/offline)
+  getClientStatus: async () => {
+    const response = await api.get("/v1/api/longtermhire/chat/client-status");
+    return response.data;
+  },
+
+  // Get specific client status
+  getClientStatusById: async (clientId) => {
+    const response = await api.get(
+      `/v1/api/longtermhire/chat/client-status/${clientId}`
+    );
+    return response.data;
+  },
 };

@@ -31,12 +31,63 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
         {/* Modal Content */}
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Equipment Image */}
+            {/* Left Column - Equipment Images */}
             <div className="lg:col-span-1">
               <div className="bg-[#292A2B] border border-[#333333] rounded-lg p-4">
-                {equipment.content?.image || equipment.image ? (
+                {equipment.images && equipment.images.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Main Image */}
+                    <div>
+                      <img
+                        src={
+                          equipment.images.find((img) => img.is_main === 1)
+                            ?.image_url || equipment.images[0]?.image_url
+                        }
+                        alt={equipment.equipment_name || equipment.name}
+                        className="w-full h-64 object-cover rounded-md"
+                        onError={(e) => {
+                          e.target.src = "/placeholder-equipment.jpg";
+                        }}
+                      />
+                    </div>
+
+                    {/* Image Gallery - Show additional images if available */}
+                    {equipment.images.length > 1 && (
+                      <div>
+                        <h4 className="text-[#E5E5E5] font-[Inter] font-medium text-sm mb-2">
+                          Additional Images ({equipment.images.length - 1})
+                        </h4>
+                        <div className="grid grid-cols-3 gap-2">
+                          {equipment.images
+                            .filter((img) => img.is_main === 0)
+                            .slice(0, 6) // Show max 6 additional images
+                            .map((image, index) => (
+                              <div key={image.id || index} className="relative">
+                                <img
+                                  src={image.image_url}
+                                  alt={
+                                    image.caption ||
+                                    `${equipment.equipment_name} - Image ${index + 1}`
+                                  }
+                                  className="w-full h-16 object-cover rounded-md"
+                                  onError={(e) => {
+                                    e.target.src = "/placeholder-equipment.jpg";
+                                  }}
+                                />
+                                {image.caption && (
+                                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 rounded-b-md truncate">
+                                    {image.caption}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : equipment.content_image ? (
                   <img
-                    src={equipment.content?.image || equipment.image}
+                    src={equipment.content_image}
                     alt={equipment.equipment_name || equipment.name}
                     className="w-full h-64 object-cover rounded-md"
                     onError={(e) => {
@@ -172,34 +223,21 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
 
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
-                      Discounted Price
+                      Minimum Duration
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      ${equipment.discounted_price || "N/A"}
+                      {equipment.minimum_duration || "N/A"}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
-                      Discount Percentage
+                      Total Images
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      {equipment.discount_percentage
-                        ? `${equipment.discount_percentage}%`
-                        : "N/A"}
+                      {equipment.images ? equipment.images.length : 0} images
                     </div>
                   </div>
-
-                  {equipment.pricing_package && (
-                    <div>
-                      <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
-                        Pricing Package
-                      </label>
-                      <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                        {equipment.pricing_package.name}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -213,9 +251,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Description
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-3 text-[#E5E5E5] min-h-[80px]">
-                      {equipment.content?.description ||
-                        equipment.description ||
-                        "No description available"}
+                      {equipment.description || "No description available"}
                     </div>
                   </div>
 
@@ -224,7 +260,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Banner Description
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-3 text-[#E5E5E5] min-h-[80px]">
-                      {equipment.content?.banner_description ||
+                      {equipment.banner_description ||
                         "No banner description available"}
                     </div>
                   </div>

@@ -136,12 +136,19 @@ const ClientManagement = () => {
             equipmentAssignments[client.user_id] = clientEquipmentDetails;
           }
 
-          // Load pricing assignments based on pricing type
-          if (
-            client.pricing_type === "package" &&
-            client.pricing_package_name
-          ) {
-            // Find the full pricing package object
+          // Load pricing assignments based on API response structure
+          if (client.has_custom_discounts === 1) {
+            // Client has custom discounts
+            pricingAssignments[client.user_id] = [
+              {
+                name: "Custom Pricing",
+                description: "Equipment-specific custom discounts applied",
+                package_id: "custom",
+                type: "custom",
+              },
+            ];
+          } else if (client.pricing_package_name) {
+            // Client has a pricing package assigned
             const fullPackage = pricingPackages.find(
               (pkg) => pkg.name === client.pricing_package_name
             );
@@ -152,18 +159,8 @@ const ClientManagement = () => {
             };
 
             pricingAssignments[client.user_id] = [pricingInfo];
-          } else if (client.pricing_type === "custom") {
-            // Custom pricing - show as custom pricing
-            pricingAssignments[client.user_id] = [
-              {
-                name: "Custom Pricing",
-                description: "Equipment-specific custom discounts applied",
-                package_id: "custom",
-                type: "custom",
-              },
-            ];
           }
-          // For "none" type, no pricing assignment is shown
+          // If neither custom discounts nor package, no pricing assignment is shown
         } catch (error) {
           console.error(
             `Error loading assignments for client ${client.user_id}:`,
@@ -233,8 +230,32 @@ const ClientManagement = () => {
       setAssignmentLoading(true);
       await clientApi.assignPricing(clientUserId, pricingPackageId);
       toast.success("Pricing package assigned successfully!");
-      // Reload data to reflect changes
-      loadInitialData(currentPage, searchData);
+
+      // Update local state instead of full reload
+      const selectedPackage = pricingPackages.find(
+        (pkg) => pkg.id === pricingPackageId
+      );
+      if (selectedPackage) {
+        // Update clients state
+        setClients((prevClients) =>
+          prevClients.map((client) =>
+            client.user_id === clientUserId
+              ? {
+                  ...client,
+                  pricing_package_name: selectedPackage.name,
+                  pricing_package_id: selectedPackage.id,
+                  has_custom_discounts: 0, // Reset custom discounts when package is assigned
+                }
+              : client
+          )
+        );
+
+        // Update pricing assignments state
+        setClientPricing((prev) => ({
+          ...prev,
+          [clientUserId]: [selectedPackage],
+        }));
+      }
     } catch (error) {
       console.error("Error assigning pricing:", error);
       toast.error(
@@ -421,8 +442,32 @@ const ClientManagement = () => {
           "Custom discount applied to all assigned equipment successfully!"
         );
 
-        // Reload data to reflect changes
-        loadInitialData(currentPage, searchData);
+        // Update local state instead of full reload
+        setClients((prevClients) =>
+          prevClients.map((client) =>
+            client.user_id === customPackageModal.clientId
+              ? {
+                  ...client,
+                  has_custom_discounts: 1,
+                  pricing_package_name: null, // Clear package when custom is applied
+                  pricing_package_id: null,
+                }
+              : client
+          )
+        );
+
+        // Update pricing assignments state
+        setClientPricing((prev) => ({
+          ...prev,
+          [customPackageModal.clientId]: [
+            {
+              name: "Custom Pricing",
+              description: "Equipment-specific custom discounts applied",
+              package_id: "custom",
+              type: "custom",
+            },
+          ],
+        }));
       } catch (error) {
         console.error("Error applying custom discount:", error);
         toast.error("Error applying custom discount. Please try again.");
@@ -656,24 +701,19 @@ const ClientManagement = () => {
                         <button
                           onClick={(e) => handlePricingClick(client.user_id, e)}
                           className={`border rounded-md font-[Inter] font-normal line-clamp-2 text-[12px] leading-[1.25em] px-3 py-1 flex items-center gap-2 transition-colors ${
-                            client.pricing_type &&
-                            client.pricing_type !== "none"
+                            client.has_custom_discounts === 1 ||
+                            client.pricing_package_name
                               ? "bg-[#FDCE06] border-[#FDCE06] text-[#1F1F20]"
                               : "bg-[#292A2B] border-[#333333] text-[#E5E5E5] hover:border-[#FDCE06]"
                           }`}
                         >
                           {(() => {
-                            switch (client.pricing_type) {
-                              case "package":
-                                return (
-                                  client.pricing_package_name ||
-                                  "Package Pricing"
-                                );
-                              case "custom":
-                                return "Custom Pricing";
-                              case "none":
-                              default:
-                                return "Set Pricing";
+                            if (client.has_custom_discounts === 1) {
+                              return "Custom";
+                            } else if (client.pricing_package_name) {
+                              return client.pricing_package_name;
+                            } else {
+                              return "Set Pricing";
                             }
                           })()}
                           <svg

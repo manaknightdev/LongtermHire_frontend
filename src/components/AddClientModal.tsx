@@ -90,6 +90,22 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
     }));
   };
 
+  // Handle select all equipment
+  const handleSelectAll = () => {
+    setFormData((prev) => ({
+      ...prev,
+      equipment: availableEquipment.map((eq) => eq.id),
+    }));
+  };
+
+  // Handle deselect all equipment
+  const handleDeselectAll = () => {
+    setFormData((prev) => ({
+      ...prev,
+      equipment: [],
+    }));
+  };
+
   // Get selected equipment names for display
   const getSelectedEquipmentNames = () => {
     if (formData.equipment.length === 0) return "Select Equipment";
@@ -499,28 +515,101 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
               {showEquipmentDropdown && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-[#292A2B] border border-[#333333] rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
                   {availableEquipment.length > 0 ? (
-                    availableEquipment.map((equipment) => (
-                      <div
-                        key={equipment.id}
-                        className="flex items-center px-4 py-3 hover:bg-[#333333] cursor-pointer"
-                        onClick={() => handleEquipmentToggle(equipment.id)}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.equipment.includes(equipment.id)}
-                          onChange={() => {}} // Handled by parent onClick
-                          className="mr-3 w-4 h-4 text-[#FDCE06] bg-[#292A2B] border-[#333333] rounded focus:ring-[#FDCE06] focus:ring-2"
-                        />
-                        <div className="flex-1">
-                          <div className="text-[#E5E5E5] font-medium">
-                            {equipment.equipment_name}
-                          </div>
-                          <div className="text-[#9CA3AF] text-sm">
-                            {equipment.category_name} - ${equipment.base_price}
+                    <>
+                      {/* Select All / Deselect All Buttons */}
+                      <div className="px-4 py-3 border-b border-[#333333]">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#9CA3AF] text-xs">
+                            {formData.equipment.length} of{" "}
+                            {availableEquipment.length} equipment selected
+                          </span>
+                          <div
+                            style={{ display: "flex", gap: "8px" }}
+                            className="whitespace-nowrap"
+                          >
+                            <button
+                              type="button"
+                              onClick={handleSelectAll}
+                              className="whitespace-nowrap text-[12px]"
+                              style={{
+                                padding: "4px 8px",
+                                backgroundColor: "transparent",
+                                border: "1px solid #FDCE06",
+                                borderRadius: "4px",
+                                color: "#FDCE06",
+                                fontSize: "12px",
+                                fontWeight: 500,
+                                fontFamily: "Inter, sans-serif",
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = "#FDCE06";
+                                e.target.style.color = "#1F1F20";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = "transparent";
+                                e.target.style.color = "#FDCE06";
+                              }}
+                            >
+                              Select All
+                            </button>
+                            <button
+                              type="button"
+                              className="whitespace-nowrap text-[12px]"
+                              onClick={handleDeselectAll}
+                              style={{
+                                padding: "4px 8px",
+                                backgroundColor: "transparent",
+                                border: "1px solid #9CA3AF",
+                                borderRadius: "4px",
+                                color: "#9CA3AF",
+                                fontSize: "12px",
+                                fontWeight: 500,
+                                fontFamily: "Inter, sans-serif",
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = "#9CA3AF";
+                                e.target.style.color = "#1F1F20";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = "transparent";
+                                e.target.style.color = "#9CA3AF";
+                              }}
+                            >
+                              Deselect All
+                            </button>
                           </div>
                         </div>
                       </div>
-                    ))
+
+                      {/* Equipment List */}
+                      {availableEquipment.map((equipment) => (
+                        <div
+                          key={equipment.id}
+                          className="flex items-center px-4 py-3 hover:bg-[#333333] cursor-pointer"
+                          onClick={() => handleEquipmentToggle(equipment.id)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.equipment.includes(equipment.id)}
+                            onChange={() => {}} // Handled by parent onClick
+                            className="mr-3 w-4 h-4 text-[#FDCE06] bg-[#292A2B] border-[#333333] rounded focus:ring-[#FDCE06] focus:ring-2"
+                          />
+                          <div className="flex-1">
+                            <div className="text-[#E5E5E5] font-medium">
+                              {equipment.equipment_name}
+                            </div>
+                            <div className="text-[#9CA3AF] text-sm">
+                              {equipment.category_name} - $
+                              {equipment.base_price}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
                   ) : (
                     <div className="px-4 py-3 text-[#9CA3AF]">
                       {dataLoading ? "Loading..." : "No equipment available"}

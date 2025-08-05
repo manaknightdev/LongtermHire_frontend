@@ -10,6 +10,13 @@ function ClientDetailsModal({
   clientEquipment = [],
   clientPricing = [],
 }) {
+  // Debug logging
+  console.log("ClientDetailsModal props:", {
+    client,
+    clientEquipment,
+    clientPricing,
+    isOpen,
+  });
   const [customDiscounts, setCustomDiscounts] = useState([]);
   const [loadingDiscounts, setLoadingDiscounts] = useState(false);
 
@@ -168,7 +175,7 @@ function ClientDetailsModal({
             {/* Right Column - Equipment & Pricing */}
             <div className="space-y-6">
               {/* Assigned Equipment */}
-              {/* <div>
+              <div>
                 <h3 className="text-[#E5E5E5] font-[Inter] font-semibold text-lg mb-4">
                   Assigned Equipment
                 </h3>
@@ -199,7 +206,7 @@ function ClientDetailsModal({
                     </div>
                   )}
                 </div>
-              </div> */}
+              </div>
 
               {/* Pricing Package */}
               <div>

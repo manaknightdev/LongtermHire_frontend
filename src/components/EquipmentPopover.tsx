@@ -166,58 +166,6 @@ const EquipmentPopover = ({
           >
             Select Equipment
           </h3>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button
-              onClick={handleSelectAll}
-              style={{
-                padding: "4px 8px",
-                backgroundColor: "transparent",
-                border: "1px solid #FDCE06",
-                borderRadius: "4px",
-                color: "#FDCE06",
-                fontSize: "12px",
-                fontWeight: 500,
-                fontFamily: "Inter, sans-serif",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#FDCE06";
-                e.target.style.color = "#1F1F20";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.color = "#FDCE06";
-              }}
-            >
-              Select All
-            </button>
-            <button
-              onClick={handleDeselectAll}
-              style={{
-                padding: "4px 8px",
-                backgroundColor: "transparent",
-                border: "1px solid #9CA3AF",
-                borderRadius: "4px",
-                color: "#9CA3AF",
-                fontSize: "12px",
-                fontWeight: 500,
-                fontFamily: "Inter, sans-serif",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#9CA3AF";
-                e.target.style.color = "#1F1F20";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.color = "#9CA3AF";
-              }}
-            >
-              Deselect All
-            </button>
-          </div>
         </div>
         <div
           style={{
@@ -229,6 +177,63 @@ const EquipmentPopover = ({
           {localSelected.length} of{" "}
           {equipmentOptions.filter((e) => e.available).length} equipment
           selected
+        </div>
+        <div
+          style={{ display: "flex", gap: "8px" }}
+          className="whitespace-nowrap"
+        >
+          <button
+            onClick={handleSelectAll}
+            className="whitespace-nowrap text-[12px]"
+            style={{
+              padding: "4px 8px",
+              backgroundColor: "transparent",
+              border: "1px solid #FDCE06",
+              borderRadius: "4px",
+              color: "#FDCE06",
+              fontSize: "12px",
+              fontWeight: 500,
+              fontFamily: "Inter, sans-serif",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#FDCE06";
+              e.target.style.color = "#1F1F20";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.color = "#FDCE06";
+            }}
+          >
+            Select All
+          </button>
+          <button
+            className="whitespace-nowrap text-[12px]"
+            onClick={handleDeselectAll}
+            style={{
+              padding: "4px 8px",
+              backgroundColor: "transparent",
+              border: "1px solid #9CA3AF",
+              borderRadius: "4px",
+              color: "#9CA3AF",
+              fontSize: "12px",
+              fontWeight: 500,
+              fontFamily: "Inter, sans-serif",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#9CA3AF";
+              e.target.style.color = "#1F1F20";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.color = "#9CA3AF";
+            }}
+          >
+            Deselect All
+          </button>
         </div>
       </div>
 

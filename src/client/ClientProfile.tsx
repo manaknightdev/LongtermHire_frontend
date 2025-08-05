@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { clientProfileApi } from "../services/clientProfileApi";
 import { clientAuthApi } from "../services/clientAuthApi";
+import { chatApi } from "../services/chatApi";
 import ClientChangePassword from "./ClientChangePassword";
 
 function ClientProfile() {
@@ -89,7 +90,17 @@ function ClientProfile() {
   };
 
   const handleLogout = async () => {
-    await clientAuthApi.logout();
+    try {
+      // Set offline status before logout
+      await chatApi.setOffline();
+
+      // Then logout
+      await clientAuthApi.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force logout even if API call fails
+      await clientAuthApi.logout();
+    }
   };
 
   if (loading) {

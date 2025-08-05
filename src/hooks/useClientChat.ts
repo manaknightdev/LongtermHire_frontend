@@ -321,7 +321,7 @@ export const useClientChat = () => {
 
     // Cleanup on unmount
     return () => {
-      setOffline();
+      // Don't set offline on component unmount - only on actual browser/tab close
       stopHeartbeat();
       stopAdminStatusCheck();
       stopPolling();

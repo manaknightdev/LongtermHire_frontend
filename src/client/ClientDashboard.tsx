@@ -672,7 +672,7 @@ function ClientDashboard() {
   return (
     <div className="min-h-screen bg-[#292A2B] font-[Inter]">
       {/* Header */}
-      <header className="bg-[#1F1F20] border-b border-[#333333] px-4 sm:px-8 lg:px-20 py-5">
+      <header className="bg-[#1F1F20] border-b border-[#333333] px-4 sm:px-8 lg:px-5 py-5">
         <div className="flex items-center justify-between  mx-auto">
           <div className="flex items-center">
             <img
@@ -825,7 +825,7 @@ function ClientDashboard() {
                           <div
                             className={`space-y-2 sm:space-y-3 ${
                               equipment?.allImages.length == 1
-                                ? "mt-[76px]"
+                                ? "mt-[80px]"
                                 : ""
                             }`}
                           >
@@ -841,7 +841,7 @@ function ClientDashboard() {
                                 {equipment.status}
                               </span>
                             </div>
-                            <p className="text-[#9CA3AF] text-xs leading-relaxed">
+                            <p className="text-[#9CA3AF] text-xs leading-relaxed h-[50px]">
                               {equipment.description}
                             </p>
                             <p className="text-[#FFFFFF] text-sm font-semibold">
@@ -883,7 +883,7 @@ function ClientDashboard() {
         </main>
 
         {/* Right Sidebar */}
-        <aside className="w-full lg:w-[389px] p-4 sm:p-6 lg:p-8 lg:pt-[168px] order-first lg:order-last">
+        <aside className="w-full lg:w-[389px] pb-[100px] p-4 sm:p-6 lg:p-8 lg:pt-[168px] order-first lg:order-last">
           <div className="space-y-6 lg:space-y-8">
             {/* Equipment Selector */}
             <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6">
@@ -970,7 +970,7 @@ function ClientDashboard() {
                     </div>
                     {equipmentDiscount > 0 && (
                       <div className="text-[#22C55E] text-xs">
-                        -${equipmentDiscount.toFixed(2)} discount
+                        ${equipmentDiscount.toFixed(2)} saved
                       </div>
                     )}
                   </div>
@@ -1030,7 +1030,6 @@ function ClientDashboard() {
                   </span>
                   {equipmentDiscount > 0 && (
                     <div className="text-[#9CA3AF] text-xs mt-1">
-                      {discountPercentage}% standard compounding discount
                       {(() => {
                         const selectedEquipmentData = equipment.find(
                           (item) => item.equipment_name === selectedEquipment
@@ -1042,11 +1041,11 @@ function ClientDashboard() {
                           if (
                             selectedEquipmentData.discount_type === "percentage"
                           ) {
-                            return ` + ${selectedEquipmentData.discount_value}% package discount`;
+                            return `${selectedEquipmentData.discount_value}% package discount`;
                           } else if (
                             selectedEquipmentData.discount_type === "fixed"
                           ) {
-                            return ` + $${selectedEquipmentData.discount_value} package discount`;
+                            return `$${selectedEquipmentData.discount_value} package discount`;
                           }
                         }
                         return "";
@@ -1302,27 +1301,26 @@ function ClientDashboard() {
             )}
 
             {/* Show Chat Button when chat is hidden */}
-            {!isChatVisible && (
-              <div className="fixed bottom-4 right-4 lg:block hidden z-50">
-                <button
-                  onClick={() => setIsChatVisible(true)}
-                  className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+
+            <div className="fixed bottom-4 right-4 lg:block hidden z-50">
+              <button
+                onClick={() => setIsChatVisible(!isChatVisible)}
+                className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="sm:w-5 sm:h-5"
                 >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className="sm:w-5 sm:h-5"
-                  >
-                    <path
-                      d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
-                      fill="#000000"
-                    />
-                  </svg>
-                </button>
-              </div>
-            )}
+                  <path
+                    d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
+                    fill="#000000"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </aside>
       </div>
