@@ -270,7 +270,7 @@ const EquipmentManagement = () => {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="bg-[#FDCE06] rounded-md text-[#1F1F20] font-[Inter] font-bold text-[16px] leading-[1.19em] px-6 py-3 hover:bg-[#E5B800] transition-colors disabled:opacity-50"
+                className="bg-[#FDCE06] w-[200px] rounded-md text-[#1F1F20] font-[Inter] font-bold text-[16px] leading-[1.19em] px-6 py-3 hover:bg-[#E5B800] transition-colors disabled:opacity-50"
                 style={{ height: "42px" }}
               >
                 {loading ? "Searching..." : "Search"}

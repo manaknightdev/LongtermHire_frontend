@@ -221,7 +221,7 @@ const ContentManagement = () => {
           <div className="flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-bold text-sm px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors h-[42px]"
+              className="bg-[#FDCE06] w-[200px] text-[#1F1F20] font-[Inter] font-bold text-sm px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors h-[42px]"
             >
               Search
             </button>

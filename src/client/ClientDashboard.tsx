@@ -1080,27 +1080,8 @@ function ClientDashboard() {
             </div>
 
             {/* Chat Section - Hidden on mobile, shown on desktop */}
-            <div className="relative">
-              <div className="absolute bottom-[-100px] right-4 lg:block hidden z-50">
-                <button
-                  onClick={() => setIsChatVisible(!isChatVisible)}
-                  className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
-                >
-                  <svg
-                    width="20"
-                    height="19"
-                    viewBox="0 0 20 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M20.0002 8.875C20.0002 13.3633 15.5236 17 10.0002 17C8.55096 17 7.17596 16.75 5.93377 16.3008C5.46893 16.6406 4.71112 17.1055 3.81268 17.4961C2.87518 17.9023 1.74628 18.25 0.625182 18.25C0.371276 18.25 0.144713 18.0977 0.0470568 17.8633C-0.0505994 17.6289 0.00408808 17.3633 0.179869 17.1836L0.191588 17.1719C0.203307 17.1602 0.218932 17.1445 0.242369 17.1172C0.285338 17.0703 0.351744 16.9961 0.433776 16.8945C0.593932 16.6992 0.808776 16.4102 1.02753 16.0508C1.41815 15.4023 1.78924 14.5508 1.86346 13.5938C0.691588 12.2656 0.00018184 10.6367 0.00018184 8.875C0.00018184 4.38672 4.47674 0.75 10.0002 0.75C15.5236 0.75 20.0002 4.38672 20.0002 8.875Z"
-                      fill="black"
-                    />
-                  </svg>
-                </button>
-              </div>
-              {isChatVisible && (
+            <div className="">
+              {isChatVisible ? (
                 <>
                   <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden relative">
                     {/* Show Chat Button when chat is hidden */}
@@ -1352,6 +1333,26 @@ function ClientDashboard() {
                     </div>
                   </div>
                 </>
+              ) : (
+                <div className="fixed bottom-4 right-4 lg:block hidden z-50">
+                  <button
+                    onClick={() => setIsChatVisible(!isChatVisible)}
+                    className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+                  >
+                    <svg
+                      width="20"
+                      height="19"
+                      viewBox="0 0 20 19"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20.0002 8.875C20.0002 13.3633 15.5236 17 10.0002 17C8.55096 17 7.17596 16.75 5.93377 16.3008C5.46893 16.6406 4.71112 17.1055 3.81268 17.4961C2.87518 17.9023 1.74628 18.25 0.625182 18.25C0.371276 18.25 0.144713 18.0977 0.0470568 17.8633C-0.0505994 17.6289 0.00408808 17.3633 0.179869 17.1836L0.191588 17.1719C0.203307 17.1602 0.218932 17.1445 0.242369 17.1172C0.285338 17.0703 0.351744 16.9961 0.433776 16.8945C0.593932 16.6992 0.808776 16.4102 1.02753 16.0508C1.41815 15.4023 1.78924 14.5508 1.86346 13.5938C0.691588 12.2656 0.00018184 10.6367 0.00018184 8.875C0.00018184 4.38672 4.47674 0.75 10.0002 0.75C15.5236 0.75 20.0002 4.38672 20.0002 8.875Z"
+                        fill="black"
+                      />
+                    </svg>
+                  </button>
+                </div>
               )}
             </div>
           </div>
