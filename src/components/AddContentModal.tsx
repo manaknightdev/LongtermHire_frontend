@@ -26,17 +26,8 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
     }
   }, [isOpen]);
 
-  // Clean up when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setImages([]);
-      setFormData({
-        equipment_id: "",
-        description: "",
-        bannerDescription: "",
-      });
-    }
-  }, [isOpen]);
+  // Only clean up on successful submission, not on modal close
+  // Form data is preserved when canceling
 
   // Load equipment list
   const loadEquipmentList = async () => {
@@ -153,6 +144,13 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
 
     try {
       await onSubmit(contentData);
+      // Clear form data only on successful submission
+      setImages([]);
+      setFormData({
+        equipment_id: "",
+        description: "",
+        bannerDescription: "",
+      });
     } catch (error) {
       // Error handling is done in parent component
       console.error("Form submission error:", error);
@@ -160,6 +158,7 @@ const AddContentModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
   };
 
   const handleCancel = () => {
+    // Don't clear form data when canceling - preserve user input
     onClose();
   };
 

@@ -120,7 +120,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
         .padStart(3, "0")}`,
     });
 
-    // Reset form
+    // Reset form only on successful submission
     setFormData({
       category: "",
       equipmentName: "",
@@ -134,13 +134,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleCancel = () => {
-    setFormData({
-      category: "",
-      equipmentName: "",
-      basePrice: "",
-      minimumDuration: "3",
-      description: "",
-    });
+    // Don't clear form data when canceling - preserve user input
     setErrors({});
     setShowAddCategory(false);
     setNewCategoryName("");

@@ -62,15 +62,19 @@ const AddPricingPackageModal = ({ isOpen, onClose, onSubmit, loading }) => {
     };
 
     onSubmit(packageData);
-  };
 
-  const handleCancel = () => {
+    // Clear form data only on successful submission
     setFormData({
       name: "",
       description: "",
       discount_type: "0",
       discount_value: "",
     });
+    setErrors({});
+  };
+
+  const handleCancel = () => {
+    // Don't clear form data when canceling - preserve user input
     setErrors({});
     onClose();
   };

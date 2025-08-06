@@ -107,22 +107,24 @@ const Chat = () => {
     return clientStatus[clientId] || { is_online: false, last_seen: null };
   };
 
-  // Auto-scroll to bottom when new messages arrive
+  // Enhanced auto-scroll to bottom when new messages arrive
   const scrollToBottom = (force = false) => {
-    if (messagesEndRef.current) {
-      const container = messagesEndRef.current.parentElement;
-      if (container) {
-        const isNearBottom =
-          container.scrollHeight -
-            container.scrollTop -
-            container.clientHeight <
-          100;
+    setTimeout(() => {
+      if (messagesEndRef.current) {
+        const container = messagesEndRef.current.parentElement;
+        if (container) {
+          const isNearBottom =
+            container.scrollHeight -
+              container.scrollTop -
+              container.clientHeight <
+            100;
 
-        if (force || isNearBottom) {
-          messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+          if (force || isNearBottom) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+          }
         }
       }
-    }
+    }, 100);
   };
 
   // Auto-scroll when messages change
@@ -147,7 +149,7 @@ const Chat = () => {
 
     if (currentMessageCount > previousMessageCount) {
       // New message arrived, scroll to bottom
-      setTimeout(() => scrollToBottom(true), 100);
+      scrollToBottom(true);
     }
 
     lastMessageCountRef.current = currentMessageCount;
@@ -156,7 +158,7 @@ const Chat = () => {
   // Effect to scroll to bottom when conversation changes
   useEffect(() => {
     if (selectedConversation) {
-      setTimeout(() => scrollToBottom(true), 200);
+      scrollToBottom(true);
     }
   }, [selectedConversation]);
 
@@ -316,7 +318,7 @@ const Chat = () => {
 
       const response = await chatApi.startConversation(
         clientToUse.user_id,
-        `Hello ${clientToUse.name || clientToUse.email || "there"}, how can I help you today?`
+        "" // Empty message - no pre-generated message
       );
 
       if (!response.error) {
@@ -368,9 +370,7 @@ const Chat = () => {
               {clientStatusLoading && (
                 <div className="flex items-center gap-1">
                   <ClipLoader size={12} color="#FDCE06" />
-                  <span className="text-[#9CA3AF] text-xs">
-                    Updating status...
-                  </span>
+                  {/* Status update text removed to prevent layout shift */}
                 </div>
               )}
             </div>
@@ -606,7 +606,6 @@ const Chat = () => {
 
             {/* Messages Area */}
             <div
-              ref={messagesEndRef}
               className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-[#292A2B]"
               style={{ scrollBehavior: "smooth" }}
             >
@@ -760,6 +759,8 @@ const Chat = () => {
                   </div>
                 ))
               )}
+              {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Message Input */}

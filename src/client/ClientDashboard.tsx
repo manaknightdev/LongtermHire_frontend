@@ -229,6 +229,15 @@ function ClientDashboard() {
     }
   };
 
+  // Enhanced scroll to bottom for chat sections
+  const scrollChatToBottom = (force = false) => {
+    setTimeout(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   // Cleanup polling on unmount
   useEffect(() => {
     return () => {
@@ -243,7 +252,7 @@ function ClientDashboard() {
 
     if (currentMessageCount > previousMessageCount) {
       // New message arrived, scroll to bottom
-      setTimeout(() => scrollToBottom(true), 100);
+      scrollChatToBottom(true);
     }
 
     lastMessageCountRef.current = currentMessageCount;
@@ -251,10 +260,10 @@ function ClientDashboard() {
 
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
-    if (isChatOpen && messages.length > 0) {
-      setTimeout(() => scrollToBottom(true), 200);
+    if ((isChatOpen || isChatVisible) && messages.length > 0) {
+      scrollChatToBottom(true);
     }
-  }, [isChatOpen]);
+  }, [isChatOpen, isChatVisible]);
 
   // Process equipment data from API and organize by categories with discount support
   const getEquipmentData = () => {
@@ -269,9 +278,9 @@ function ClientDashboard() {
         acc[category] = [];
       }
 
-      // Equipment cards show base price only
+      // Equipment cards show price per month
       const priceDisplay = item.base_price
-        ? `$${item.base_price.toFixed(2)}`
+        ? `$${item.base_price.toFixed(2)}/month`
         : "Contact for pricing";
 
       // Create discount info object
@@ -679,7 +688,7 @@ function ClientDashboard() {
             <img
               src="/login-logo.png"
               alt="Equipment Rental Logo"
-              className="h-[70px] sm:h-[100px] mr-4 sm:mr-6"
+              className="h-[100px] sm:h-[150px] mr-4 sm:mr-6"
             />
           </div>
           <nav className="flex items-center gap-2 sm:gap-4">
@@ -710,11 +719,11 @@ function ClientDashboard() {
         <main className="flex-1 px-4 sm:px-8 lg:px-20 pb-[100px] py-6 lg:py-8 lg:max-w-[866px] xl:max-w-full">
           <div className="max-w-full lg:max-w-[810px]">
             {/* Project Name */}
-            <div className="mb-12 lg:mb-22">
+            {/* <div className="mb-12 lg:mb-22">
               <h1 className="text-[#FFFFFF] text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
                 Longterm Hire
               </h1>
-            </div>
+            </div> */}
 
             {/* Dynamic Equipment Sections */}
             {Object.keys(equipmentData).length === 0 ? (
@@ -963,7 +972,7 @@ function ClientDashboard() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[#FFFFFF] text-base sm:text-lg font-semibold">
-                    Hire For
+                    Cost of Hire
                   </span>
                   <div className="text-right">
                     <span className="text-[#FDCE06] text-base sm:text-lg font-bold">
@@ -973,7 +982,7 @@ function ClientDashboard() {
                       Total for {selectedDuration}
                     </div>
                     {equipmentDiscount > 0 && (
-                      <div className="text-[#22C55E] text-xs">
+                      <div className="text-[#EF4444] text-sm font-semibold">
                         ${equipmentDiscount.toFixed(2)} saved
                       </div>
                     )}
@@ -1091,16 +1100,7 @@ function ClientDashboard() {
                         <h3 className="text-[#FFFFFF] text-base font-semibold">
                           Message Rental Company
                         </h3>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
-                          ></div>
-                          <span
-                            className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
-                          >
-                            {adminOnline ? "Admin Online" : "Admin Offline"}
-                          </span>
-                        </div>
+                        {/* Admin status removed from client view */}
                       </div>
                       <button
                         onClick={() => setIsChatVisible(false)}
@@ -1288,6 +1288,8 @@ function ClientDashboard() {
                           )
                         )
                       )}
+                      {/* Scroll anchor for desktop chat */}
+                      <div ref={messagesEndRef} />
                     </div>
                     <div className="border-t border-[#333333] p-4">
                       <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-4 py-2">
@@ -1389,16 +1391,7 @@ function ClientDashboard() {
                 <h3 className="text-[#FFFFFF] text-base font-semibold">
                   Message Rental Company
                 </h3>
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
-                  ></div>
-                  <span
-                    className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
-                  >
-                    {adminOnline ? "Admin Online" : "Admin Offline"}
-                  </span>
-                </div>
+                {/* Admin status removed from client view */}
               </div>
               <button
                 onClick={() => setIsChatOpen(false)}
@@ -1481,7 +1474,7 @@ function ClientDashboard() {
                   );
                 })
               )}
-              {/* Scroll anchor */}
+              {/* Scroll anchor for mobile chat */}
               <div ref={messagesEndRef} />
             </div>
             <div className="border-t border-[#333333] p-4">
