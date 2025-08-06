@@ -11,7 +11,7 @@ import { isImageUrl } from "./utils/uploadUtils";
 
 const ContentManagement = () => {
   const [searchData, setSearchData] = useState({
-    equipmentId: "",
+    contentId: "",
     equipmentName: "",
   });
 
@@ -23,16 +23,20 @@ const ContentManagement = () => {
     }));
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      setDebouncedSearchData(searchData);
+    }
+  };
+
   const handleSearch = () => {
-    console.log("Search data:", searchData);
-    setCurrentPage(1); // Reset to first page when searching
-    fetchContent(1, searchData);
+    setDebouncedSearchData(searchData);
   };
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    fetchContent(newPage, searchData);
+    fetchContent(newPage, debouncedSearchData);
   };
 
   const [contentData, setContentData] = useState([]);
@@ -55,6 +59,9 @@ const ContentManagement = () => {
     hasNext: false,
     hasPrev: false,
   });
+
+  // Debounced search state
+  const [debouncedSearchData, setDebouncedSearchData] = useState(searchData);
 
   // Fetch content data from API with pagination and search
   const fetchContent = async (page = 1, searchFilters = {}) => {
@@ -83,6 +90,21 @@ const ContentManagement = () => {
     fetchContent(1, {});
   }, []);
 
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchData(searchData);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchData]);
+
+  // Fetch data when debounced search changes
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchContent(1, debouncedSearchData);
+  }, [debouncedSearchData]);
+
   // Add content handlers
   const handleAddContent = () => {
     setIsAddModalOpen(true);
@@ -96,7 +118,7 @@ const ContentManagement = () => {
       toast.success("Content created successfully!");
       setIsAddModalOpen(false);
       // Refresh the content list
-      await fetchContent(currentPage, searchData);
+      await fetchContent(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error creating content:", err);
       toast.error("Failed to create content. Please try again.");
@@ -132,7 +154,7 @@ const ContentManagement = () => {
       setIsEditModalOpen(false);
       setSelectedContent(null);
       // Refresh the content list
-      await fetchContent(currentPage, searchData);
+      await fetchContent(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error updating content:", err);
       toast.error("Failed to update content. Please try again.");
@@ -149,7 +171,7 @@ const ContentManagement = () => {
       await contentApi.deleteContent(contentId);
       toast.success("Content deleted successfully!");
       // Refresh the content list
-      await fetchContent(currentPage, searchData);
+      await fetchContent(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error deleting content:", err);
       toast.error("Failed to delete content. Please try again.");
@@ -196,9 +218,10 @@ const ContentManagement = () => {
             </label>
             <input
               type="text"
-              name="equipmentId"
-              value={searchData.equipmentId}
+              name="contentId"
+              value={searchData.contentId}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-3 py-3 outline-none focus:border-[#FDCE06] transition-colors h-[42px]"
             />
           </div>
@@ -213,6 +236,7 @@ const ContentManagement = () => {
               name="equipmentName"
               value={searchData.equipmentName}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-3 py-3 outline-none focus:border-[#FDCE06] transition-colors h-[42px]"
             />
           </div>
@@ -221,7 +245,7 @@ const ContentManagement = () => {
           <div className="flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              className="bg-[#FDCE06] w-[200px] text-[#1F1F20] font-[Inter] font-bold text-sm px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors h-[42px]"
+              className="bg-[#FDCE06] w-[120px] text-[#1F1F20] font-[Inter] font-bold text-sm px-4 py-2 rounded-md hover:bg-[#E5B800] transition-colors h-[42px]"
             >
               Search
             </button>
@@ -240,7 +264,7 @@ const ContentManagement = () => {
           {/* Add Content Button */}
           <button
             onClick={handleAddContent}
-            className="bg-[#FDCE06] hover:bg-[#E5B800] text-[#1F1F20] font-[Inter] font-medium text-sm px-4 py-2 rounded-lg transition-colors w-full sm:w-auto"
+            className="bg-[#FDCE06] hover:bg-[#E5B800] text-[#1F1F20] font-[Inter] font-bold text-sm px-4 py-2 rounded-lg transition-colors w-full sm:w-auto"
           >
             Add Content
           </button>
@@ -429,7 +453,7 @@ const ContentManagement = () => {
                             index === 0 || index === 4 ? "9.9px" : "10.4px",
                         }}
                       >
-                        {item.equipment_id || item.id}
+                        {item.id}
                       </div>
                     </td>
                     <td

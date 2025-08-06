@@ -35,6 +35,9 @@ const EquipmentManagement = () => {
     hasPrev: false,
   });
 
+  // Debounced search state
+  const [debouncedSearchData, setDebouncedSearchData] = useState(searchData);
+
   // Fetch equipment data from API with pagination and search
   const fetchEquipment = async (page = 1, searchFilters = {}) => {
     try {
@@ -62,6 +65,21 @@ const EquipmentManagement = () => {
     fetchEquipment();
   }, []);
 
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchData(searchData);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchData]);
+
+  // Fetch data when debounced search changes
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchEquipment(1, debouncedSearchData);
+  }, [debouncedSearchData]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchData((prev) => ({
@@ -70,16 +88,20 @@ const EquipmentManagement = () => {
     }));
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      setDebouncedSearchData(searchData);
+    }
+  };
+
   const handleSearch = () => {
-    console.log("Search data:", searchData);
-    setCurrentPage(1); // Reset to first page when searching
-    fetchEquipment(1, searchData);
+    setDebouncedSearchData(searchData);
   };
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    fetchEquipment(newPage, searchData);
+    fetchEquipment(newPage, debouncedSearchData);
   };
 
   const handleAddEquipment = () => {
@@ -93,7 +115,7 @@ const EquipmentManagement = () => {
       setIsAddModalOpen(false);
       toast.success("Equipment added successfully!");
       // Refresh the equipment list
-      await fetchEquipment(currentPage, searchData);
+      await fetchEquipment(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error adding equipment:", err);
       setError("Failed to add equipment");
@@ -122,7 +144,7 @@ const EquipmentManagement = () => {
       setIsEditModalOpen(false);
       setSelectedEquipment(null);
       // Refresh the equipment list
-      await fetchEquipment(currentPage, searchData);
+      await fetchEquipment(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error updating equipment:", err);
       toast.error("Failed to update equipment");
@@ -215,6 +237,7 @@ const EquipmentManagement = () => {
                 name="categoryId"
                 value={searchData.categoryId}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
                 style={{ height: "42px" }}
               />
@@ -230,6 +253,7 @@ const EquipmentManagement = () => {
                 name="categoryName"
                 value={searchData.categoryName}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
                 style={{ height: "42px" }}
               />
@@ -245,6 +269,7 @@ const EquipmentManagement = () => {
                 name="equipmentId"
                 value={searchData.equipmentId}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
                 style={{ height: "42px" }}
               />
@@ -260,6 +285,7 @@ const EquipmentManagement = () => {
                 name="equipmentName"
                 value={searchData.equipmentName}
                 onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
                 className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
                 style={{ height: "42px" }}
               />
@@ -349,7 +375,7 @@ const EquipmentManagement = () => {
                     </div>
                   </th>
                   <th className="text-[#E5E5E5] font-inter font-bold text-xs lg:text-sm text-center px-3 py-4">
-                    Description
+                    View
                   </th>
                   <th className="text-[#E5E5E5] font-inter font-bold text-xs lg:text-sm text-left px-3 py-4">
                     <div className="flex flex-col">
@@ -432,7 +458,12 @@ const EquipmentManagement = () => {
                         {item.equipment_name}
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
-                        {/* Empty for now until content page is implemented */}
+                        <button
+                          onClick={() => handleViewDetails(item)}
+                          className="text-[#FDCE06] font-inter font-medium text-sm hover:underline transition-all"
+                        >
+                          View
+                        </button>
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
                         {item.base_price}

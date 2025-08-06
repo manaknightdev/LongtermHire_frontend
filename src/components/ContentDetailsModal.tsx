@@ -43,7 +43,9 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                       Equipment ID
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      {content.equipment_id || "N/A"}
+                      {content.equipment_id ||
+                        content.equipment?.equipment_id ||
+                        "N/A"}
                     </div>
                   </div>
 
@@ -297,7 +299,7 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
               }
               onClose();
             }}
-            className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-medium"
+            className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-bold"
           >
             Edit Content
           </button>

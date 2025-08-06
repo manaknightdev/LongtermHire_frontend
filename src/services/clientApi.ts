@@ -163,4 +163,16 @@ export const clientApi = {
       throw error.response?.data || error.message;
     }
   },
+
+  // Remove pricing package assignment from client
+  removePricing: async (clientUserId) => {
+    try {
+      const response = await api.delete(
+        `/v1/api/longtermhire/super_admin/remove-pricing/${clientUserId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };

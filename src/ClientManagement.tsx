@@ -38,6 +38,9 @@ const ClientManagement = () => {
     hasPrev: false,
   });
 
+  // Debounced search state
+  const [debouncedSearchData, setDebouncedSearchData] = useState(searchData);
+
   // Equipment popover state
   const [equipmentPopover, setEquipmentPopover] = useState({
     isOpen: false,
@@ -70,6 +73,21 @@ const ClientManagement = () => {
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchData(searchData);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchData]);
+
+  // Fetch data when debounced search changes
+  useEffect(() => {
+    setCurrentPage(1);
+    loadInitialData(1, debouncedSearchData);
+  }, [debouncedSearchData]);
 
   const loadInitialData = async (page = 1, searchFilters = {}) => {
     try {
@@ -304,16 +322,20 @@ const ClientManagement = () => {
     }));
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      setDebouncedSearchData(searchData);
+    }
+  };
+
   const handleSearch = () => {
-    console.log("Search data:", searchData);
-    setCurrentPage(1); // Reset to first page when searching
-    loadInitialData(1, searchData);
+    setDebouncedSearchData(searchData);
   };
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    loadInitialData(newPage, searchData);
+    loadInitialData(newPage, debouncedSearchData);
   };
 
   const handleAddClient = () => {
@@ -529,6 +551,7 @@ const ClientManagement = () => {
               name="clientId"
               value={searchData.clientId}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
               style={{ height: "42px" }}
             />
@@ -544,6 +567,7 @@ const ClientManagement = () => {
               name="clientName"
               value={searchData.clientName}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
               style={{ height: "42px" }}
             />
@@ -559,6 +583,7 @@ const ClientManagement = () => {
               name="companyName"
               value={searchData.companyName}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
               style={{ height: "42px" }}
             />

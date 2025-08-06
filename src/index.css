@@ -27,6 +27,10 @@
     @apply bg-[#4a4b4c] rounded-full hover:bg-[#5a5b5c];
   }
 
+  input[type="checkbox"] {
+    @apply !bg-[transparent] accent-[#FDCE06] border-[#fdce06] checked:!bg-[#fdce06] checked:border-[#fdce06] hover:border-[#e6b800] hover:bg-[#e6b800] focus:ring-[#fdce06] focus:ring-opacity-50;
+  }
+
   /* For Firefox */
   * {
     scrollbar-width: thin;

@@ -651,7 +651,6 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
                 name="pricing"
                 value={formData.pricing}
                 onChange={handleInputChange}
-                required
                 className="w-full bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 outline-none focus:border-[#FDCE06] transition-colors appearance-none"
                 style={{
                   width: "606px",

@@ -21,22 +21,20 @@ const PricingManagement = () => {
     }));
   };
 
-  const handleSearch = async () => {
-    console.log("Search data:", searchData);
-    setCurrentPage(1); // Reset to first page when searching
-    try {
-      await fetchPricingPackages(1, searchData);
-      toast.success("Search completed!");
-    } catch (error) {
-      console.error("Search error:", error);
-      toast.error("Search failed. Please try again.");
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      setDebouncedSearchData(searchData);
     }
+  };
+
+  const handleSearch = () => {
+    setDebouncedSearchData(searchData);
   };
 
   // Pagination handlers
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    fetchPricingPackages(newPage, searchData);
+    fetchPricingPackages(newPage, debouncedSearchData);
   };
 
   // Clear search
@@ -68,6 +66,9 @@ const PricingManagement = () => {
     hasPrev: false,
   });
 
+  // Debounced search state
+  const [debouncedSearchData, setDebouncedSearchData] = useState(searchData);
+
   // Fetch pricing packages from API with pagination and search
   const fetchPricingPackages = async (page = 1, searchFilters = {}) => {
     try {
@@ -95,6 +96,21 @@ const PricingManagement = () => {
     fetchPricingPackages();
   }, []);
 
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchData(searchData);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchData]);
+
+  // Fetch data when debounced search changes
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchPricingPackages(1, debouncedSearchData);
+  }, [debouncedSearchData]);
+
   // Handle package submission
   const handleSubmitPackage = async (packageData) => {
     try {
@@ -103,7 +119,7 @@ const PricingManagement = () => {
       setIsAddModalOpen(false);
       toast.success("Pricing package created successfully!");
       // Refresh the package list
-      await fetchPricingPackages(currentPage, searchData);
+      await fetchPricingPackages(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error creating package:", err);
       toast.error("Failed to create package. Please try again.");
@@ -126,7 +142,7 @@ const PricingManagement = () => {
       setIsEditModalOpen(false);
       setSelectedPackage(null);
       // Refresh the package list
-      await fetchPricingPackages(currentPage, searchData);
+      await fetchPricingPackages(currentPage, debouncedSearchData);
     } catch (err) {
       console.error("Error updating package:", err);
       toast.error("Failed to update package. Please try again.");
@@ -144,7 +160,7 @@ const PricingManagement = () => {
         await pricingApi.deletePricingPackage(packageId);
         toast.success("Pricing package deleted successfully!");
         // Refresh the package list
-        await fetchPricingPackages(currentPage, searchData);
+        await fetchPricingPackages(currentPage, debouncedSearchData);
       } catch (err) {
         console.error("Error deleting package:", err);
         toast.error("Failed to delete package. Please try again.");
@@ -190,6 +206,7 @@ const PricingManagement = () => {
               name="packageId"
               value={searchData.packageId}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
               style={{ height: "42px" }}
             />
@@ -205,6 +222,7 @@ const PricingManagement = () => {
               name="packageName"
               value={searchData.packageName}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               className="bg-[#292A2B] border border-[#333333] rounded-md text-[#E5E5E5] px-4 py-3 outline-none focus:border-[#FDCE06] transition-colors"
               style={{ height: "42px" }}
             />
@@ -216,7 +234,7 @@ const PricingManagement = () => {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="flex-1 bg-[#FDCE06] text-[#1F1F20] w-[200px] font-[Inter] w-[200px] text-[14px] px-4 py-3 rounded-md font-bold hover:bg-[#E5B800] transition-colors disabled:opacity-50"
+                className="flex-1 bg-[#FDCE06] text-[#1F1F20] w-[120px] font-[Inter] text-[14px] px-4 py-2 rounded-md font-bold hover:bg-[#E5B800] transition-colors disabled:opacity-50"
                 style={{ height: "42px" }}
               >
                 {loading ? "Searching..." : "Search"}
@@ -245,7 +263,7 @@ const PricingManagement = () => {
             </h3>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-medium text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
+              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-bold text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
             >
               Add Pricing Package
             </button>

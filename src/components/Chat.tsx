@@ -323,8 +323,37 @@ const Chat = () => {
 
       if (!response.error) {
         console.log("Conversation started successfully:", response);
-        // Reload conversations to show the new one
-        loadConversations();
+
+        // Check if the response contains the new conversation data
+        if (response.data && response.data.conversation) {
+          console.log(
+            "Auto-selecting new conversation from response:",
+            response.data.conversation
+          );
+          handleSelectConversation(response.data.conversation);
+        } else {
+          // Fallback: reload conversations and find the new one
+          await loadConversations();
+
+          // Wait a bit for the state to update, then find and select the new conversation
+          setTimeout(async () => {
+            // Get the updated conversations list
+            const updatedConversations = await chatApi.getConversations();
+
+            // Find the newly created conversation
+            const newConversation = updatedConversations.data.find(
+              (conv) =>
+                parseInt(conv.user1_id) === clientToUse.user_id ||
+                parseInt(conv.user2_id) === clientToUse.user_id
+            );
+
+            if (newConversation) {
+              console.log("Auto-selecting new conversation:", newConversation);
+              handleSelectConversation(newConversation);
+            }
+          }, 100);
+        }
+
         setShowNewConversationModal(false);
         setSelectedClientId("");
       } else {
@@ -581,13 +610,6 @@ const Chat = () => {
                       <div
                         className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
                       ></div>
-                      <span
-                        className={`text-xs ${adminOnline ? "text-green-400" : "text-gray-400"}`}
-                      >
-                        {adminOnline
-                          ? `Admin Online (${adminStatus.online_admin_count}/${adminStatus.total_admin_count})`
-                          : "Admin Offline"}
-                      </span>
                     </div>
                   </div>
                   {/* Client Last Seen */}
@@ -862,7 +884,7 @@ const Chat = () => {
                 <button
                   onClick={() => handleStartConversation()}
                   disabled={!selectedClientId}
-                  className="flex-1 bg-[#FDCE06] text-[#1F1F20] py-2 px-4 rounded-lg hover:bg-[#E5B800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 bg-[#FDCE06] font-bold text-[#1F1F20] py-2 px-4 rounded-lg hover:bg-[#E5B800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Start Chat
                 </button>

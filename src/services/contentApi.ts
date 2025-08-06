@@ -8,6 +8,7 @@ export const contentApi = {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
+        ...(searchData.contentId && { contentId: searchData.contentId }),
         ...(searchData.equipmentId && { equipmentId: searchData.equipmentId }),
         ...(searchData.equipmentName && {
           equipmentName: searchData.equipmentName,

@@ -148,7 +148,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
                       Equipment ID
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      {equipment.equipment_id || equipment.id || "N/A"}
+                      {equipment.equipment_id || "N/A"}
                     </div>
                   </div>
 
@@ -284,7 +284,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
               console.log("Edit equipment:", equipment);
               onClose();
             }}
-            className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-medium"
+            className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-bold"
           >
             Edit Equipment
           </button>

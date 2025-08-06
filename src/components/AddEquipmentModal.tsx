@@ -93,9 +93,6 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
     if (!formData.basePrice || parseFloat(formData.basePrice) <= 0) {
       newErrors.basePrice = "Please enter a valid base price";
     }
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -360,29 +357,6 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                 Months
               </span>
             </div>
-          </div>
-
-          {/* Description Field */}
-          <div>
-            <label className="block text-[#D1D5DB] font-[Inter] font-medium text-[14px] leading-[20px] mb-2">
-              Description *
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Describe the equipment specifications, features, and any special requirements..."
-              rows="4"
-              className={`w-full bg-[#292A2B] border rounded-[6px] text-[#E5E5E5] text-[16px] font-[Inter] p-3 outline-none resize-none transition-colors ${
-                errors.description
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-[#333333] focus:border-[#FDCE06]"
-              }`}
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1 font-[Inter]">
-                {errors.description}
-              </p>
-            )}
           </div>
 
           {/* Action Buttons */}

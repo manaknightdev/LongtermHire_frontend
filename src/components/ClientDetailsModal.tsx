@@ -57,6 +57,24 @@ function ClientDetailsModal({
     }
   };
 
+  const handleRemovePricing = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to remove the pricing package assignment?"
+      )
+    ) {
+      try {
+        await clientApi.removePricing(client.user_id);
+        toast.success("Pricing package removed successfully!");
+        // Close modal or refresh data - you might want to add a callback to refresh the parent component
+        onClose();
+      } catch (error) {
+        console.error("Error removing pricing:", error);
+        toast.error("Error removing pricing package. Please try again.");
+      }
+    }
+  };
+
   if (!isOpen || !client) return null;
 
   return (
@@ -221,14 +239,23 @@ function ClientDetailsModal({
                           key={index}
                           className="flex justify-between items-center py-1 border-b border-[#333333] last:border-b-0"
                         >
-                          <span>
-                            {pricing.package_name ||
-                              pricing.name ||
-                              "Unknown Package"}
-                          </span>
-                          <span className="text-[#FDCE06] text-sm">
-                            {pricing.description || "N/A"}
-                          </span>
+                          <div className="flex-1">
+                            <span>
+                              {pricing.package_name ||
+                                pricing.name ||
+                                "Unknown Package"}
+                            </span>
+                            <div className="text-[#FDCE06] text-sm">
+                              {pricing.description || "N/A"}
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleRemovePricing}
+                            className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors ml-3"
+                            title="Remove pricing package"
+                          >
+                            Remove
+                          </button>
                         </div>
                       ))}
                     </div>
