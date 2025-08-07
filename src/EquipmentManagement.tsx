@@ -457,10 +457,10 @@ const EquipmentManagement = () => {
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
                         {item.equipment_name}
                       </td>
-                      <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
+                      <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4 flex justify-center">
                         <button
                           onClick={() => handleViewDetails(item)}
-                          className="text-[#FDCE06] font-inter font-medium text-sm hover:underline transition-all"
+                          className="text-[white]/70 border border-white/50 p-3 rounded-lg font-inter font-medium text-le text-sm hover:underline transition-all"
                         >
                           View
                         </button>

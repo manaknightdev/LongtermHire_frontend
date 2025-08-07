@@ -606,11 +606,6 @@ const Chat = () => {
                       </span>
                     </div>
                     {/* Admin Online Status */}
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-2 h-2 rounded-full ${adminOnline ? "bg-green-500" : "bg-gray-500"}`}
-                      ></div>
-                    </div>
                   </div>
                   {/* Client Last Seen */}
                   {!getClientOnlineStatus(selectedConversation).is_online &&

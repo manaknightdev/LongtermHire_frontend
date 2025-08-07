@@ -234,7 +234,7 @@ const PricingManagement = () => {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="flex-1 bg-[#FDCE06] text-[#1F1F20] w-[120px] font-[Inter] text-[14px] px-4 py-2 rounded-md font-bold hover:bg-[#E5B800] transition-colors disabled:opacity-50"
+                className="bg-[#FDCE06] w-[200px] rounded-md text-[#1F1F20] font-[Inter] font-bold text-[16px] leading-[1.19em] px-6 py-3 hover:bg-[#E5B800] transition-colors disabled:opacity-50"
                 style={{ height: "42px" }}
               >
                 {loading ? "Searching..." : "Search"}
@@ -263,7 +263,7 @@ const PricingManagement = () => {
             </h3>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#FDCE06] text-[#1F1F20] font-[Inter] font-bold text-[14px] px-6 py-3 rounded-md hover:bg-[#E5B800] transition-colors"
+              className="bg-[#FDCE06] rounded-md text-[#1F1F20] font-inter font-bold text-sm lg:text-base px-6 py-2 hover:bg-[#E5B800] transition-colors whitespace-nowrap"
             >
               Add Pricing Package
             </button>
