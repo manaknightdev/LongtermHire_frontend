@@ -48,6 +48,18 @@ styleSheet.type = "text/css";
 styleSheet.innerText = scrollbarHideStyles;
 document.head.appendChild(styleSheet);
 
+// Format currency with English locale and thousands separators
+const formatCurrency = (value) => {
+  const number = typeof value === "number" ? value : parseFloat(value || 0);
+  const safeNumber = Number.isFinite(number) ? number : 0;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(safeNumber);
+};
+
 function ClientDashboard() {
   const [user, setUser] = useState(null);
   const [selectedEquipment, setSelectedEquipment] = useState(
@@ -279,9 +291,10 @@ function ClientDashboard() {
       }
 
       // Equipment cards show price per month
-      const priceDisplay = item.base_price
-        ? `$${item.base_price.toFixed(2)}/month`
-        : "Contact for pricing";
+      const priceDisplay =
+        item.base_price !== undefined && item.base_price !== null
+          ? `${formatCurrency(item.base_price)}/month`
+          : "Contact for pricing";
 
       // Create discount info object
       const hasDiscount = item.discount_type && item.discount_value;
@@ -976,14 +989,14 @@ function ClientDashboard() {
                   </span>
                   <div className="text-right">
                     <span className="text-[#FDCE06] text-base sm:text-lg font-bold">
-                      ${finalPrice.toFixed(2)}
+                      {formatCurrency(finalPrice)}
                     </span>
                     <div className="text-[#9CA3AF] text-xs">
                       Total for {selectedDuration}
                     </div>
                     {equipmentDiscount > 0 && (
                       <div className="text-[#EF4444] text-sm font-semibold">
-                        ${equipmentDiscount.toFixed(2)} saved
+                        {formatCurrency(equipmentDiscount)} saved
                       </div>
                     )}
                   </div>
@@ -1077,7 +1090,7 @@ function ClientDashboard() {
                           } else if (
                             selectedEquipmentData.discount_type === "fixed"
                           ) {
-                            return `$${selectedEquipmentData.discount_value} package discount`;
+                            return `${formatCurrency(selectedEquipmentData.discount_value)} package discount`;
                           }
                         }
                         return "";

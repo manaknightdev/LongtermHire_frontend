@@ -13,10 +13,12 @@ const EditContentModal = ({
   content,
   loading = false,
 }) => {
+  console.log("content", content);
   const [formData, setFormData] = useState({
     equipment_id: "",
     description: "",
     bannerDescription: "",
+    equipment_name: "",
   });
 
   const [images, setImages] = useState([]);
@@ -31,10 +33,12 @@ const EditContentModal = ({
   }, [isOpen]);
 
   // Update form data when content prop changes
+  console.log("formdata", formData);
   useEffect(() => {
     if (content) {
       setFormData({
-        equipment_id: content.equipment_id || "",
+        equipment_id: content.content_equipment_id || "",
+        equipment_name: content.equipment_name || "",
         description: content.description || "",
         bannerDescription: content.banner_description || "",
       });
@@ -151,7 +155,7 @@ const EditContentModal = ({
     // Prepare data for API
     const contentData = {
       equipment_id: formData.equipment_id,
-      equipment_name: selectedEquipment?.equipment_name || "",
+      equipment_name: formData?.equipment_name || "",
       description: formData.description,
       banner_description: formData.bannerDescription,
       image_url: imageUrl, // Keep for backward compatibility
@@ -177,6 +181,7 @@ const EditContentModal = ({
     // Reset form to original content data
     if (content) {
       setFormData({
+        equipment_name: content.equipment_name || "",
         equipment_id: content.equipment_id || "",
         description: content.description || "",
         bannerDescription: content.banner_description || "",

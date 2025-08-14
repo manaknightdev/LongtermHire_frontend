@@ -14,6 +14,7 @@ import Chat from "./components/Chat";
 import PrivateRoute from "./components/PrivateRoute";
 import ClientPrivateRoute from "./components/ClientPrivateRoute";
 import { OnlineStatusProvider } from "./contexts/OnlineStatusContext";
+import HomePage from "./HomePage";
 
 // Client Portal Components
 import ClientLogin from "./client/ClientLogin";
@@ -48,8 +49,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+
         {/* Admin Routes */}
-        <Route path="/" element={<Login />} />
+        <Route path="/admin/login" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/dashboard"
