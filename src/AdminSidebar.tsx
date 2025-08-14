@@ -27,7 +27,7 @@ function AdminSidebar() {
 
   const menuItems = [
     {
-      path: "/",
+      path: "/dashboard",
       name: "Dashboard",
       icon: (
         <svg
