@@ -10,7 +10,7 @@ const HomePage: React.FC = () => {
           className="h-[120px] w-auto mx-auto"
         />
         <div className="space-y-2">
-          <p className="text-[#ADAEBC]">Contact Administrator</p>
+          <p className="text-[#ADAEBC]">Contact Administrator for more info</p>
           <a
             href="mailto:admin@longtermhire.com"
             className="text-[#FDCE06] font-semibold hover:underline break-all"
