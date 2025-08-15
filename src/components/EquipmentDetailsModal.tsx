@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from "react";
 
-function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
+function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
   if (!isOpen || !equipment) return null;
 
   return (
@@ -280,8 +280,9 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment }) {
           </button>
           <button
             onClick={() => {
-              // Handle edit action
-              console.log("Edit equipment:", equipment);
+              if (onEdit) {
+                onEdit(equipment);
+              }
               onClose();
             }}
             className="px-4 py-2 bg-[#FDCE06] text-[#1F1F20] rounded-md hover:bg-[#E5B800] transition-colors font-bold"

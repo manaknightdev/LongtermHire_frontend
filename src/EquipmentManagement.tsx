@@ -611,6 +611,13 @@ const EquipmentManagement = () => {
             setSelectedEquipment(null);
           }}
           equipment={selectedEquipment}
+          onEdit={(equip) => {
+            if (equip) {
+              setSelectedEquipment(equip);
+            }
+            setIsDetailsModalOpen(false);
+            setIsEditModalOpen(true);
+          }}
         />
 
         {/* Toast Container */}

@@ -40,13 +40,13 @@ function PrivateRoute({ children, allowedRoles = [] }) {
 
   // If no token, redirect to login
   if (!token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // If specific roles are required, check user role
   if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
     // User doesn't have required role, redirect to login or unauthorized page
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // User is authenticated and has required role, render children
