@@ -72,7 +72,7 @@ const ClientManagement = () => {
   // Load data on component mount
   useEffect(() => {
     loadInitialData();
-  }, [isClientDetailsModalOpen]);
+  }, []);
 
   // Debounced search effect
   useEffect(() => {
