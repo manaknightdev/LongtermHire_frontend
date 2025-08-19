@@ -1375,25 +1375,27 @@ function ClientDashboard() {
       </div>
 
       {/* Floating Chat Button - Only visible on mobile/tablet */}
-      <div className="fixed bottom-4 right-4 lg:hidden z-50">
-        <button
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 20 20"
-            fill="none"
-            className="sm:w-5 sm:h-5"
+      {!isChatOpen && (
+        <div className="fixed bottom-4 right-4 lg:hidden z-50">
+          <button
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
           >
-            <path
-              d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
-              fill="#000000"
-            />
-          </svg>
-        </button>
-      </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 20 20"
+              fill="none"
+              className="sm:w-5 sm:h-5"
+            >
+              <path
+                d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
+                fill="#000000"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Mobile Chat Popup */}
       {isChatOpen && (

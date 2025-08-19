@@ -1,6 +1,14 @@
 // @ts-nocheck
 import React from "react";
 
+const formatMoney = (value) => {
+  if (value === null || value === undefined || value === "") return "N/A";
+  const sanitized = typeof value === "string" ? value.replace(/,/g, "") : value;
+  const number = Number(sanitized);
+  if (Number.isNaN(number)) return "N/A";
+  return number.toLocaleString("en-US");
+};
+
 function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
   if (!isOpen || !equipment) return null;
 
@@ -217,7 +225,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
                       Base Price
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
-                      ${equipment.base_price || "N/A"}
+                      ${formatMoney(equipment.base_price)}
                     </div>
                   </div>
 
