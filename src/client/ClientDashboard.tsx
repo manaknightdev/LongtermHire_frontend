@@ -907,7 +907,7 @@ function ClientDashboard() {
 
         {/* Right Sidebar */}
         <aside className="w-full lg:w-[389px] pb-[100px] p-4 sm:p-6 lg:p-8 lg:pt-[168px] order-first lg:order-last">
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between">
             {/* Equipment Selector */}
             <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6">
               <div className="mb-4 sm:mb-6">
