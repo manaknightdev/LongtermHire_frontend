@@ -1113,8 +1113,8 @@ function ClientDashboard() {
               </div>
             </div>
 
-            {/* Chat Section - Hidden on mobile, shown on desktop */}
-            <div className="">
+            {/* Chat Section (disabled in sidebar for desktop; replaced with floating popup) */}
+            <div className="hidden">
               {isChatVisible ? (
                 <>
                   <div className="hidden lg:block bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden relative">
@@ -1409,6 +1409,24 @@ function ClientDashboard() {
         </div>
       )}
 
+      {/* Floating Chat Button - Desktop */}
+      {!isChatOpen && (
+        <div className="hidden lg:block fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors"
+            title="Open chat"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M18 8.5C18 12.6421 14.6421 16 10.5 16H4L2 18V4C2 2.89543 2.89543 2 4 2H16C17.1046 2 18 2.89543 18 4V8.5Z"
+                fill="#000000"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Mobile Chat Popup */}
       {isChatOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden">
@@ -1545,6 +1563,153 @@ function ClientDashboard() {
         </div>
       )}
 
+      {/* Desktop Chat Popup */}
+      {isChatOpen && (
+        <div className="hidden lg:block fixed bottom-20 right-4 z-50">
+          <div className="bg-[#1F1F20] border border-[#333333] rounded-lg w-[380px] h-[520px] flex flex-col shadow-2xl">
+            <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h3 className="text-[#FFFFFF] text-base font-semibold">
+                  Message Rental Company
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="text-[#9CA3AF] hover:text-[#FFFFFF] transition-colors"
+                title="Close chat"
+              >
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M15 5L5 15M5 5L15 15"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div
+              className="p-4 space-y-4 flex-1 overflow-y-auto"
+              ref={messagesContainerRef}
+            >
+              {hasMoreMessages && (
+                <div className="flex justify-center mb-2">
+                  <button
+                    onClick={() => {
+                      if (conversations.length > 0) {
+                        loadMoreMessages(conversations[0].id);
+                      }
+                    }}
+                    disabled={loadingMore}
+                    className="bg-[#333333] text-[#E5E5E5] px-3 py-1 rounded-md hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                  >
+                    {loadingMore ? "Loading..." : "Load More"}
+                  </button>
+                </div>
+              )}
+
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-[#9CA3AF]">
+                    No messages yet. Start the conversation!
+                  </p>
+                </div>
+              ) : (
+                messages.map((message) => {
+                  const messageUserId = parseInt(message.from_user_id || "0");
+                  const currentUserId = getCurrentUserId();
+                  const isCurrentUser =
+                    messageUserId === currentUserId && messageUserId > 0;
+                  const isEquipmentRequest =
+                    message.message_type === "equipment_request";
+
+                  return (
+                    <div
+                      key={message.id}
+                      className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-lg p-3 ${
+                          isEquipmentRequest
+                            ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                            : isCurrentUser
+                              ? "bg-[#FDCE06] text-[#000000]"
+                              : "bg-[#292A2B] text-[#E5E5E5]"
+                        }`}
+                      >
+                        {isEquipmentRequest && (
+                          <div className="mb-1">
+                            <span className="text-[10px] font-bold bg-[#000000] text-[#FDCE06] px-2 py-0.5 rounded">
+                              Equipment Request
+                            </span>
+                          </div>
+                        )}
+                        <p className="text-sm">{message.message}</p>
+                        {message.equipment_name && (
+                          <div className="mt-1 text-[10px] opacity-80">
+                            Equipment: {message.equipment_name}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-[10px] opacity-70">
+                            {new Date(message.created_at).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" }
+                            )}
+                          </p>
+                          {message.read_at && (
+                            <p className="text-[10px] opacity-50">✓ Read</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="border-t border-[#333333] p-3">
+              <div className="flex items-start bg-[#2A2A2B] border border-[#444444] rounded-lg px-3 py-2">
+                <textarea
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  placeholder="Type your message... "
+                  className="flex-1 bg-transparent text-[#ADAEBC] text-sm placeholder-[#ADAEBC] outline-none placeholder:text-xs resize-none min-h-[32px] max-h-[100px] overflow-y-auto"
+                  rows={1}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  style={{
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#444444 transparent",
+                  }}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={sendingMessage || !messageText.trim()}
+                  className="ml-2 bg-[#FDCE06] rounded-full w-8 h-8 flex items-center justify-center hover:bg-[#E5B800] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sendingMessage ? (
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M2 14L14 8L2 2L2 6L10 8L2 10L2 14Z"
+                        fill="#000000"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Toast notifications */}
       <ToastContainer
         position="top-right"
@@ -1590,19 +1755,21 @@ function ClientDashboard() {
 
             {/* Image area */}
             <div className="relative bg-[#0F0F10]">
-              <img
-                src={
-                  (quickViewEquipment.allImages &&
-                    quickViewEquipment.allImages[quickViewImageIndex]
-                      ?.image_url) ||
-                  quickViewEquipment.image
-                }
-                alt={quickViewEquipment.name}
-                className="w-full h-48 md:h-56 object-cover"
-                onError={(e) => {
-                  e.target.src = "/placeholder-equipment.jpg";
-                }}
-              />
+              <div className="w-full flex justify-center items-center">
+                <img
+                  src={
+                    (quickViewEquipment.allImages &&
+                      quickViewEquipment.allImages[quickViewImageIndex]
+                        ?.image_url) ||
+                    quickViewEquipment.image
+                  }
+                  alt={quickViewEquipment.name}
+                  className="max-w-[250px] h-48 md:h-56 object-cover"
+                  onError={(e) => {
+                    e.target.src = "/placeholder-equipment.jpg";
+                  }}
+                />
+              </div>
               {quickViewEquipment.allImages &&
                 quickViewEquipment.allImages.length > 1 && (
                   <>
