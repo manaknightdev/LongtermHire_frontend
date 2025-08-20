@@ -633,7 +633,7 @@ const ClientManagement = () => {
                   Email
                 </th>
                 <th className="text-[#9CA3AF] font-[Inter] font-bold text-[12px] leading-[1.25em] text-left px-4 py-3 min-w-[120px]">
-                  Phone
+                  Company Name
                 </th>
                 <th className="text-[#9CA3AF] font-[Inter] font-bold text-[12px] leading-[1.25em] text-center px-4 py-3 min-w-[120px]">
                   Equipment
@@ -676,7 +676,7 @@ const ClientManagement = () => {
                       {client.email}
                     </td>
                     <td className="text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] px-4 py-4">
-                      {client.phone || "N/A"}
+                      {client.company_name || "N/A"}
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center">

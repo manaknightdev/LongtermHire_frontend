@@ -5,7 +5,6 @@ import { clientAuthApi } from "../services/clientAuthApi";
 import { clientEquipmentApi } from "../services/clientEquipmentApi";
 import { chatApi } from "../services/chatApi";
 import { useClientChat } from "../hooks/useClientChat";
-import EquipmentDetailsModal from "../components/EquipmentDetailsModal";
 import { ClipLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -75,6 +74,9 @@ function ClientDashboard() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
   const [selectedImages, setSelectedImages] = useState({}); // Track selected image for each equipment
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [quickViewEquipment, setQuickViewEquipment] = useState(null);
+  const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -349,6 +351,7 @@ function ClientDashboard() {
         status: item.availability === 1 ? "Available" : "Unavailable",
         description:
           item.content?.description || `${item.equipment_name} equipment`,
+        banner_description: item.content?.banner_description || null,
         price: priceDisplay,
         base_price: item.base_price,
         discounted_price: item.discounted_price,
@@ -761,7 +764,12 @@ function ClientDashboard() {
                     {items.map((equipment) => (
                       <div
                         key={equipment.id}
-                        className="bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors"
+                        className="bg-[#1F1F20] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
+                        onClick={() => {
+                          setQuickViewEquipment(equipment);
+                          setQuickViewImageIndex(0);
+                          setIsQuickViewOpen(true);
+                        }}
                       >
                         <div className="p-3 sm:p-4">
                           <div className="bg-[#292A2B] rounded-md p-0 mb-3 sm:mb-4 relative">
@@ -792,7 +800,10 @@ function ClientDashboard() {
                           {/* Horizontal Thumbnail Strip */}
                           {equipment?.allImages &&
                             equipment.allImages.length > 1 && (
-                              <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
+                              <div
+                                className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 {equipment.allImages.map((img, index) => {
                                   const isSelected =
                                     selectedImages[equipment.id] === index;
@@ -864,7 +875,7 @@ function ClientDashboard() {
                                 {equipment.status}
                               </span>
                             </div>
-                            <p className="text-[#9CA3AF] text-xs leading-relaxed h-[50px]">
+                            <p className="text-[#9CA3AF] text-xs leading-relaxed line-clamp-3">
                               {equipment.description}
                             </p>
                             <p className="text-[#FFFFFF] text-sm font-semibold">
@@ -882,6 +893,7 @@ function ClientDashboard() {
                                 className={`px-3 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-1 ${getButtonClass(
                                   equipment.status
                                 )}`}
+                                onClickCapture={(e) => e.stopPropagation()}
                               >
                                 {requestLoading[equipment.id] ? (
                                   <>
@@ -907,7 +919,7 @@ function ClientDashboard() {
 
         {/* Right Sidebar */}
         <aside className="w-full lg:w-[389px] pb-[100px] p-4 sm:p-6 lg:p-8 lg:pt-[168px] order-first lg:order-last">
-          <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between">
+          <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between h-full">
             {/* Equipment Selector */}
             <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6">
               <div className="mb-4 sm:mb-6">
@@ -1546,6 +1558,128 @@ function ClientDashboard() {
         pauseOnHover
         theme="dark"
       />
+      {/* Quick View Modal */}
+      {isQuickViewOpen && quickViewEquipment && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4"
+          onClick={() => setIsQuickViewOpen(false)}
+        >
+          <div
+            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-[#333333]">
+              <h3 className="text-[#E5E5E5] text-lg font-semibold">
+                {quickViewEquipment.name}
+              </h3>
+              <button
+                onClick={() => setIsQuickViewOpen(false)}
+                className="text-[#9CA3AF] hover:text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M15 5L5 15M5 5L15 15"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Image area */}
+            <div className="relative bg-[#0F0F10]">
+              <img
+                src={
+                  (quickViewEquipment.allImages &&
+                    quickViewEquipment.allImages[quickViewImageIndex]
+                      ?.image_url) ||
+                  quickViewEquipment.image
+                }
+                alt={quickViewEquipment.name}
+                className="w-full h-48 md:h-56 object-cover"
+                onError={(e) => {
+                  e.target.src = "/placeholder-equipment.jpg";
+                }}
+              />
+              {quickViewEquipment.allImages &&
+                quickViewEquipment.allImages.length > 1 && (
+                  <>
+                    <button
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                      onClick={() =>
+                        setQuickViewImageIndex(
+                          (quickViewImageIndex -
+                            1 +
+                            quickViewEquipment.allImages.length) %
+                            quickViewEquipment.allImages.length
+                        )
+                      }
+                      aria-label="Previous image"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M15 19l-7-7 7-7"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                      onClick={() =>
+                        setQuickViewImageIndex(
+                          (quickViewImageIndex + 1) %
+                            quickViewEquipment.allImages.length
+                        )
+                      }
+                      aria-label="Next image"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M9 5l7 7-7 7"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </>
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-3 flex-1 overflow-y-auto overflow-x-hidden">
+              <p className="text-[#ADAEBC] text-sm w-full ">
+                {quickViewEquipment.banner_description ||
+                  quickViewEquipment.description}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-[#FFFFFF] text-base font-semibold">
+                  Price
+                </span>
+                <span className="text-[#FDCE06] text-base font-bold">
+                  {formatCurrency(quickViewEquipment.base_price || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
