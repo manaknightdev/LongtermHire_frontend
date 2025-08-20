@@ -168,6 +168,15 @@ const EquipmentManagement = () => {
   //   }
   // };
 
+  const formatMoney = (value) => {
+    if (value === null || value === undefined || value === "") return "N/A";
+    const sanitized =
+      typeof value === "string" ? value.replace(/,/g, "") : value;
+    const number = Number(sanitized);
+    if (Number.isNaN(number)) return "N/A";
+    return number.toLocaleString("en-US");
+  };
+
   // Handle equipment deletion
   const handleDeleteEquipment = async (equipmentId) => {
     if (!window.confirm("Are you sure you want to delete this equipment?")) {
@@ -466,7 +475,7 @@ const EquipmentManagement = () => {
                         </button>
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
-                        {item.base_price}
+                        {formatMoney(item.base_price)}
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
                         {item.minimum_duration}
