@@ -54,7 +54,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
                         alt={equipment.equipment_name || equipment.name}
                         className="w-full h-64 object-cover rounded-md"
                         onError={(e) => {
-                          e.target.src = "/placeholder-equipment.jpg";
+                          e.target.src = "/images/graphview.png";
                         }}
                       />
                     </div>
@@ -79,7 +79,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
                                   }
                                   className="w-full h-16 object-cover rounded-md"
                                   onError={(e) => {
-                                    e.target.src = "/placeholder-equipment.jpg";
+                                    e.target.src = "/images/graphview.png";
                                   }}
                                 />
                                 {image.caption && (
@@ -99,7 +99,7 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
                     alt={equipment.equipment_name || equipment.name}
                     className="w-full h-64 object-cover rounded-md"
                     onError={(e) => {
-                      e.target.src = "/placeholder-equipment.jpg";
+                      e.target.src = "/images/graphview.png";
                     }}
                   />
                 ) : (

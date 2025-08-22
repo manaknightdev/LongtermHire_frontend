@@ -168,7 +168,7 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                                   }
                                   className="w-full h-48 object-cover rounded-md"
                                   onError={(e) => {
-                                    e.target.src = "/placeholder-equipment.jpg";
+                                    e.target.src = "/images/graphview.png";
                                   }}
                                 />
                                 {displayImage.caption && (
@@ -196,8 +196,7 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                                       }
                                       className="w-full h-20 object-cover rounded-md border border-[#333333]"
                                       onError={(e) => {
-                                        e.target.src =
-                                          "/placeholder-equipment.jpg";
+                                        e.target.src = "/images/graphview.png";
                                       }}
                                     />
                                     {(image.is_main === 1 ||
@@ -233,7 +232,7 @@ function ContentDetailsModal({ isOpen, onClose, content, onEdit }) {
                             alt={content.equipment_name}
                             className="w-full h-48 object-cover rounded-md"
                             onError={(e) => {
-                              e.target.src = "/placeholder-equipment.jpg";
+                              e.target.src = "/images/graphview.png";
                             }}
                           />
                         </div>
