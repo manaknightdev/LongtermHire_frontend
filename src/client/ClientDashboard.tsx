@@ -764,7 +764,7 @@ function ClientDashboard() {
                     {items.map((equipment) => (
                       <div
                         key={equipment.id}
-                        className="bg-[#1F1F20] h-[392px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
+                        className="bg-[#1F1F20] h-[404px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
                         onClick={() => {
                           setQuickViewEquipment(equipment);
                           setQuickViewImageIndex(0);
@@ -801,7 +801,8 @@ function ClientDashboard() {
 
                           <div
                             className={`space-y-2 sm:space-y-3 ${
-                              equipment?.allImages.length == 1
+                              equipment?.allImages.length == 1 ||
+                              equipment?.allImages.length == 0
                                 ? "mt-[80px]"
                                 : ""
                             }`}
