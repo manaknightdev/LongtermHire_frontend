@@ -28,7 +28,7 @@ const AddClientModal = ({ isOpen, onClose, onSubmit, loading = false }) => {
         setDataLoading(true);
         try {
           // Load equipment
-          const equipmentResponse = await equipmentApi.getEquipment();
+          const equipmentResponse = await equipmentApi.getEquipment(1, 1000);
           setAvailableEquipment(equipmentResponse.data || []);
 
           // Load pricing packages

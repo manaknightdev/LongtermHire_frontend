@@ -94,7 +94,7 @@ const ClientManagement = () => {
       setLoading(true);
       const [clientsRes, equipmentRes, pricingRes] = await Promise.all([
         clientApi.getClients(page, 10, searchFilters),
-        equipmentApi.getEquipment(),
+        equipmentApi.getEquipment(1, 1000),
         pricingApi.getPricingPackages(),
       ]);
       console.log(clientsRes, equipmentRes, pricingRes);
