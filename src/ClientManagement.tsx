@@ -31,7 +31,7 @@ const ClientManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 200,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -93,7 +93,7 @@ const ClientManagement = () => {
     try {
       setLoading(true);
       const [clientsRes, equipmentRes, pricingRes] = await Promise.all([
-        clientApi.getClients(page, 10, searchFilters),
+        clientApi.getClients(page, 200, searchFilters),
         equipmentApi.getEquipment(1, 1000),
         pricingApi.getPricingPackages(),
       ]);

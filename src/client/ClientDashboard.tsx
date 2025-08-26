@@ -813,9 +813,10 @@ function ClientDashboard() {
                                           ? "border-[#FDCE06] ring-2 ring-[#FDCE06] ring-opacity-50 shadow-lg"
                                           : "border-[#333333] hover:border-[#555555] hover:shadow-md"
                                       }`}
-                                      onClick={() =>
-                                        handleImageSelect(equipment.id, index)
-                                      }
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // Prevent modal from opening
+                                        handleImageSelect(equipment.id, index);
+                                      }}
                                       title={
                                         img.caption || `Image ${index + 1}`
                                       }
@@ -1767,7 +1768,7 @@ function ClientDashboard() {
                     quickViewEquipment.image
                   }
                   alt={quickViewEquipment.name}
-                  className="max-w-[250px] h-48 md:h-56 object-cover"
+                  className="max-w-[250px] h-48 md:h-56 object-contain"
                   onError={(e) => {
                     e.target.src = "/images/graphview.png";
                   }}

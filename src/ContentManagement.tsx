@@ -53,7 +53,7 @@ const ContentManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 200,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -68,7 +68,7 @@ const ContentManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await contentApi.getContent(page, 10, searchFilters);
+      const data = await contentApi.getContent(page, 200, searchFilters);
       setContentData(data.data || []);
 
       // Update pagination info

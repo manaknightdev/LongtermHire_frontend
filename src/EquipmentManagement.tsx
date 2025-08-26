@@ -28,7 +28,7 @@ const EquipmentManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 200,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -43,7 +43,7 @@ const EquipmentManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await equipmentApi.getEquipment(page, 10, searchFilters);
+      const data = await equipmentApi.getEquipment(page, 200, searchFilters);
       setEquipment(data.data || []);
 
       // Update pagination info

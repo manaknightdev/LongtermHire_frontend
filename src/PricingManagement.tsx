@@ -59,7 +59,7 @@ const PricingManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 200,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -74,7 +74,11 @@ const PricingManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await pricingApi.getPricingPackages(page, 10, searchFilters);
+      const data = await pricingApi.getPricingPackages(
+        page,
+        200,
+        searchFilters
+      );
       setPackageData(data.data || []);
 
       // Update pagination info
