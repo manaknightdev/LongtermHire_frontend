@@ -475,7 +475,7 @@ const EquipmentManagement = () => {
                         </button>
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
-                        {formatMoney(item.base_price)}
+                        ${formatMoney(item.base_price)}
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
                         {item.minimum_duration}

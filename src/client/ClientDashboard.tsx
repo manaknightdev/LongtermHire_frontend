@@ -614,7 +614,8 @@ function ClientDashboard() {
   };
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || conversations.length === 0 || sendingMessage) {
+    console.log("hi");
+    if (!messageText.trim() || sendingMessage) {
       return; // Prevent sending if already sending or no message/conversation
     }
 
@@ -622,13 +623,15 @@ function ClientDashboard() {
       setSendingMessage(true);
 
       // Get the admin user ID from the conversation
-      const conversation = conversations[0];
+      const conversation = conversations?.[0];
       const currentUserId = getCurrentUserId();
+      console.log(currentUserId);
+      console.log("kdj");
       const adminUserId =
-        parseInt(conversation.user1_id) === currentUserId
-          ? conversation.user2_id
-          : conversation.user1_id;
-
+        parseInt(conversation?.user1_id) === currentUserId
+          ? conversation?.user2_id
+          : 2;
+      console.log("done");
       const success = await sendMessage(adminUserId, messageText);
       if (success) {
         setMessageText("");
@@ -1159,7 +1162,7 @@ function ClientDashboard() {
                           <button
                             onClick={() => {
                               if (conversations.length > 0) {
-                                loadMoreMessages(conversations[0].id);
+                                loadMoreMessages(conversations?.[0].id);
                               }
                             }}
                             disabled={loadingMore}
@@ -1597,7 +1600,7 @@ function ClientDashboard() {
               className="p-4 space-y-4 flex-1 overflow-y-auto"
               ref={messagesContainerRef}
             >
-              {hasMoreMessages && (
+              {hasMoreMessages && conversations.length > 0 && (
                 <div className="flex justify-center mb-2">
                   <button
                     onClick={() => {
