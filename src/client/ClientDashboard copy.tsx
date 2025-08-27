@@ -78,7 +78,6 @@ function ClientDashboard() {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quickViewEquipment, setQuickViewEquipment] = useState(null);
   const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0); // Track scroll position
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -282,16 +281,6 @@ function ClientDashboard() {
       setSelectedImages(initialSelectedImages);
     }
   }, [equipment]);
-
-  // Track scroll position for dynamic positioning
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollTop(window.pageYOffset || document.documentElement.scrollTop);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Load chat conversations and start polling
   useEffect(() => {
@@ -825,7 +814,7 @@ function ClientDashboard() {
             <img
               src="/login-logo.png"
               alt="Equipment Rental Logo"
-              className="h-[100px] sm:h-[100px] mr-4 sm:mr-6"
+              className="h-[100px] sm:h-[150px] mr-4 sm:mr-6"
             />
           </div>
           <nav className="flex items-center gap-2 sm:gap-4">
@@ -1176,14 +1165,10 @@ function ClientDashboard() {
         </main>
 
         {/* Right Sidebar */}
-        <aside className="w-full lg:w-[389px] pb-[100px] p-4 sm:p-6 lg:p-8 lg:pt-[38px] order-first lg:order-last">
+        <aside className="w-full lg:w-[389px] pb-[100px] p-4 sm:p-6 lg:p-8 lg:pt-[168px] order-first lg:order-last">
           <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between h-full">
             {/* Equipment Selector */}
-            <div
-              className={`bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 sm:pb-3 lg:fixed ${
-                scrollTop > 150 ? "lg:top-[20px]" : "lg:top-[150px]"
-              } transition-all duration-300 ease-in-out`}
-            >
+            <div className="bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6">
               <div className="mb-4 sm:mb-6">
                 <label className="block text-[#D1D5DB] text-sm font-medium mb-3 sm:mb-4">
                   Select Equipment
@@ -1241,7 +1226,7 @@ function ClientDashboard() {
               </div>
 
               {/* Minimum Hire Duration */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div className="text-[#FDCE06] text-xs text-center font-semibold bg-[#1A1A1A] border border-[#333333] rounded-md py-2 px-3">
                   {(() => {
                     const selectedEquipmentData = equipment.find(
@@ -1253,7 +1238,7 @@ function ClientDashboard() {
                       : "Minimum hire duration: 1 Month";
                   })()}
                 </div>
-              </div> */}
+              </div>
 
               {/* Hire Duration */}
               <div>
@@ -1833,7 +1818,7 @@ function ClientDashboard() {
 
       {/* Desktop Chat Popup */}
       {isChatOpen && (
-        <div className="hidden lg:block fixed bottom-4 right-4 z-50">
+        <div className="hidden lg:block fixed bottom-20 right-4 z-50">
           <div className="bg-[#1F1F20] border border-[#333333] rounded-lg w-[380px] h-[520px] flex flex-col shadow-2xl">
             <div className="bg-[#1F1F20] border-b border-[#333333] px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
