@@ -36,4 +36,20 @@
     scrollbar-width: thin;
     scrollbar-color: #4a4b4c #1a1b1c;
   }
+
+  /* Thumbnail scroll container */
+  .thumbnail-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide scrollbar for thumbnail container */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
