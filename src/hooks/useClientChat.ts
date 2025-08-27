@@ -15,6 +15,7 @@ export const useClientChat = () => {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Intervals for online status management
   const heartbeatInterval = useRef(null);
@@ -101,6 +102,11 @@ export const useClientChat = () => {
       if (!response.error) {
         const messagesData = response.data || [];
         const pagination = response.pagination || {};
+
+        // Extract unread count from API response if available
+        if (response.unread_count !== undefined) {
+          setUnreadCount(response.unread_count);
+        }
 
         if (page === 1) {
           // First page - replace all messages
@@ -250,6 +256,11 @@ export const useClientChat = () => {
       try {
         const response = await chatApi.getMessages(conversationId, 1, 10);
         if (!response.error && response.data.length > 0) {
+          // Update unread count from polling response
+          if (response.unread_count !== undefined) {
+            setUnreadCount(response.unread_count);
+          }
+
           const newMessages = response.data.filter(
             (msg) =>
               new Date(msg.created_at).getTime() > lastMessageTimestamp.current
@@ -296,6 +307,11 @@ export const useClientChat = () => {
   const clearMessages = useCallback(() => {
     setMessages([]);
     lastMessageTimestamp.current = 0;
+  }, []);
+
+  // Clear unread count (when messages are read)
+  const clearUnreadCount = useCallback(() => {
+    setUnreadCount(0);
   }, []);
 
   // Initialize online status and intervals on mount
@@ -347,6 +363,7 @@ export const useClientChat = () => {
     hasMoreMessages,
     loadingMore,
     currentPage,
+    unreadCount,
     loadConversations,
     loadMessages,
     loadMoreMessages,
@@ -354,6 +371,7 @@ export const useClientChat = () => {
     startPolling,
     stopPolling,
     clearMessages,
+    clearUnreadCount,
     clearError,
     setOnline,
     setOffline,

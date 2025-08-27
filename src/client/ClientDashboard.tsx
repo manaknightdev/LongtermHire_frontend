@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { clientAuthApi } from "../services/clientAuthApi";
 import { clientEquipmentApi } from "../services/clientEquipmentApi";
 import { chatApi } from "../services/chatApi";
+import { dashboardApi } from "../services/dashboardApi";
 import { useClientChat } from "../hooks/useClientChat";
 import { ClipLoader } from "react-spinners";
 import { toast, ToastContainer } from "react-toastify";
@@ -101,6 +102,7 @@ function ClientDashboard() {
     hasMoreMessages,
     loadingMore,
     currentPage,
+    unreadCount: hookUnreadCount,
     loadConversations,
     loadMessages,
     loadMoreMessages,
@@ -108,6 +110,7 @@ function ClientDashboard() {
     startPolling,
     stopPolling,
     clearMessages,
+    clearUnreadCount,
     clearError: clearChatError,
   } = useClientChat();
 
@@ -374,21 +377,16 @@ function ClientDashboard() {
     lastMessageCountRef.current = currentMessageCount;
   }, [messages, isChatVisible]);
 
-  // Calculate unread messages from admin
+  // Use unread count from API
   useEffect(() => {
-    if (messages.length > 0) {
-      const currentUserId = getCurrentUserId();
-      const unreadCount = messages.filter(
-        (message) => message.from_user_id !== currentUserId && !message.read_at
-      ).length;
-
-      setUnreadMessageCount(unreadCount);
+    if (hookUnreadCount !== undefined && hookUnreadCount >= 0) {
+      setUnreadMessageCount(hookUnreadCount);
 
       // Auto-open chat if there are unread messages and chat is hidden
-      if (unreadCount > 0 && !isChatVisible) {
+      if (hookUnreadCount > 0 && !isChatVisible) {
         setIsChatVisible(true);
         toast.info(
-          `${unreadCount} unread message${unreadCount > 1 ? "s" : ""} from admin!`,
+          `${hookUnreadCount} unread message${hookUnreadCount > 1 ? "s" : ""} from admin!`,
           {
             position: "top-right",
             autoClose: 4000,
@@ -396,15 +394,33 @@ function ClientDashboard() {
         );
       }
     }
-  }, [messages, isChatVisible]);
+  }, [hookUnreadCount, isChatVisible]);
 
-  // Clear unread count when chat becomes visible
+  // Mark messages as read when chat becomes visible
   useEffect(() => {
-    if (isChatVisible || isChatOpen) {
-      // Clear unread count when chat is opened
-      setUnreadMessageCount(0);
+    if ((isChatVisible || isChatOpen) && messages.length > 0) {
+      // Call API to mark messages as read when chat is opened
+      const markMessagesRead = async () => {
+        try {
+          const messageIds = messages
+            .filter(
+              (msg) =>
+                !msg.read_at &&
+                parseInt(msg.from_user_id) !== getCurrentUserId()
+            )
+            .map((msg) => msg.id);
+
+          if (messageIds.length > 0) {
+            await dashboardApi.markMessagesAsRead(messageIds);
+          }
+        } catch (error) {
+          console.error("Failed to mark messages as read:", error);
+        }
+      };
+
+      markMessagesRead();
     }
-  }, [isChatVisible, isChatOpen]);
+  }, [isChatVisible, isChatOpen, messages]);
 
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
