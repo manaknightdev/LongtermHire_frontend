@@ -114,6 +114,21 @@ function ClientDashboard() {
     clearError: clearChatError,
   } = useClientChat();
 
+  // Track screen size to determine which chat state to use
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen size on mount and resize
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   // Get current user ID - simple approach
   const getCurrentUserId = () => {
     const clientUserId = localStorage.getItem("clientUserId");
@@ -396,9 +411,12 @@ function ClientDashboard() {
     }
   }, [hookUnreadCount, isChatVisible]);
 
-  // Mark messages as read when chat becomes visible
+  // Mark messages as read when chat becomes visible on the current device
   useEffect(() => {
-    if ((isChatVisible || isChatOpen) && messages.length > 0) {
+    // Only mark as read if chat is visible on the current device
+    const isChatVisibleOnCurrentDevice = isMobile ? isChatOpen : isChatVisible;
+
+    if (isChatVisibleOnCurrentDevice && messages.length > 0) {
       // Call API to mark messages as read when chat is opened
       const markMessagesRead = async () => {
         try {
@@ -420,7 +438,7 @@ function ClientDashboard() {
 
       markMessagesRead();
     }
-  }, [isChatVisible, isChatOpen, messages]);
+  }, [isChatVisible, isChatOpen, messages, isMobile]);
 
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
