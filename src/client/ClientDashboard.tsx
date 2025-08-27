@@ -79,6 +79,7 @@ function ClientDashboard() {
   const [quickViewEquipment, setQuickViewEquipment] = useState(null);
   const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
   const [scrollTop, setScrollTop] = useState(0); // Track scroll position
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0); // Track unread messages
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -350,10 +351,52 @@ function ClientDashboard() {
     if (currentMessageCount > previousMessageCount) {
       // New message arrived, scroll to bottom
       scrollChatToBottom(true);
+
+      // Check if new message is from admin and chat is not visible
+      if (messages.length > 0) {
+        const latestMessage = messages[messages.length - 1];
+        const currentUserId = getCurrentUserId();
+
+        // If message is from admin (not from current user) and chat is hidden
+        if (latestMessage.from_user_id !== currentUserId && !isChatVisible) {
+          // Auto-open the chat when new message arrives from admin
+          setIsChatVisible(true);
+
+          // Show notification toast
+          toast.info("New message received! Chat opened automatically.", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
+      }
     }
 
     lastMessageCountRef.current = currentMessageCount;
-  }, [messages]);
+  }, [messages, isChatVisible]);
+
+  // Calculate unread messages from admin
+  useEffect(() => {
+    if (messages.length > 0) {
+      const currentUserId = getCurrentUserId();
+      const unreadCount = messages.filter(
+        (message) => message.from_user_id !== currentUserId && !message.read_at
+      ).length;
+
+      setUnreadMessageCount(unreadCount);
+
+      // Auto-open chat if there are unread messages and chat is hidden
+      if (unreadCount > 0 && !isChatVisible) {
+        setIsChatVisible(true);
+        toast.info(
+          `${unreadCount} unread message${unreadCount > 1 ? "s" : ""} from admin!`,
+          {
+            position: "top-right",
+            autoClose: 4000,
+          }
+        );
+      }
+    }
+  }, [messages, isChatVisible]);
 
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
@@ -881,11 +924,11 @@ function ClientDashboard() {
                   <h2 className="text-[#D1D5DB] text-xl sm:text-2xl font-semibold mb-8 lg:mb-12 capitalize">
                     {category}
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                  <div className="grid grid-cols-1 justify-items-center  sm:justify-items-[unset] sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {items.map((equipment) => (
                       <div
                         key={equipment.id}
-                        className="bg-[#1F1F20] h-[444px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
+                        className="bg-[#1F1F20] w-[248px]  h-[444px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
                         onClick={() => {
                           setQuickViewEquipment(equipment);
                           setQuickViewImageIndex(
@@ -1180,7 +1223,7 @@ function ClientDashboard() {
           <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between h-full">
             {/* Equipment Selector */}
             <div
-              className={`bg-[#1F1F20] border w-[378px] border-[#333333] rounded-lg p-4 sm:p-6 sm:pb-3 lg:fixed ${
+              className={`bg-[#1F1F20] border w-full lg:w-[378px] border-[#333333] rounded-lg p-4 sm:p-6 sm:pb-3 lg:fixed ${
                 scrollTop > 150
                   ? "lg:top-[20px] right-4"
                   : "lg:top-[150px] right-4"
@@ -1655,7 +1698,7 @@ function ClientDashboard() {
         <div className="fixed bottom-4 right-4 lg:hidden z-50">
           <button
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors"
+            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-lg transition-colors relative"
           >
             <svg
               width="20"
@@ -1669,6 +1712,13 @@ function ClientDashboard() {
                 fill="black"
               />
             </svg>
+
+            {/* Notification Badge */}
+            {unreadMessageCount > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold animate-pulse">
+                {unreadMessageCount > 9 ? "9+" : unreadMessageCount}
+              </div>
+            )}
           </button>
         </div>
       )}
@@ -1678,7 +1728,7 @@ function ClientDashboard() {
         <div className="hidden lg:block fixed bottom-4 right-4 z-50">
           <button
             onClick={() => setIsChatOpen(true)}
-            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors"
+            className="bg-[#FDCE06] hover:bg-[#E5B800] rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors relative"
             title="Open chat"
           >
             <svg
@@ -1693,6 +1743,13 @@ function ClientDashboard() {
                 fill="black"
               />
             </svg>
+
+            {/* Notification Badge */}
+            {unreadMessageCount > 0 && (
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                {unreadMessageCount > 9 ? "9+" : unreadMessageCount}
+              </div>
+            )}
           </button>
         </div>
       )}
