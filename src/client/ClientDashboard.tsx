@@ -1180,8 +1180,10 @@ function ClientDashboard() {
           <div className="space-y-6 lg:space-y-8 lg:flex lg:flex-col lg:justify-between h-full">
             {/* Equipment Selector */}
             <div
-              className={`bg-[#1F1F20] border border-[#333333] rounded-lg p-4 sm:p-6 sm:pb-3 lg:fixed ${
-                scrollTop > 150 ? "lg:top-[20px]" : "lg:top-[150px]"
+              className={`bg-[#1F1F20] border w-[378px] border-[#333333] rounded-lg p-4 sm:p-6 sm:pb-3 lg:fixed ${
+                scrollTop > 150
+                  ? "lg:top-[20px] right-4"
+                  : "lg:top-[150px] right-4"
               } transition-all duration-300 ease-in-out`}
             >
               <div className="mb-4 sm:mb-6">
