@@ -39,39 +39,39 @@ const pwaConfig: Partial<VitePWAOptions> = {
   manifest: {
     icons: [
       {
-        src: "/icons/pwa-64x64.png",
+        src: "/icons/favicon-96x96.png",
         sizes: "64x64",
         type: "image/png",
       },
       {
-        src: "/icons/pwa-192x192.png",
+        src: "/icons/favicon-96x96.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/icons/apple-touch-icon-180x180.png",
+        src: "/icons/apple-touch-icon.png",
         sizes: "180x180",
         type: "image/png",
       },
       {
-        src: "/icons/pwa-512x512.png",
-        sizes: "512x512",
+        src: "/icons/favicon-96x96.png",
+        sizes: "96x96",
         type: "image/png",
       },
       {
-        src: "/icons/maskable-icon-512x512.png",
+        src: "/icons/favicon-96x96.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
       },
     ],
-    name: "Baas Wireframe",
-    short_name: "BaasW",
+    name: "Long Term Hire",
+    short_name: "Long Term Hire",
     display: "standalone",
     background_color: "#ffffff",
-    description: "A Wireframe Builder tool.",
+    description: "Long Term Hire",
     theme_color: "#000000",
-    start_url: "/admin/login",
+    start_url: "/",
   },
 };
 

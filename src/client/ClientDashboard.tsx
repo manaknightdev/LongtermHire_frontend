@@ -263,6 +263,25 @@ function ClientDashboard() {
     }
   }, [equipment, preloadImages]);
 
+  // Initialize selected images with main images (is_main: 1) for each equipment
+  useEffect(() => {
+    if (equipment && equipment.length > 0) {
+      const initialSelectedImages = {};
+      equipment.forEach((item) => {
+        if (item.content?.images && Array.isArray(item.content.images)) {
+          const mainImageIndex = item.content.images.findIndex(
+            (img) => img.is_main === 1
+          );
+          if (mainImageIndex !== -1) {
+            initialSelectedImages[item.equipment_id || item.id] =
+              mainImageIndex;
+          }
+        }
+      });
+      setSelectedImages(initialSelectedImages);
+    }
+  }, [equipment]);
+
   // Load chat conversations and start polling
   useEffect(() => {
     const initializeChat = async () => {
@@ -387,7 +406,7 @@ function ClientDashboard() {
           selectedImages[item.equipment_id || item.id] || 0;
         mainImage =
           allImages[selectedImageIndex]?.image_url ||
-          allImages.find((img) => img.is_main === 1)?.image_url ||
+          allImages.find((img) => img.is_main == 1)?.image_url ||
           allImages[0]?.image_url ||
           "/figma-assets/equipment-placeholder.jpg";
       } else if (item.content?.image) {
@@ -636,9 +655,26 @@ function ClientDashboard() {
   const getMainImageSrc = useCallback(
     (equipment) => {
       if (equipment?.allImages && equipment.allImages.length > 0) {
-        const selectedIndex = selectedImages[equipment.id] || 0;
+        const selectedIndex = selectedImages[equipment.id];
+
+        // If there's a selected image, use it
+        if (selectedIndex !== undefined && selectedIndex >= 0) {
+          return (
+            equipment.allImages[selectedIndex]?.image_url ||
+            equipment.image ||
+            "/images/graphview.png"
+          );
+        }
+
+        // Otherwise, find and use the main image (is_main: 1)
+        const mainImage = equipment.allImages.find((img) => img.is_main === 1);
+        if (mainImage) {
+          return mainImage.image_url;
+        }
+
+        // Fallback to first image, then equipment.image, then placeholder
         return (
-          equipment.allImages[selectedIndex]?.image_url ||
+          equipment.allImages[0]?.image_url ||
           equipment.image ||
           "/images/graphview.png"
         );
@@ -841,7 +877,9 @@ function ClientDashboard() {
                         className="bg-[#1F1F20] h-[444px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
                         onClick={() => {
                           setQuickViewEquipment(equipment);
-                          setQuickViewImageIndex(0);
+                          setQuickViewImageIndex(
+                            selectedImages[equipment.id] || 0
+                          );
                           setIsQuickViewOpen(true);
                         }}
                       >
@@ -1069,7 +1107,7 @@ function ClientDashboard() {
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
-                              <h3 className="text-[#FFFFFF] text-sm font-bold flex-1">
+                              <h3 className="text-[#FFFFFF] text-sm font-bold lg:h-[40px] flex-1">
                                 {equipment.name}
                               </h3>
                               <span
