@@ -769,7 +769,7 @@ function ClientDashboard() {
                     {items.map((equipment) => (
                       <div
                         key={equipment.id}
-                        className="bg-[#1F1F20] h-[404px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
+                        className="bg-[#1F1F20] h-[444px] border border-[#333333] rounded-lg overflow-hidden hover:border-[#444444] transition-colors cursor-pointer"
                         onClick={() => {
                           setQuickViewEquipment(equipment);
                           setQuickViewImageIndex(0);
@@ -777,7 +777,7 @@ function ClientDashboard() {
                         }}
                       >
                         <div className="p-3 sm:p-4">
-                          <div className="bg-[#292A2B] rounded-md p-0 mb-3 sm:mb-4 relative">
+                          <div className=" rounded-md p-0   relative aspect-[4/3]">
                             {/* Main Image */}
                             <img
                               src={
@@ -878,7 +878,7 @@ function ClientDashboard() {
                                 {equipment.status}
                               </span>
                             </div>
-                            <p className="text-[#9CA3AF] text-xs leading-relaxed line-clamp-3">
+                            <p className="text-[#9CA3AF] text-xs leading-relaxed line-clamp-3 lg:h-[38.5px]">
                               {equipment.description}
                             </p>
                             <p className="text-[#FFFFFF] text-sm font-semibold">
