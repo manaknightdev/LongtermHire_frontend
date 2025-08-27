@@ -71,7 +71,7 @@ function ClientDashboard() {
   const [loading, setLoading] = useState(true);
   const [equipment, setEquipment] = useState([]);
   const [error, setError] = useState("");
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [isChatVisible, setIsChatVisible] = useState(true);
   const [selectedImages, setSelectedImages] = useState({}); // Track selected image for each equipment
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
