@@ -398,6 +398,14 @@ function ClientDashboard() {
     }
   }, [messages, isChatVisible]);
 
+  // Clear unread count when chat becomes visible
+  useEffect(() => {
+    if (isChatVisible || isChatOpen) {
+      // Clear unread count when chat is opened
+      setUnreadMessageCount(0);
+    }
+  }, [isChatVisible, isChatOpen]);
+
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
     if ((isChatOpen || isChatVisible) && messages.length > 0) {
