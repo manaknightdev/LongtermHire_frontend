@@ -2167,7 +2167,7 @@ function ClientDashboard() {
           onClick={() => setIsQuickViewOpen(false)}
         >
           <div
-            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] lg:h-[90vh] h-[650px] max-h-[90vh] overflow-hidden flex flex-col"
+            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] lg:h-[600px] h-[650px]  xl:h-[90vh] max-h-[90vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-[#333333]">
@@ -2192,7 +2192,7 @@ function ClientDashboard() {
 
             {/* Image area */}
             <div className="relative bg-[#0F0F10] flex-shrink-0">
-              <div className="w-full lg:mt-10 flex justify-center items-center h-[400px] lg:h-[500px]">
+              <div className="w-full lg:mt-10 flex justify-center items-center h-[400px] xl:h-[calc(90vh-300px)] lg:h-[300px]">
                 {/* Render ALL images at once, only show the current one */}
                 {quickViewEquipment.allImages &&
                 quickViewEquipment.allImages.length > 0 ? (
