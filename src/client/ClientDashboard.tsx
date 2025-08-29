@@ -2167,7 +2167,7 @@ function ClientDashboard() {
           onClick={() => setIsQuickViewOpen(false)}
         >
           <div
-            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] lg:h-[90%] h-[550px] max-h-[85vh] overflow-hidden flex flex-col"
+            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] h-[90vh] max-h-[90vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-[#333333]">
@@ -2191,8 +2191,8 @@ function ClientDashboard() {
             </div>
 
             {/* Image area */}
-            <div className="relative bg-[#0F0F10]">
-              <div className="w-full flex justify-center items-center lg:h-[750px] h-[300px]">
+            <div className="relative bg-[#0F0F10] flex-shrink-0">
+              <div className="w-full flex justify-center items-center h-[400px] lg:h-[500px]">
                 {/* Render ALL images at once, only show the current one */}
                 {quickViewEquipment.allImages &&
                 quickViewEquipment.allImages.length > 0 ? (
@@ -2201,7 +2201,7 @@ function ClientDashboard() {
                       key={`modal-image-${index}`}
                       src={img.image_url}
                       alt={`${quickViewEquipment.name} - Image ${index + 1}`}
-                      className={`lg:max-w-[750px] lg:h-[750px] max-w-[300px] max-h-[300px] object-contain absolute inset-0 mx-auto transition-opacity duration-75 ${
+                      className={`max-w-[90%] max-h-[90%] object-contain absolute inset-0 mx-auto transition-opacity duration-75 ${
                         index === quickViewImageIndex
                           ? "opacity-100"
                           : "opacity-0"
@@ -2216,80 +2216,105 @@ function ClientDashboard() {
                   <img
                     src={quickViewEquipment.image}
                     alt={quickViewEquipment.name}
-                    className="max-w-[750px] h-[750px] object-contain"
+                    className="max-w-[90%] max-h-[90%] object-contain"
                     onError={(e) => {
                       e.target.src = "/images/graphview.png";
                     }}
                     onLoad={() => handleImageLoad(quickViewEquipment.image)}
                   />
                 )}
-              </div>
-              {quickViewEquipment.allImages &&
-                quickViewEquipment.allImages.length > 1 && (
-                  <>
-                    <button
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                      onClick={previousImage}
-                      aria-label="Previous image"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M15 19l-7-7 7-7"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                      onClick={nextImage}
-                      aria-label="Next image"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <path
-                          d="M9 5l7 7-7 7"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
 
-                    {/* Image counter indicator */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                      {quickViewImageIndex + 1} /{" "}
-                      {quickViewEquipment.allImages.length}
-                    </div>
-                  </>
-                )}
+                {quickViewEquipment.allImages &&
+                  quickViewEquipment.allImages.length > 1 && (
+                    <>
+                      <button
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                        onClick={previousImage}
+                        aria-label="Previous image"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M15 19l-7-7 7-7"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                        onClick={nextImage}
+                        aria-label="Next image"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M9 5l7 7-7 7"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* Image counter indicator */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                        {quickViewImageIndex + 1} /{" "}
+                        {quickViewEquipment.allImages.length}
+                      </div>
+                    </>
+                  )}
+              </div>
             </div>
 
             {/* Content */}
-            <div className="p-4 space-y-3 flex-1 overflow-y-auto content-end overflow-x-hidden items-end">
-              <p className="text-[#ADAEBC] lg:text-xl text-sm w-full ">
-                {quickViewEquipment.banner_description ||
-                  quickViewEquipment.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-[#FFFFFF] text-base lg:text-xl font-semibold">
-                  Price
-                </span>
-                <span className="text-[#FDCE06] text-base lg:text-xl font-bold">
-                  {formatCurrency(quickViewEquipment.base_price || 0)}
-                </span>
+            <div className="p-4 space-y-4 flex-1 overflow-y-auto min-h-0 content-end">
+              <div className="space-y-4">
+                <p className="text-[#ADAEBC] text-base lg:text-lg leading-relaxed">
+                  {quickViewEquipment.banner_description ||
+                    quickViewEquipment.description}
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[#FFFFFF] text-base lg:text-lg font-semibold">
+                    Price
+                  </span>
+                  <span className="text-[#FDCE06] text-base lg:text-lg font-bold">
+                    {formatCurrency(quickViewEquipment.base_price || 0)}
+                  </span>
+                </div>
+
+                {/* Additional equipment details */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#9CA3AF] text-sm">Status</span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(quickViewEquipment.status)}`}
+                    >
+                      {quickViewEquipment.status}
+                    </span>
+                  </div>
+
+                  {quickViewEquipment.category && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#9CA3AF] text-sm">Category</span>
+                      <span className="text-[#E5E5E5] text-sm capitalize">
+                        {quickViewEquipment.category}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
