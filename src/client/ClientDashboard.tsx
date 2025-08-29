@@ -86,6 +86,79 @@ function ClientDashboard() {
   // const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
+  // Track loaded images for instant switching
+  const [loadedImages, setLoadedImages] = useState(new Set());
+
+  // Mark image as loaded when it loads
+  const handleImageLoad = useCallback((imageUrl) => {
+    setLoadedImages((prev) => new Set(prev).add(imageUrl));
+  }, []);
+
+  // Memoized image switching functions for better performance
+  const nextImage = useCallback(() => {
+    if (quickViewEquipment?.allImages?.length > 1) {
+      const nextIndex =
+        (quickViewImageIndex + 1) % quickViewEquipment.allImages.length;
+      const nextImageUrl = quickViewEquipment.allImages[nextIndex]?.image_url;
+
+      // Preload next image if not already loaded
+      if (nextImageUrl && !loadedImages.has(nextImageUrl)) {
+        const imgElement = new Image();
+        imgElement.onload = () => handleImageLoad(nextImageUrl);
+        imgElement.src = nextImageUrl;
+      }
+
+      setQuickViewImageIndex(nextIndex);
+    }
+  }, [
+    quickViewEquipment?.allImages,
+    quickViewImageIndex,
+    loadedImages,
+    handleImageLoad,
+  ]);
+
+  const previousImage = useCallback(() => {
+    if (quickViewEquipment?.allImages?.length > 1) {
+      const prevIndex =
+        (quickViewImageIndex - 1 + quickViewEquipment.allImages.length) %
+        quickViewEquipment.allImages.length;
+      const prevImageUrl = quickViewEquipment.allImages[prevIndex]?.image_url;
+
+      // Preload previous image if not already loaded
+      if (prevImageUrl && !loadedImages.has(prevImageUrl)) {
+        const imgElement = new Image();
+        imgElement.onload = () => handleImageLoad(prevImageUrl);
+        imgElement.src = prevImageUrl;
+      }
+
+      setQuickViewImageIndex(prevIndex);
+    }
+  }, [
+    quickViewEquipment?.allImages,
+    quickViewImageIndex,
+    loadedImages,
+    handleImageLoad,
+  ]);
+
+  // Preload quick view images when modal opens
+  const preloadQuickViewImages = useCallback(
+    (images) => {
+      if (images && Array.isArray(images)) {
+        images.forEach((img) => {
+          if (img.image_url) {
+            const imgElement = new Image();
+            imgElement.onload = () => {
+              // Mark this image as loaded immediately
+              handleImageLoad(img.image_url);
+            };
+            imgElement.src = img.image_url;
+          }
+        });
+      }
+    },
+    [handleImageLoad]
+  );
+
   // Refs for scroll management
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -282,6 +355,65 @@ function ClientDashboard() {
       });
     }
   }, [equipment, preloadImages]);
+
+  // Preload quick view images when modal opens for instant switching
+  useEffect(() => {
+    if (isQuickViewOpen && quickViewEquipment?.allImages) {
+      preloadQuickViewImages(quickViewEquipment.allImages);
+
+      // Also preload the main image if it exists
+      if (quickViewEquipment.image) {
+        const imgElement = new Image();
+        imgElement.onload = () => handleImageLoad(quickViewEquipment.image);
+        imgElement.src = quickViewEquipment.image;
+      }
+    }
+  }, [
+    isQuickViewOpen,
+    quickViewEquipment?.allImages,
+    quickViewEquipment?.image,
+    preloadQuickViewImages,
+    handleImageLoad,
+  ]);
+
+  // Check if current image is loaded
+  const isCurrentImageLoaded = useMemo(() => {
+    const currentImageUrl =
+      quickViewEquipment?.allImages?.[quickViewImageIndex]?.image_url ||
+      quickViewEquipment?.image;
+    return loadedImages.has(currentImageUrl);
+  }, [
+    quickViewEquipment?.allImages,
+    quickViewImageIndex,
+    quickViewEquipment?.image,
+    loadedImages,
+  ]);
+
+  // Add keyboard navigation for quick view modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isQuickViewOpen) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          previousImage();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          nextImage();
+          break;
+        case "Escape":
+          setIsQuickViewOpen(false);
+          break;
+      }
+    };
+
+    if (isQuickViewOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isQuickViewOpen, nextImage, previousImage]);
 
   // Initialize selected images with main images (is_main: 1) for each equipment
   useEffect(() => {
@@ -2099,7 +2231,7 @@ function ClientDashboard() {
           onClick={() => setIsQuickViewOpen(false)}
         >
           <div
-            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col"
+            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] h-[90%] max-h-[85vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-[#333333]">
@@ -2124,7 +2256,15 @@ function ClientDashboard() {
 
             {/* Image area */}
             <div className="relative bg-[#0F0F10]">
-              <div className="w-full flex justify-center items-center">
+              <div className="w-full flex justify-center items-center h-[750px]">
+                {/* Loading indicator */}
+                {!isCurrentImageLoaded && (
+                  <div className="flex items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-[#FDCE06] border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+
+                {/* Main display image */}
                 <img
                   src={
                     (quickViewEquipment.allImages &&
@@ -2133,25 +2273,44 @@ function ClientDashboard() {
                     quickViewEquipment.image
                   }
                   alt={quickViewEquipment.name}
-                  className="max-w-[250px] h-48 md:h-56 object-contain"
+                  className={`max-w-[750px] h-[750px] object-contain transition-opacity duration-150 ${
+                    isCurrentImageLoaded ? "opacity-100" : "opacity-0"
+                  }`}
                   onError={(e) => {
                     e.target.src = "/images/graphview.png";
                   }}
+                  onLoad={(e) => {
+                    const imageUrl = e.target.src;
+                    handleImageLoad(imageUrl);
+                  }}
                 />
+
+                {/* Hidden preloaded images for instant switching */}
+                <div className="hidden">
+                  {quickViewEquipment.allImages &&
+                    quickViewEquipment.allImages.map((img, index) => (
+                      <img
+                        key={`preload-${index}`}
+                        src={img.image_url}
+                        alt={`${quickViewEquipment.name} - Image ${index + 1}`}
+                        onLoad={() => handleImageLoad(img.image_url)}
+                      />
+                    ))}
+                  {quickViewEquipment.image && (
+                    <img
+                      src={quickViewEquipment.image}
+                      alt={`${quickViewEquipment.name} - Main`}
+                      onLoad={() => handleImageLoad(quickViewEquipment.image)}
+                    />
+                  )}
+                </div>
               </div>
               {quickViewEquipment.allImages &&
                 quickViewEquipment.allImages.length > 1 && (
                   <>
                     <button
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center"
-                      onClick={() =>
-                        setQuickViewImageIndex(
-                          (quickViewImageIndex -
-                            1 +
-                            quickViewEquipment.allImages.length) %
-                            quickViewEquipment.allImages.length
-                        )
-                      }
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                      onClick={previousImage}
                       aria-label="Previous image"
                     >
                       <svg
@@ -2170,13 +2329,8 @@ function ClientDashboard() {
                       </svg>
                     </button>
                     <button
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center"
-                      onClick={() =>
-                        setQuickViewImageIndex(
-                          (quickViewImageIndex + 1) %
-                            quickViewEquipment.allImages.length
-                        )
-                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                      onClick={nextImage}
                       aria-label="Next image"
                     >
                       <svg
@@ -2194,6 +2348,12 @@ function ClientDashboard() {
                         />
                       </svg>
                     </button>
+
+                    {/* Image counter indicator */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {quickViewImageIndex + 1} /{" "}
+                      {quickViewEquipment.allImages.length}
+                    </div>
                   </>
                 )}
             </div>

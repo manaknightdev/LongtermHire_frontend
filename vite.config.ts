@@ -39,27 +39,27 @@ const pwaConfig: Partial<VitePWAOptions> = {
   manifest: {
     icons: [
       {
-        src: "/icons/favicon-96x96.png",
+        src: "/favicon-96x96.png",
         sizes: "64x64",
         type: "image/png",
       },
       {
-        src: "/icons/favicon-96x96.png",
+        src: "/favicon-96x96.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/icons/apple-touch-icon.png",
+        src: "/apple-touch-icon.png",
         sizes: "180x180",
         type: "image/png",
       },
       {
-        src: "/icons/favicon-96x96.png",
+        src: "/favicon-96x96.png",
         sizes: "96x96",
         type: "image/png",
       },
       {
-        src: "/icons/favicon-96x96.png",
+        src: "/favicon-96x96.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
