@@ -99,46 +99,18 @@ function ClientDashboard() {
     if (quickViewEquipment?.allImages?.length > 1) {
       const nextIndex =
         (quickViewImageIndex + 1) % quickViewEquipment.allImages.length;
-      const nextImageUrl = quickViewEquipment.allImages[nextIndex]?.image_url;
-
-      // Preload next image if not already loaded
-      if (nextImageUrl && !loadedImages.has(nextImageUrl)) {
-        const imgElement = new Image();
-        imgElement.onload = () => handleImageLoad(nextImageUrl);
-        imgElement.src = nextImageUrl;
-      }
-
       setQuickViewImageIndex(nextIndex);
     }
-  }, [
-    quickViewEquipment?.allImages,
-    quickViewImageIndex,
-    loadedImages,
-    handleImageLoad,
-  ]);
+  }, [quickViewEquipment?.allImages?.length, quickViewImageIndex]);
 
   const previousImage = useCallback(() => {
     if (quickViewEquipment?.allImages?.length > 1) {
       const prevIndex =
         (quickViewImageIndex - 1 + quickViewEquipment.allImages.length) %
         quickViewEquipment.allImages.length;
-      const prevImageUrl = quickViewEquipment.allImages[prevIndex]?.image_url;
-
-      // Preload previous image if not already loaded
-      if (prevImageUrl && !loadedImages.has(prevImageUrl)) {
-        const imgElement = new Image();
-        imgElement.onload = () => handleImageLoad(prevImageUrl);
-        imgElement.src = prevImageUrl;
-      }
-
       setQuickViewImageIndex(prevIndex);
     }
-  }, [
-    quickViewEquipment?.allImages,
-    quickViewImageIndex,
-    loadedImages,
-    handleImageLoad,
-  ]);
+  }, [quickViewEquipment?.allImages?.length, quickViewImageIndex]);
 
   // Preload quick view images when modal opens
   const preloadQuickViewImages = useCallback(
@@ -206,7 +178,7 @@ function ClientDashboard() {
   const getCurrentUserId = () => {
     const clientUserId = localStorage.getItem("clientUserId");
     const userId = localStorage.getItem("user_id");
-    console.log("Getting user ID:", { clientUserId, userId });
+
     return parseInt(clientUserId || userId || "0");
   };
 
@@ -360,34 +332,8 @@ function ClientDashboard() {
   useEffect(() => {
     if (isQuickViewOpen && quickViewEquipment?.allImages) {
       preloadQuickViewImages(quickViewEquipment.allImages);
-
-      // Also preload the main image if it exists
-      if (quickViewEquipment.image) {
-        const imgElement = new Image();
-        imgElement.onload = () => handleImageLoad(quickViewEquipment.image);
-        imgElement.src = quickViewEquipment.image;
-      }
     }
-  }, [
-    isQuickViewOpen,
-    quickViewEquipment?.allImages,
-    quickViewEquipment?.image,
-    preloadQuickViewImages,
-    handleImageLoad,
-  ]);
-
-  // Check if current image is loaded
-  const isCurrentImageLoaded = useMemo(() => {
-    const currentImageUrl =
-      quickViewEquipment?.allImages?.[quickViewImageIndex]?.image_url ||
-      quickViewEquipment?.image;
-    return loadedImages.has(currentImageUrl);
-  }, [
-    quickViewEquipment?.allImages,
-    quickViewImageIndex,
-    quickViewEquipment?.image,
-    loadedImages,
-  ]);
+  }, [isQuickViewOpen, quickViewEquipment?.allImages, preloadQuickViewImages]);
 
   // Add keyboard navigation for quick view modal
   useEffect(() => {
@@ -1688,16 +1634,6 @@ function ClientDashboard() {
                                 const isEquipmentRequest =
                                   message.message_type === "equipment_request";
 
-                                // Debug logging
-                                console.log("Message alignment:", {
-                                  messageId: message.id,
-                                  messageUserId,
-                                  currentUserId,
-                                  isCurrentUser,
-                                  message: message.message.substring(0, 10),
-                                  rawFromUserId: message.from_user_id,
-                                });
-
                                 return (
                                   <div
                                     key={message.id}
@@ -2231,7 +2167,7 @@ function ClientDashboard() {
           onClick={() => setIsQuickViewOpen(false)}
         >
           <div
-            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] h-[90%] max-h-[85vh] overflow-hidden flex flex-col"
+            className="bg-[#1F1F20] border border-[#333333] rounded-lg w-full max-w-[90%] lg:h-[90%] h-[550px] max-h-[85vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-[#333333]">
@@ -2256,54 +2192,37 @@ function ClientDashboard() {
 
             {/* Image area */}
             <div className="relative bg-[#0F0F10]">
-              <div className="w-full flex justify-center items-center h-[750px]">
-                {/* Loading indicator */}
-                {!isCurrentImageLoaded && (
-                  <div className="flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-[#FDCE06] border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-
-                {/* Main display image */}
-                <img
-                  src={
-                    (quickViewEquipment.allImages &&
-                      quickViewEquipment.allImages[quickViewImageIndex]
-                        ?.image_url) ||
-                    quickViewEquipment.image
-                  }
-                  alt={quickViewEquipment.name}
-                  className={`max-w-[750px] h-[750px] object-contain transition-opacity duration-150 ${
-                    isCurrentImageLoaded ? "opacity-100" : "opacity-0"
-                  }`}
-                  onError={(e) => {
-                    e.target.src = "/images/graphview.png";
-                  }}
-                  onLoad={(e) => {
-                    const imageUrl = e.target.src;
-                    handleImageLoad(imageUrl);
-                  }}
-                />
-
-                {/* Hidden preloaded images for instant switching */}
-                <div className="hidden">
-                  {quickViewEquipment.allImages &&
-                    quickViewEquipment.allImages.map((img, index) => (
-                      <img
-                        key={`preload-${index}`}
-                        src={img.image_url}
-                        alt={`${quickViewEquipment.name} - Image ${index + 1}`}
-                        onLoad={() => handleImageLoad(img.image_url)}
-                      />
-                    ))}
-                  {quickViewEquipment.image && (
+              <div className="w-full flex justify-center items-center lg:h-[750px] h-[300px]">
+                {/* Render ALL images at once, only show the current one */}
+                {quickViewEquipment.allImages &&
+                quickViewEquipment.allImages.length > 0 ? (
+                  quickViewEquipment.allImages.map((img, index) => (
                     <img
-                      src={quickViewEquipment.image}
-                      alt={`${quickViewEquipment.name} - Main`}
-                      onLoad={() => handleImageLoad(quickViewEquipment.image)}
+                      key={`modal-image-${index}`}
+                      src={img.image_url}
+                      alt={`${quickViewEquipment.name} - Image ${index + 1}`}
+                      className={`lg:max-w-[750px] lg:h-[750px] max-w-[300px] max-h-[300px] object-contain absolute inset-0 mx-auto transition-opacity duration-75 ${
+                        index === quickViewImageIndex
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                      onError={(e) => {
+                        e.target.src = "/images/graphview.png";
+                      }}
+                      onLoad={() => handleImageLoad(img.image_url)}
                     />
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <img
+                    src={quickViewEquipment.image}
+                    alt={quickViewEquipment.name}
+                    className="max-w-[750px] h-[750px] object-contain"
+                    onError={(e) => {
+                      e.target.src = "/images/graphview.png";
+                    }}
+                    onLoad={() => handleImageLoad(quickViewEquipment.image)}
+                  />
+                )}
               </div>
               {quickViewEquipment.allImages &&
                 quickViewEquipment.allImages.length > 1 && (
@@ -2359,16 +2278,16 @@ function ClientDashboard() {
             </div>
 
             {/* Content */}
-            <div className="p-4 space-y-3 flex-1 overflow-y-auto overflow-x-hidden">
-              <p className="text-[#ADAEBC] text-sm w-full ">
+            <div className="p-4 space-y-3 flex-1 overflow-y-auto content-end overflow-x-hidden items-end">
+              <p className="text-[#ADAEBC] lg:text-xl text-sm w-full ">
                 {quickViewEquipment.banner_description ||
                   quickViewEquipment.description}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-[#FFFFFF] text-base font-semibold">
+                <span className="text-[#FFFFFF] text-base lg:text-xl font-semibold">
                   Price
                 </span>
-                <span className="text-[#FDCE06] text-base font-bold">
+                <span className="text-[#FDCE06] text-base lg:text-xl font-bold">
                   {formatCurrency(quickViewEquipment.base_price || 0)}
                 </span>
               </div>

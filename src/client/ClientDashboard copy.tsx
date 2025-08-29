@@ -113,7 +113,7 @@ function ClientDashboard() {
   const getCurrentUserId = () => {
     const clientUserId = localStorage.getItem("clientUserId");
     const userId = localStorage.getItem("user_id");
-    console.log("Getting user ID:", { clientUserId, userId });
+
     return parseInt(clientUserId || userId || "0");
   };
 

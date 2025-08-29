@@ -39,27 +39,27 @@ const pwaConfig: Partial<VitePWAOptions> = {
   manifest: {
     icons: [
       {
-        src: "/favicon-96x96.png",
+        src: "windows11/SmallTile.scale-100.png",
         sizes: "64x64",
         type: "image/png",
       },
       {
-        src: "/favicon-96x96.png",
+        src: "windows11/Square150x150Logo.scale-125.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/apple-touch-icon.png",
+        src: "ios/180.png",
         sizes: "180x180",
         type: "image/png",
       },
       {
-        src: "/favicon-96x96.png",
+        src: "windows11/Square44x44Logo.targetsize-96.png",
         sizes: "96x96",
         type: "image/png",
       },
       {
-        src: "/favicon-96x96.png",
+        src: "android/android-launchericon-512-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
