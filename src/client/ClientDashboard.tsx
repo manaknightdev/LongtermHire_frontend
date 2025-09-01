@@ -2193,35 +2193,72 @@ function ClientDashboard() {
             {/* Image area */}
             <div className="relative bg-[#0F0F10] flex-shrink-0">
               <div className="w-full lg:mt-10 flex justify-center items-center h-[400px] xl:h-[calc(90vh-300px)] lg:h-[300px]">
-                {/* Render ALL images at once, only show the current one */}
-                {quickViewEquipment.allImages &&
-                quickViewEquipment.allImages.length > 0 ? (
-                  quickViewEquipment.allImages.map((img, index) => (
-                    <img
-                      key={`modal-image-${index}`}
-                      src={img.image_url}
-                      alt={`${quickViewEquipment.name} - Image ${index + 1}`}
-                      className={`max-w-[90%] max-h-[90%] object-contain absolute inset-0 lg:top-7 mx-auto transition-opacity duration-75 ${
-                        index === quickViewImageIndex
-                          ? "opacity-100"
-                          : "opacity-0"
-                      }`}
-                      onError={(e) => {
-                        e.target.src = "/images/graphview.png";
-                      }}
-                      onLoad={() => handleImageLoad(img.image_url)}
-                    />
-                  ))
-                ) : (
-                  <img
-                    src={quickViewEquipment.image}
-                    alt={quickViewEquipment.name}
-                    className="max-w-[90%] max-h-[90%] object-contain"
-                    onError={(e) => {
-                      e.target.src = "/images/graphview.png";
-                    }}
-                    onLoad={() => handleImageLoad(quickViewEquipment.image)}
-                  />
+                {/* Mobile view with 4:3 aspect ratio */}
+                <div className="relative w-full h-full">
+                  <div className="lg:hidden aspect-[4/3] w-full h-full">
+                    {quickViewEquipment.allImages &&
+                    quickViewEquipment.allImages.length > 0 ? (
+                      quickViewEquipment.allImages.map((img, index) => (
+                        <img
+                          key={`modal-image-${index}`}
+                          src={img.image_url}
+                          alt={`${quickViewEquipment.name} - Image ${index + 1}`}
+                          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-75 ${
+                            index === quickViewImageIndex
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                          onError={(e) => {
+                            e.target.src = "/images/graphview.png";
+                          }}
+                          onLoad={() => handleImageLoad(img.image_url)}
+                        />
+                      ))
+                    ) : (
+                      <img
+                        src={quickViewEquipment.image}
+                        alt={quickViewEquipment.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = "/images/graphview.png";
+                        }}
+                        onLoad={() => handleImageLoad(quickViewEquipment.image)}
+                      />
+                    )}
+                  </div>
+                  {/* Desktop view - untouched */}
+                  <div className="hidden lg:block">
+                    {quickViewEquipment.allImages &&
+                    quickViewEquipment.allImages.length > 0 ? (
+                      quickViewEquipment.allImages.map((img, index) => (
+                        <img
+                          key={`modal-image-${index}`}
+                          src={img.image_url}
+                          alt={`${quickViewEquipment.name} - Image ${index + 1}`}
+                          className={`max-w-[90%] max-h-[90%] object-contain absolute inset-0 lg:top-7 mx-auto transition-opacity duration-75 ${
+                            index === quickViewImageIndex
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                          onError={(e) => {
+                            e.target.src = "/images/graphview.png";
+                          }}
+                          onLoad={() => handleImageLoad(img.image_url)}
+                        />
+                      ))
+                    ) : (
+                      <img
+                        src={quickViewEquipment.image}
+                        alt={quickViewEquipment.name}
+                        className="max-w-[90%] max-h-[90%] object-contain"
+                        onError={(e) => {
+                          e.target.src = "/images/graphview.png";
+                        }}
+                        onLoad={() => handleImageLoad(quickViewEquipment.image)}
+                      />
+                    )}
+                  </div>
+                </div>
                 )}
 
                 {quickViewEquipment.allImages &&
