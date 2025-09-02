@@ -8,6 +8,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
     equipmentName: "",
     basePrice: "",
     minimumDuration: "3",
+    position: "",
     description: "",
   });
   const [errors, setErrors] = useState({});
@@ -93,6 +94,9 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
     if (!formData.basePrice || parseFloat(formData.basePrice) <= 0) {
       newErrors.basePrice = "Please enter a valid base price";
     }
+    if (!formData.position || parseInt(formData.position) <= 0) {
+      newErrors.position = "Please enter a valid position number";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -123,6 +127,7 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
       equipmentName: "",
       basePrice: "",
       minimumDuration: "3",
+      position: "",
       description: "",
     });
     setErrors({});
@@ -357,6 +362,30 @@ const AddEquipmentModal = ({ isOpen, onClose, onSave }) => {
                 Months
               </span>
             </div>
+          </div>
+
+          {/* Position Field */}
+          <div>
+            <label className="block text-[#D1D5DB] font-[Inter] font-medium text-[14px] leading-[20px] mb-2">
+              Position Number *
+            </label>
+            <input
+              type="number"
+              value={formData.position}
+              onChange={(e) => handleInputChange("position", e.target.value)}
+              placeholder="Enter position number"
+              min="1"
+              className={`w-full h-[46px] bg-[#292A2B] border rounded-[6px] text-[#E5E5E5] text-[16px] font-[Inter] px-3 outline-none transition-colors ${
+                errors.position
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-[#333333] focus:border-[#FDCE06]"
+              }`}
+            />
+            {errors.position && (
+              <p className="text-red-500 text-sm mt-1 font-[Inter]">
+                {errors.position}
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}

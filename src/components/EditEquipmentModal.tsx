@@ -16,6 +16,7 @@ const EditEquipmentModal = ({
     equipmentName: "",
     basePrice: "",
     minimumDuration: "3 Months",
+    position: "",
     availability: true,
     description: "",
   });
@@ -30,6 +31,7 @@ const EditEquipmentModal = ({
         equipmentName: equipment.equipment_name || "",
         basePrice: equipment.base_price || "",
         minimumDuration: equipment.minimum_duration || "3 Months",
+        position: equipment.position || "",
         availability:
           equipment.availability === 1 || equipment.availability === true,
         description: equipment.description || "",
@@ -56,6 +58,7 @@ const EditEquipmentModal = ({
       equipmentName: formData.equipmentName,
       basePrice: formData.basePrice,
       minimumDuration: formData.minimumDuration,
+      position: formData.position,
       availability: formData.availability ? 1 : 0,
       description: formData.description,
     };
@@ -79,6 +82,7 @@ const EditEquipmentModal = ({
         equipmentName: equipment.equipment_name || "",
         basePrice: equipment.base_price || "",
         minimumDuration: equipment.minimum_duration || "3 Months",
+        position: equipment.position || "",
         availability:
           equipment.availability === 1 || equipment.availability === true,
         description: equipment.description || "",
@@ -206,6 +210,23 @@ const EditEquipmentModal = ({
             <p className="text-[#9CA3AF] text-xs mt-1">
               Enter a number between 1 and 60 months
             </p>
+          </div>
+
+          {/* Position */}
+          <div>
+            <label className="block text-[#E5E5E5] font-[Inter] font-medium text-[14px] leading-[1.21em] mb-2">
+              Position Number*
+            </label>
+            <input
+              type="number"
+              name="position"
+              value={formData.position}
+              onChange={handleInputChange}
+              required
+              min="1"
+              className="w-full h-[48px] bg-[#1A1A1A] border border-[#333333] rounded-[8px] px-4 text-[#E5E5E5] font-[Inter] font-normal text-[14px] leading-[1.21em] focus:outline-none focus:border-[#FDCE06] transition-colors"
+              placeholder="Enter position number"
+            />
           </div>
 
           {/* Availability */}

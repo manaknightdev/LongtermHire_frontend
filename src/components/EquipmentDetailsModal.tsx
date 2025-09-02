@@ -180,6 +180,15 @@ function EquipmentDetailsModal({ isOpen, onClose, equipment, onEdit }) {
 
                   <div>
                     <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
+                      Position
+                    </label>
+                    <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2 text-[#E5E5E5]">
+                      {equipment.position || "N/A"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[#9CA3AF] font-[Inter] font-medium text-sm mb-1">
                       Availability Status
                     </label>
                     <div className="bg-[#292A2B] border border-[#333333] rounded-md px-3 py-2">

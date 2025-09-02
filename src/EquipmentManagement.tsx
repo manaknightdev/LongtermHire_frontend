@@ -387,6 +387,9 @@ const EquipmentManagement = () => {
                     View
                   </th>
                   <th className="text-[#E5E5E5] font-inter font-bold text-xs lg:text-sm text-left px-3 py-4">
+                    Position
+                  </th>
+                  <th className="text-[#E5E5E5] font-inter font-bold text-xs lg:text-sm text-left px-3 py-4">
                     <div className="flex flex-col">
                       <span>Base</span>
                       <span>Price</span>
@@ -411,7 +414,7 @@ const EquipmentManagement = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-8">
+                    <td colSpan="9" className="text-center py-8">
                       <div className="flex justify-center items-center">
                         <ClipLoader color="#FDCE06" size={30} />
                         <span className="ml-3 text-[#E5E5E5]">
@@ -422,7 +425,7 @@ const EquipmentManagement = () => {
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-8">
+                    <td colSpan="9" className="text-center py-8">
                       <div className="text-red-500">
                         <p>{error}</p>
                         <button
@@ -436,7 +439,7 @@ const EquipmentManagement = () => {
                   </tr>
                 ) : equipment.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-8">
+                    <td colSpan="9" className="text-center py-8">
                       <div className="text-[#9CA3AF]">
                         <p>No equipment found</p>
                         <button
@@ -473,6 +476,9 @@ const EquipmentManagement = () => {
                         >
                           View
                         </button>
+                      </td>
+                      <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
+                        {item.position || "N/A"}
                       </td>
                       <td className="text-[#E5E5E5] font-inter font-normal text-sm px-3 py-4">
                         ${formatMoney(item.base_price)}
