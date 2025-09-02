@@ -84,6 +84,7 @@ function ClientDashboard() {
   const [isLoadingMore, setIsLoadingMore] = useState(false); // Track when load more is clicked
   const [justSentMessage, setJustSentMessage] = useState(false); // Track when user just sent a message
   const [shouldPreventAutoScroll, setShouldPreventAutoScroll] = useState(false); // Prevent auto-scroll after load more
+  const [hasUnreadFromPolling, setHasUnreadFromPolling] = useState(false); // Track if polling brought unread messages
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -476,19 +477,31 @@ function ClientDashboard() {
       // This prevents auto-scroll when "Load More" is clicked
       if (!loadingMore && !isLoadingMore && !shouldPreventAutoScroll) {
         console.log("✅ Auto-scroll conditions met - checking message type");
-        // Only auto-scroll if the user just sent a message
+
+        // Auto-scroll if user just sent a message
         if (justSentMessage) {
           console.log("👤 User just sent message - auto-scrolling");
           scrollChatToBottom(true);
           setJustSentMessage(false); // Reset the flag
-        } else if (messages.length > 0) {
+        }
+        // Auto-scroll if polling brought unread messages and chat is visible
+        else if (hasUnreadFromPolling && (isChatVisible || isChatOpen)) {
+          console.log("📩 Unread messages from polling - auto-scrolling");
+          scrollChatToBottom(true);
+          setHasUnreadFromPolling(false); // Reset the flag
+        }
+        // Check for new admin messages when chat is not visible
+        else if (messages.length > 0) {
           console.log("📩 Checking for admin message notifications");
-          // Check if new message is from admin and chat is not visible (new incoming message)
           const latestMessage = messages[messages.length - 1];
           const currentUserId = getCurrentUserId();
 
           // If message is from admin (not from current user) and chat is hidden
-          if (latestMessage.from_user_id !== currentUserId && !isChatVisible) {
+          if (
+            latestMessage.from_user_id !== currentUserId &&
+            !isChatVisible &&
+            !isChatOpen
+          ) {
             console.log("🔔 Admin message received - auto-opening chat");
             // Auto-open the chat when new message arrives from admin
             setIsChatVisible(true);
@@ -517,15 +530,24 @@ function ClientDashboard() {
     isLoadingMore,
     justSentMessage,
     shouldPreventAutoScroll,
+    hasUnreadFromPolling,
+    isChatOpen,
   ]);
 
   // Use unread count from API
   useEffect(() => {
     if (hookUnreadCount !== undefined && hookUnreadCount >= 0) {
+      const previousUnreadCount = unreadMessageCount;
       setUnreadMessageCount(hookUnreadCount);
 
+      // Check if unread count increased (new messages from polling)
+      if (hookUnreadCount > previousUnreadCount && previousUnreadCount >= 0) {
+        console.log("📨 Unread count increased from polling - setting flag");
+        setHasUnreadFromPolling(true);
+      }
+
       // Auto-open chat if there are unread messages and chat is hidden
-      if (hookUnreadCount > 0 && !isChatVisible) {
+      if (hookUnreadCount > 0 && !isChatVisible && !isChatOpen) {
         setIsChatVisible(true);
         toast.info(
           `${hookUnreadCount} unread message${hookUnreadCount > 1 ? "s" : ""} from admin!`,
@@ -536,7 +558,7 @@ function ClientDashboard() {
         );
       }
     }
-  }, [hookUnreadCount, isChatVisible]);
+  }, [hookUnreadCount, isChatVisible, isChatOpen, unreadMessageCount]);
 
   // Mark messages as read when chat becomes visible on the current device
   useEffect(() => {
@@ -567,34 +589,24 @@ function ClientDashboard() {
     }
   }, [isChatVisible, isChatOpen, messages, isMobile]);
 
-  // Effect to scroll to bottom when chat opens
+  // Effect to scroll to bottom when chat opens (only when chat state changes)
   useEffect(() => {
     console.log("🚪 Chat open effect triggered:", {
       isChatOpen,
       isChatVisible,
       messagesLength: messages.length,
-      loadingMore,
-      isLoadingMore,
-      shouldPreventAutoScroll,
     });
 
-    // Only auto-scroll when chat opens if:
-    // 1. Chat is opening (not just re-rendering)
-    // 2. We have messages
-    // 3. We're not loading more messages
-    // 4. We're not preventing auto-scroll
-    // 5. User just sent a message (to show their new message)
+    // Only auto-scroll when chat is actually opening (not just re-rendering)
+    // Check loading states inside the effect to avoid re-triggering
     if (
       (isChatOpen || isChatVisible) &&
       messages.length > 0 &&
       !loadingMore &&
       !isLoadingMore &&
-      !shouldPreventAutoScroll &&
-      justSentMessage
+      !shouldPreventAutoScroll
     ) {
-      console.log(
-        "🚪 Chat opened with user message - auto-scrolling to bottom"
-      );
+      console.log("🚪 Chat opened - auto-scrolling to bottom");
       scrollChatToBottom(true);
     } else {
       console.log("🚪 Chat open scroll blocked by conditions:", {
@@ -602,16 +614,12 @@ function ClientDashboard() {
         loadingMore,
         isLoadingMore,
         shouldPreventAutoScroll,
-        justSentMessage,
       });
     }
   }, [
     isChatOpen,
     isChatVisible,
-    loadingMore,
-    isLoadingMore,
-    shouldPreventAutoScroll,
-    justSentMessage,
+    // Remove loading states from dependencies to prevent re-triggering
   ]);
 
   // Process equipment data from API and organize by categories with discount support
