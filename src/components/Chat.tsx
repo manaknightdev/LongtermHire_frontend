@@ -26,10 +26,12 @@ const Chat = () => {
   const [hasUnreadFromPolling, setHasUnreadFromPolling] = useState(false);
   const [justSwitchedConversation, setJustSwitchedConversation] =
     useState(false);
+  const [shouldScrollOnNextLoad, setShouldScrollOnNextLoad] = useState(false);
 
   // Refs for scroll management
   const messagesEndRef = useRef(null);
   const lastMessageCountRef = useRef(0);
+  const lastConversationIdRef = useRef(null);
 
   // Use the chat hook for real-time functionality
   const {
@@ -174,13 +176,38 @@ const Chat = () => {
     }
   }, [selectedConversation, userSwitchedConversation]); // Only run when user switches
 
-  // Auto-scroll ONLY when switching to a new conversation
+  // Auto-scroll when switching to a new conversation
   useEffect(() => {
-    if (selectedConversation && filteredMessages.length > 0 && !loadingMore) {
-      console.log("📋 Switched to new conversation - auto-scrolling to bottom");
-      setTimeout(() => scrollToBottom(true), 150); // Small delay to ensure DOM is updated
+    if (
+      selectedConversation &&
+      selectedConversation.id !== lastConversationIdRef.current
+    ) {
+      console.log(
+        "📋 Switched to new conversation - will scroll when messages load"
+      );
+      lastConversationIdRef.current = selectedConversation.id;
+      setShouldScrollOnNextLoad(true); // Set flag to scroll on next message load
     }
-  }, [selectedConversation?.id]); // ONLY run when conversation ID changes, NOT when messages change
+  }, [selectedConversation?.id]);
+
+  // Auto-scroll when messages are loaded and we should scroll (conversation switch or first load)
+  useEffect(() => {
+    if (
+      selectedConversation &&
+      filteredMessages.length > 0 &&
+      !loadingMore &&
+      shouldScrollOnNextLoad
+    ) {
+      console.log("📋 Messages loaded - auto-scrolling to bottom");
+      setTimeout(() => scrollToBottom(true), 100);
+      setShouldScrollOnNextLoad(false); // Reset the flag
+    }
+  }, [
+    filteredMessages.length,
+    selectedConversation?.id,
+    loadingMore,
+    shouldScrollOnNextLoad,
+  ]);
 
   // Load conversations on component mount
   useEffect(() => {
