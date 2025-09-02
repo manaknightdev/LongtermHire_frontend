@@ -1310,7 +1310,7 @@ function ClientDashboard() {
                                 }}
                                 disabled={
                                   equipment.status == "Booked" ||
-                                  requestLoading[equipment.id] || 
+                                  requestLoading[equipment.id] ||
                                   equipment.status == "Unavailable"
                                 }
                                 className={`px-3 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-1 ${getButtonClass(
@@ -2260,7 +2260,6 @@ function ClientDashboard() {
                     )}
                   </div>
                 </div>
-                )}
 
                 {quickViewEquipment.allImages &&
                   quickViewEquipment.allImages.length > 1 && (
