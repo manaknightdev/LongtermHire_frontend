@@ -463,7 +463,7 @@ function ClientDashboard() {
       const response = await chatApi.sendEquipmentRequest({
         equipment_id: equipment.id,
         equipment_name: equipment.name,
-        message: `I would like to request the ${equipment.name} for ${selectedDuration}.`,
+        message: `I would like to request the ${equipment.name}.`,
       });
 
       if (!response.error) {
