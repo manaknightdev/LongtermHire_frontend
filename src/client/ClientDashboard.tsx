@@ -445,30 +445,34 @@ function ClientDashboard() {
     const previousMessageCount = lastMessageCountRef.current;
 
     if (currentMessageCount > previousMessageCount) {
-      // New message arrived, scroll to bottom
-      scrollChatToBottom(true);
+      // Only auto-scroll if we're not currently loading more messages
+      // This prevents auto-scroll when "Load More" is clicked
+      if (!loadingMore) {
+        // New message arrived, scroll to bottom
+        scrollChatToBottom(true);
 
-      // Check if new message is from admin and chat is not visible
-      if (messages.length > 0) {
-        const latestMessage = messages[messages.length - 1];
-        const currentUserId = getCurrentUserId();
+        // Check if new message is from admin and chat is not visible
+        if (messages.length > 0) {
+          const latestMessage = messages[messages.length - 1];
+          const currentUserId = getCurrentUserId();
 
-        // If message is from admin (not from current user) and chat is hidden
-        if (latestMessage.from_user_id !== currentUserId && !isChatVisible) {
-          // Auto-open the chat when new message arrives from admin
-          setIsChatVisible(true);
+          // If message is from admin (not from current user) and chat is hidden
+          if (latestMessage.from_user_id !== currentUserId && !isChatVisible) {
+            // Auto-open the chat when new message arrives from admin
+            setIsChatVisible(true);
 
-          // Show notification toast
-          toast.info("New message received! Chat opened automatically.", {
-            position: "top-right",
-            autoClose: 3000,
-          });
+            // Show notification toast
+            toast.info("New message received! Chat opened automatically.", {
+              position: "top-right",
+              autoClose: 3000,
+            });
+          }
         }
       }
     }
 
     lastMessageCountRef.current = currentMessageCount;
-  }, [messages, isChatVisible]);
+  }, [messages, isChatVisible, loadingMore]);
 
   // Use unread count from API
   useEffect(() => {
@@ -1902,60 +1906,82 @@ function ClientDashboard() {
                   </p>
                 </div>
               ) : (
-                messages.map((message) => {
-                  const messageUserId = parseInt(message.from_user_id || "0");
-                  const currentUserId = getCurrentUserId();
-                  const isCurrentUser =
-                    messageUserId === currentUserId && messageUserId > 0;
-                  const isEquipmentRequest =
-                    message.message_type === "equipment_request";
-
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${
-                        isCurrentUser ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          isEquipmentRequest
-                            ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
-                            : isCurrentUser
-                              ? "bg-[#FDCE06] text-[#000000]"
-                              : "bg-[#292A2B] text-[#E5E5E5]"
-                        }`}
-                      >
-                        {isEquipmentRequest && (
-                          <div className="mb-2">
-                            <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
-                              Equipment Request
-                            </span>
-                          </div>
-                        )}
-                        <p className="text-sm">{message.message}</p>
-                        {message.equipment_name && (
-                          <div className="mt-2 text-xs opacity-80">
-                            Equipment: {message.equipment_name}
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between mt-2">
-                          <p className="text-xs opacity-70">
-                            {new Date(message.created_at).toLocaleString([], {
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                          {message.read_at && (
-                            <p className="text-xs opacity-50">✓ Read</p>
-                          )}
-                        </div>
+                Object.entries(messageGroups).map(([date, dateMessages]) => (
+                  <div key={date}>
+                    {/* Date Header */}
+                    <div className="flex justify-center my-4">
+                      <div className="bg-[#333333] text-[#9CA3AF] text-xs px-3 py-1 rounded-full">
+                        {new Date(date).toLocaleDateString([], {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
                       </div>
                     </div>
-                  );
-                })
+
+                    {/* Messages for this date */}
+                    {dateMessages.map((message) => {
+                      const messageUserId = parseInt(
+                        message.from_user_id || "0"
+                      );
+                      const currentUserId = getCurrentUserId();
+                      const isCurrentUser =
+                        messageUserId === currentUserId && messageUserId > 0;
+                      const isEquipmentRequest =
+                        message.message_type === "equipment_request";
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${
+                            isCurrentUser ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              isEquipmentRequest
+                                ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                                : isCurrentUser
+                                  ? "bg-[#FDCE06] text-[#000000]"
+                                  : "bg-[#292A2B] text-[#E5E5E5]"
+                            }`}
+                          >
+                            {isEquipmentRequest && (
+                              <div className="mb-2">
+                                <span className="text-xs font-bold bg-[#000000] text-[#FDCE06] px-2 py-1 rounded">
+                                  Equipment Request
+                                </span>
+                              </div>
+                            )}
+                            <p className="text-sm">{message.message}</p>
+                            {message.equipment_name && (
+                              <div className="mt-2 text-xs opacity-80">
+                                Equipment: {message.equipment_name}
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              <p className="text-xs opacity-70">
+                                {new Date(message.created_at).toLocaleString(
+                                  [],
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
+                              </p>
+                              {message.read_at && (
+                                <p className="text-xs opacity-50">✓ Read</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
               )}
               {/* Scroll anchor for mobile chat */}
               <div ref={messagesEndRef} />
@@ -2054,56 +2080,76 @@ function ClientDashboard() {
                   </p>
                 </div>
               ) : (
-                messages.map((message) => {
-                  const messageUserId = parseInt(message.from_user_id || "0");
-                  const currentUserId = getCurrentUserId();
-                  const isCurrentUser =
-                    messageUserId === currentUserId && messageUserId > 0;
-                  const isEquipmentRequest =
-                    message.message_type === "equipment_request";
-
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          isEquipmentRequest
-                            ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
-                            : isCurrentUser
-                              ? "bg-[#FDCE06] text-[#000000]"
-                              : "bg-[#292A2B] text-[#E5E5E5]"
-                        }`}
-                      >
-                        {isEquipmentRequest && (
-                          <div className="mb-1">
-                            <span className="text-[10px] font-bold bg-[#000000] text-[#FDCE06] px-2 py-0.5 rounded">
-                              Equipment Request
-                            </span>
-                          </div>
-                        )}
-                        <p className="text-sm">{message.message}</p>
-                        {message.equipment_name && (
-                          <div className="mt-1 text-[10px] opacity-80">
-                            Equipment: {message.equipment_name}
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between mt-1">
-                          <p className="text-[10px] opacity-70">
-                            {new Date(message.created_at).toLocaleTimeString(
-                              [],
-                              { hour: "2-digit", minute: "2-digit" }
-                            )}
-                          </p>
-                          {message.read_at && (
-                            <p className="text-[10px] opacity-50">✓ Read</p>
-                          )}
-                        </div>
+                Object.entries(messageGroups).map(([date, dateMessages]) => (
+                  <div key={date}>
+                    {/* Date Header */}
+                    <div className="flex justify-center my-2">
+                      <div className="bg-[#333333] text-[#9CA3AF] text-[10px] px-2 py-1 rounded-full">
+                        {new Date(date).toLocaleDateString([], {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </div>
                     </div>
-                  );
-                })
+
+                    {/* Messages for this date */}
+                    {dateMessages.map((message) => {
+                      const messageUserId = parseInt(
+                        message.from_user_id || "0"
+                      );
+                      const currentUserId = getCurrentUserId();
+                      const isCurrentUser =
+                        messageUserId === currentUserId && messageUserId > 0;
+                      const isEquipmentRequest =
+                        message.message_type === "equipment_request";
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              isEquipmentRequest
+                                ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
+                                : isCurrentUser
+                                  ? "bg-[#FDCE06] text-[#000000]"
+                                  : "bg-[#292A2B] text-[#E5E5E5]"
+                            }`}
+                          >
+                            {isEquipmentRequest && (
+                              <div className="mb-1">
+                                <span className="text-[10px] font-bold bg-[#000000] text-[#FDCE06] px-2 py-0.5 rounded">
+                                  Equipment Request
+                                </span>
+                              </div>
+                            )}
+                            <p className="text-sm">{message.message}</p>
+                            {message.equipment_name && (
+                              <div className="mt-1 text-[10px] opacity-80">
+                                Equipment: {message.equipment_name}
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mt-1">
+                              <p className="text-[10px] opacity-70">
+                                {new Date(
+                                  message.created_at
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                              {message.read_at && (
+                                <p className="text-[10px] opacity-50">✓ Read</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
               )}
               <div ref={messagesEndRef} />
             </div>

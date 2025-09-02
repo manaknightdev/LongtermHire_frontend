@@ -130,35 +130,19 @@ const Chat = () => {
   // Auto-scroll when messages change
   useEffect(() => {
     if (filteredMessages.length > lastMessageCountRef.current) {
-      scrollToBottom(true); // Force scroll for new messages
+      // Only auto-scroll if we're not currently loading more messages
+      // This prevents auto-scroll when "Load More" is clicked
+      if (!loadingMore) {
+        scrollToBottom(true); // Force scroll for new messages
+      }
       lastMessageCountRef.current = filteredMessages.length;
     }
-  }, [filteredMessages]);
+  }, [filteredMessages, loadingMore]);
 
   // Auto-scroll when conversation changes
   useEffect(() => {
     if (selectedConversation) {
       setTimeout(() => scrollToBottom(true), 100); // Small delay to ensure DOM is updated
-    }
-  }, [selectedConversation]);
-
-  // Effect to handle auto-scroll when messages change
-  useEffect(() => {
-    const currentMessageCount = filteredMessages.length;
-    const previousMessageCount = lastMessageCountRef.current;
-
-    if (currentMessageCount > previousMessageCount) {
-      // New message arrived, scroll to bottom
-      scrollToBottom(true);
-    }
-
-    lastMessageCountRef.current = currentMessageCount;
-  }, [filteredMessages]);
-
-  // Effect to scroll to bottom when conversation changes
-  useEffect(() => {
-    if (selectedConversation) {
-      scrollToBottom(true);
     }
   }, [selectedConversation]);
 

@@ -274,12 +274,11 @@ const EquipmentPopover = ({
                     type="checkbox"
                     checked={localSelected.includes(equipment.id)}
                     onChange={() => handleEquipmentToggle(equipment.id)}
-                    // disabled={!equipment.available}
                     style={{
                       width: "16px",
                       height: "16px",
                       accentColor: "#FDCE06",
-                      cursor: equipment.available ? "pointer" : "not-allowed",
+                      cursor: "pointer",
                     }}
                   />
                   <span
@@ -318,7 +317,7 @@ const EquipmentPopover = ({
           justifyContent: "flex-end",
           gap: "12px",
           borderTop: "1px solid #333333",
-          paddingTop: "16px",
+          paddingTop: "6px",
         }}
       >
         <button
