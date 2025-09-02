@@ -87,10 +87,8 @@ const EquipmentPopover = ({
   };
 
   const handleSelectAll = () => {
-    const allAvailableEquipment = equipmentOptions
-      .filter((equipment) => equipment.available)
-      .map((equipment) => equipment.id);
-    setLocalSelected(allAvailableEquipment);
+    const allEquipment = equipmentOptions.map((equipment) => equipment.id);
+    setLocalSelected(allEquipment);
   };
 
   const handleDeselectAll = () => {
@@ -174,9 +172,7 @@ const EquipmentPopover = ({
             fontFamily: "Inter, sans-serif",
           }}
         >
-          {localSelected.length} of{" "}
-          {equipmentOptions.filter((e) => e.available).length} equipment
-          selected
+          {localSelected.length} of {equipmentOptions.length} equipment selected
         </div>
         <div
           style={{ display: "flex", gap: "8px" }}

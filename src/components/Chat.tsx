@@ -141,10 +141,10 @@ const Chat = () => {
 
   // Auto-scroll when conversation changes
   useEffect(() => {
-    if (selectedConversation) {
+    if (selectedConversation && !loadingMore) {
       setTimeout(() => scrollToBottom(true), 100); // Small delay to ensure DOM is updated
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, loadingMore]);
 
   // Load conversations on component mount
   useEffect(() => {

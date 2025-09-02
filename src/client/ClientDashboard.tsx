@@ -81,6 +81,9 @@ function ClientDashboard() {
   const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
   const [scrollTop, setScrollTop] = useState(0); // Track scroll position
   const [unreadMessageCount, setUnreadMessageCount] = useState(0); // Track unread messages
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Track when load more is clicked
+  const [justSentMessage, setJustSentMessage] = useState(false); // Track when user just sent a message
+  const [shouldPreventAutoScroll, setShouldPreventAutoScroll] = useState(false); // Prevent auto-scroll after load more
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -425,9 +428,20 @@ function ClientDashboard() {
 
   // Enhanced scroll to bottom for chat sections
   const scrollChatToBottom = (force = false) => {
+    console.log("🔄 scrollChatToBottom called with force:", force);
+    console.log("📊 Current states:", {
+      loadingMore,
+      isLoadingMore,
+      shouldPreventAutoScroll,
+      justSentMessage,
+      isChatVisible,
+      isChatOpen,
+      messagesCount: messages.length,
+    });
     setTimeout(() => {
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        console.log("✅ Scrolled to bottom");
       }
     }, 100);
   };
@@ -444,20 +458,38 @@ function ClientDashboard() {
     const currentMessageCount = messages.length;
     const previousMessageCount = lastMessageCountRef.current;
 
+    console.log("📨 Messages effect triggered:", {
+      currentMessageCount,
+      previousMessageCount,
+      messageCountIncreased: currentMessageCount > previousMessageCount,
+      loadingMore,
+      isLoadingMore,
+      shouldPreventAutoScroll,
+      justSentMessage,
+    });
+
     if (currentMessageCount > previousMessageCount) {
+      console.log(
+        "📈 Message count increased - checking auto-scroll conditions"
+      );
       // Only auto-scroll if we're not currently loading more messages
       // This prevents auto-scroll when "Load More" is clicked
-      if (!loadingMore) {
-        // New message arrived, scroll to bottom
-        scrollChatToBottom(true);
-
-        // Check if new message is from admin and chat is not visible
-        if (messages.length > 0) {
+      if (!loadingMore && !isLoadingMore && !shouldPreventAutoScroll) {
+        console.log("✅ Auto-scroll conditions met - checking message type");
+        // Only auto-scroll if the user just sent a message
+        if (justSentMessage) {
+          console.log("👤 User just sent message - auto-scrolling");
+          scrollChatToBottom(true);
+          setJustSentMessage(false); // Reset the flag
+        } else if (messages.length > 0) {
+          console.log("📩 Checking for admin message notifications");
+          // Check if new message is from admin and chat is not visible (new incoming message)
           const latestMessage = messages[messages.length - 1];
           const currentUserId = getCurrentUserId();
 
           // If message is from admin (not from current user) and chat is hidden
           if (latestMessage.from_user_id !== currentUserId && !isChatVisible) {
+            console.log("🔔 Admin message received - auto-opening chat");
             // Auto-open the chat when new message arrives from admin
             setIsChatVisible(true);
 
@@ -468,11 +500,24 @@ function ClientDashboard() {
             });
           }
         }
+      } else {
+        console.log("❌ Auto-scroll blocked by conditions:", {
+          loadingMore,
+          isLoadingMore,
+          shouldPreventAutoScroll,
+        });
       }
     }
 
     lastMessageCountRef.current = currentMessageCount;
-  }, [messages, isChatVisible, loadingMore]);
+  }, [
+    messages,
+    isChatVisible,
+    loadingMore,
+    isLoadingMore,
+    justSentMessage,
+    shouldPreventAutoScroll,
+  ]);
 
   // Use unread count from API
   useEffect(() => {
@@ -524,10 +569,50 @@ function ClientDashboard() {
 
   // Effect to scroll to bottom when chat opens
   useEffect(() => {
-    if ((isChatOpen || isChatVisible) && messages.length > 0) {
+    console.log("🚪 Chat open effect triggered:", {
+      isChatOpen,
+      isChatVisible,
+      messagesLength: messages.length,
+      loadingMore,
+      isLoadingMore,
+      shouldPreventAutoScroll,
+    });
+
+    // Only auto-scroll when chat opens if:
+    // 1. Chat is opening (not just re-rendering)
+    // 2. We have messages
+    // 3. We're not loading more messages
+    // 4. We're not preventing auto-scroll
+    // 5. User just sent a message (to show their new message)
+    if (
+      (isChatOpen || isChatVisible) &&
+      messages.length > 0 &&
+      !loadingMore &&
+      !isLoadingMore &&
+      !shouldPreventAutoScroll &&
+      justSentMessage
+    ) {
+      console.log(
+        "🚪 Chat opened with user message - auto-scrolling to bottom"
+      );
       scrollChatToBottom(true);
+    } else {
+      console.log("🚪 Chat open scroll blocked by conditions:", {
+        hasMessages: messages.length > 0,
+        loadingMore,
+        isLoadingMore,
+        shouldPreventAutoScroll,
+        justSentMessage,
+      });
     }
-  }, [isChatOpen, isChatVisible]);
+  }, [
+    isChatOpen,
+    isChatVisible,
+    loadingMore,
+    isLoadingMore,
+    shouldPreventAutoScroll,
+    justSentMessage,
+  ]);
 
   // Process equipment data from API and organize by categories with discount support
   const getEquipmentData = () => {
@@ -917,12 +1002,17 @@ function ClientDashboard() {
       console.log("done");
       const success = await sendMessage(adminUserId, messageText);
       if (success) {
+        console.log(
+          "📤 Message sent successfully - setting justSentMessage flag"
+        );
         setMessageText("");
+        setJustSentMessage(true); // Set flag to trigger auto-scroll
         // Force a small delay to ensure the message is properly added before re-render
         setTimeout(() => {
           // This will trigger a re-render with the new message
         }, 100);
       } else {
+        console.log("❌ Failed to send message");
         toast.error("Failed to send message. Please try again.");
       }
     } catch (error) {
@@ -1585,9 +1675,29 @@ function ClientDashboard() {
                       {hasMoreMessages && (
                         <div className="flex justify-center mb-4">
                           <button
-                            onClick={() => {
+                            onClick={async () => {
+                              console.log(
+                                "🔄 Load More button clicked (mobile)"
+                              );
                               if (conversations.length > 0) {
-                                loadMoreMessages(conversations?.[0].id);
+                                console.log(
+                                  "🔄 Setting loading states to prevent auto-scroll"
+                                );
+                                setIsLoadingMore(true);
+                                setShouldPreventAutoScroll(true);
+                                try {
+                                  await loadMoreMessages(conversations?.[0].id);
+                                  console.log("🔄 Load More completed");
+                                } finally {
+                                  // Reset after a longer delay to prevent auto-scroll from polling
+                                  setTimeout(() => {
+                                    console.log(
+                                      "🔄 Resetting loading states after 2 seconds"
+                                    );
+                                    setIsLoadingMore(false);
+                                    setShouldPreventAutoScroll(false);
+                                  }, 2000);
+                                }
                               }
                             }}
                             disabled={loadingMore}
@@ -1973,7 +2083,19 @@ function ClientDashboard() {
                                 )}
                               </p>
                               {message.read_at && (
-                                <p className="text-xs opacity-50">✓ Read</p>
+                                <div className="flex items-center gap-1">
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className="text-blue-500"
+                                  >
+                                    <polyline points="20,6 9,17 4,12" />
+                                  </svg>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -2060,9 +2182,27 @@ function ClientDashboard() {
               {hasMoreMessages && conversations.length > 0 && (
                 <div className="flex justify-center mb-2">
                   <button
-                    onClick={() => {
+                    onClick={async () => {
+                      console.log("🔄 Load More button clicked (desktop)");
                       if (conversations.length > 0) {
-                        loadMoreMessages(conversations[0].id);
+                        console.log(
+                          "🔄 Setting loading states to prevent auto-scroll"
+                        );
+                        setIsLoadingMore(true);
+                        setShouldPreventAutoScroll(true);
+                        try {
+                          await loadMoreMessages(conversations[0].id);
+                          console.log("🔄 Load More completed");
+                        } finally {
+                          // Reset after a longer delay to prevent auto-scroll from polling
+                          setTimeout(() => {
+                            console.log(
+                              "🔄 Resetting loading states after 2 seconds"
+                            );
+                            setIsLoadingMore(false);
+                            setShouldPreventAutoScroll(false);
+                          }, 2000);
+                        }
                       }
                     }}
                     disabled={loadingMore}
@@ -2141,7 +2281,19 @@ function ClientDashboard() {
                                 })}
                               </p>
                               {message.read_at && (
-                                <p className="text-[10px] opacity-50">✓ Read</p>
+                                <div className="flex items-center gap-1">
+                                  <svg
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className="text-blue-500"
+                                  >
+                                    <polyline points="20,6 9,17 4,12" />
+                                  </svg>
+                                </div>
                               )}
                             </div>
                           </div>
