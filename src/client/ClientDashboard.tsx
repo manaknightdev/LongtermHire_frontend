@@ -1276,7 +1276,7 @@ function ClientDashboard() {
                             className={`space-y-2 sm:space-y-3 ${
                               equipment?.allImages.length == 1 ||
                               equipment?.allImages.length == 0
-                                ? "mt-[80px]"
+                                ? "mt-[70px]"
                                 : ""
                             }`}
                           >
@@ -1309,8 +1309,9 @@ function ClientDashboard() {
                                   );
                                 }}
                                 disabled={
-                                  equipment.status === "Booked" ||
-                                  requestLoading[equipment.id]
+                                  equipment.status == "Booked" ||
+                                  requestLoading[equipment.id] || 
+                                  equipment.status == "Unavailable"
                                 }
                                 className={`px-3 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-1 ${getButtonClass(
                                   equipment.status
@@ -1434,7 +1435,7 @@ function ClientDashboard() {
                       Total for {selectedDuration}
                     </div>
                     {equipmentDiscount > 0 && (
-                      <div className="text-[#EF4444] text-sm font-semibold">
+                      <div className="text-[#2ec423] text-sm font-semibold">
                         {formatCurrency(equipmentDiscount)} saved
                       </div>
                     )}

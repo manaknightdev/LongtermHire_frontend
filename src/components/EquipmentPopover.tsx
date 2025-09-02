@@ -274,7 +274,7 @@ const EquipmentPopover = ({
                     type="checkbox"
                     checked={localSelected.includes(equipment.id)}
                     onChange={() => handleEquipmentToggle(equipment.id)}
-                    disabled={!equipment.available}
+                    // disabled={!equipment.available}
                     style={{
                       width: "16px",
                       height: "16px",
@@ -284,7 +284,7 @@ const EquipmentPopover = ({
                   />
                   <span
                     style={{
-                      color: equipment.available ? "#E5E5E5" : "#9CA3AF",
+                      color: "#E5E5E5",
                       fontSize: "14px",
                       fontFamily: "Inter, sans-serif",
                       userSelect: "none",
