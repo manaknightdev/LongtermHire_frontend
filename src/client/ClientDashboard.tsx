@@ -587,7 +587,7 @@ function ClientDashboard() {
 
       markMessagesRead();
     }
-  }, [isChatVisible, isChatOpen, messages, isMobile]);
+  }, [isChatVisible, isChatOpen, isMobile]); // Remove messages from dependencies to prevent auto-reading
 
   // Effect to scroll to bottom when chat opens (only when chat state changes)
   useEffect(() => {
