@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { chatApi } from "../services/chatApi";
 
-export const useChat = () => {
+export const useChat = (onNewMessagesFromPolling) => {
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -211,6 +211,10 @@ export const useChat = () => {
                 );
 
                 if (uniqueNewMessages.length > 0) {
+                  // Notify that new messages arrived from polling
+                  if (onNewMessagesFromPolling) {
+                    onNewMessagesFromPolling(uniqueNewMessages);
+                  }
                   return [...prev, ...uniqueNewMessages.reverse()];
                 }
                 return prev;

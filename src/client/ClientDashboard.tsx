@@ -85,6 +85,7 @@ function ClientDashboard() {
   const [justSentMessage, setJustSentMessage] = useState(false); // Track when user just sent a message
   const [shouldPreventAutoScroll, setShouldPreventAutoScroll] = useState(false); // Prevent auto-scroll after load more
   const [hasUnreadFromPolling, setHasUnreadFromPolling] = useState(false); // Track if polling brought unread messages
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false); // Track if messages have been initially loaded
   // const [hasMoreMessages, setHasMoreMessages] = useState(true);
   // const [loadingMore, setLoadingMore] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
@@ -589,22 +590,54 @@ function ClientDashboard() {
     }
   }, [isChatVisible, isChatOpen, isMobile]); // Remove messages from dependencies to prevent auto-reading
 
+  // Auto-scroll on very first load only (runs once when messages are first loaded)
+  useEffect(() => {
+    console.log("🔍 First load effect triggered:", {
+      messagesLength: messages.length,
+      hasInitiallyLoaded,
+      isChatOpen,
+      isChatVisible,
+      shouldRun:
+        messages.length > 0 &&
+        !hasInitiallyLoaded &&
+        (isChatOpen || isChatVisible),
+    });
+
+    if (
+      messages.length > 0 &&
+      !hasInitiallyLoaded &&
+      (isChatOpen || isChatVisible)
+    ) {
+      console.log("🚀 First time loading messages - auto-scrolling to bottom");
+      setHasInitiallyLoaded(true);
+
+      // Add a small delay to ensure DOM is ready
+      setTimeout(() => {
+        console.log("🚀 Executing first load scroll");
+        scrollChatToBottom(true);
+      }, 200);
+    }
+  }, [messages.length, hasInitiallyLoaded, isChatOpen, isChatVisible]);
+
   // Effect to scroll to bottom when chat opens (only when chat state changes)
   useEffect(() => {
     console.log("🚪 Chat open effect triggered:", {
       isChatOpen,
       isChatVisible,
       messagesLength: messages.length,
+      hasInitiallyLoaded,
     });
 
     // Only auto-scroll when chat is actually opening (not just re-rendering)
     // Check loading states inside the effect to avoid re-triggering
+    // Don't run if this is the first load (let the first load effect handle it)
     if (
       (isChatOpen || isChatVisible) &&
       messages.length > 0 &&
       !loadingMore &&
       !isLoadingMore &&
-      !shouldPreventAutoScroll
+      !shouldPreventAutoScroll &&
+      hasInitiallyLoaded // Only run if messages have been initially loaded
     ) {
       console.log("🚪 Chat opened - auto-scrolling to bottom");
       scrollChatToBottom(true);
@@ -614,11 +647,13 @@ function ClientDashboard() {
         loadingMore,
         isLoadingMore,
         shouldPreventAutoScroll,
+        hasInitiallyLoaded,
       });
     }
   }, [
     isChatOpen,
     isChatVisible,
+    hasInitiallyLoaded,
     // Remove loading states from dependencies to prevent re-triggering
   ]);
 

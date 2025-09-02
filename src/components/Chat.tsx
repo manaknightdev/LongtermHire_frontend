@@ -21,6 +21,11 @@ const Chat = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [clientStatus, setClientStatus] = useState({});
   const [clientStatusLoading, setClientStatusLoading] = useState(false);
+  const [userSwitchedConversation, setUserSwitchedConversation] =
+    useState(false);
+  const [hasUnreadFromPolling, setHasUnreadFromPolling] = useState(false);
+  const [justSwitchedConversation, setJustSwitchedConversation] =
+    useState(false);
 
   // Refs for scroll management
   const messagesEndRef = useRef(null);
@@ -41,7 +46,18 @@ const Chat = () => {
     startPolling,
     stopPolling,
     clearMessages,
-  } = useChat();
+  } = useChat((newMessages) => {
+    // Check if any of the new messages are from clients (not from current admin)
+    const currentUserId = parseInt(localStorage.getItem("userId"));
+    const hasClientMessages = newMessages.some(
+      (msg) => parseInt(msg.from_user_id) !== currentUserId
+    );
+
+    if (hasClientMessages) {
+      console.log("📨 New client messages from polling - setting unread flag");
+      setHasUnreadFromPolling(true);
+    }
+  });
 
   // Use global online status
   const { adminOnline, adminStatus } = useOnlineStatus();
@@ -131,20 +147,40 @@ const Chat = () => {
   useEffect(() => {
     if (filteredMessages.length > lastMessageCountRef.current) {
       // Only auto-scroll if we're not currently loading more messages
-      // This prevents auto-scroll when "Load More" is clicked
-      if (!loadingMore) {
+      // AND either user switched conversation OR there are unread messages from polling
+      if (!loadingMore && (userSwitchedConversation || hasUnreadFromPolling)) {
+        console.log("📩 Auto-scrolling for new messages:", {
+          userSwitchedConversation,
+          hasUnreadFromPolling,
+        });
         scrollToBottom(true); // Force scroll for new messages
+        setHasUnreadFromPolling(false); // Reset the flag
       }
       lastMessageCountRef.current = filteredMessages.length;
     }
-  }, [filteredMessages, loadingMore]);
+  }, [
+    filteredMessages,
+    loadingMore,
+    userSwitchedConversation,
+    hasUnreadFromPolling,
+  ]);
 
-  // Auto-scroll when conversation changes (only when conversation actually changes)
+  // Auto-scroll when conversation changes (only when user manually switches)
   useEffect(() => {
-    if (selectedConversation && !loadingMore) {
+    if (selectedConversation && !loadingMore && userSwitchedConversation) {
+      console.log("🔄 User switched conversation - auto-scrolling to bottom");
       setTimeout(() => scrollToBottom(true), 100); // Small delay to ensure DOM is updated
+      setUserSwitchedConversation(false); // Reset the flag
     }
-  }, [selectedConversation]); // Remove loadingMore from dependencies to prevent re-triggering
+  }, [selectedConversation, userSwitchedConversation]); // Only run when user switches
+
+  // Auto-scroll ONLY when switching to a new conversation
+  useEffect(() => {
+    if (selectedConversation && filteredMessages.length > 0 && !loadingMore) {
+      console.log("📋 Switched to new conversation - auto-scrolling to bottom");
+      setTimeout(() => scrollToBottom(true), 150); // Small delay to ensure DOM is updated
+    }
+  }, [selectedConversation?.id]); // ONLY run when conversation ID changes, NOT when messages change
 
   // Load conversations on component mount
   useEffect(() => {
@@ -191,6 +227,7 @@ const Chat = () => {
   // Handle conversation selection
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
+    setUserSwitchedConversation(true); // Mark that user manually switched
     clearMessages();
     loadMessages(conversation.id);
     startPolling(conversation.id);
