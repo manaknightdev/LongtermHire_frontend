@@ -2110,7 +2110,7 @@ function ClientDashboard() {
                           className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
                         >
                           <div
-                            className={`max-w-[80%] rounded-lg p-3 ${
+                            className={`max-w-[80%] rounded-lg mt-4 p-3 ${
                               isEquipmentRequest
                                 ? "bg-[#FDCE06] text-[#000000] border-2 border-[#E5B800]"
                                 : isCurrentUser
